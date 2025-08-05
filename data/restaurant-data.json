@@ -1,0 +1,166 @@
+{
+  "restaurant": {
+    "name": "Delicious Pollos & Parrillas",
+    "logo": "🍗",
+    "phone": "+51 999 888 777",
+    "address": "Av. 28 de mayo 123, Lima",
+    "hours": "10:00 AM - 11:00 PM",
+    "whatsapp": "+51999888777"
+  },
+  "categories": [
+    {
+      "id": "promos",
+      "name": "Promos del día",
+      "icon": "🏷️",
+      "color": "orange"
+    },
+    {
+      "id": "grill",
+      "name": "Grill con más variedad",
+      "icon": "🔥",
+      "color": "red"
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken",
+      "icon": "🍗",
+      "color": "yellow"
+    }
+  ],
+  "menuItems": [
+    {
+      "id": "1",
+      "name": "Pollo a la brasa",
+      "description": "Pollo entero a la brasa con papas fritas y ensalada",
+      "price": 35.0,
+      "image": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+      "category": "promos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25
+    },
+    {
+      "id": "2",
+      "name": "1/4 de pollo + papas",
+      "description": "Cuarto de pollo a la brasa con papas fritas",
+      "price": 12.0,
+      "image": "/placeholder.svg?height=200&width=300&text=1/4+pollo+papas",
+      "category": "promos",
+      "rating": 4.7,
+      "available": true,
+      "preparationTime": 15
+    },
+    {
+      "id": "3",
+      "name": "Hamburguesa crispy",
+      "description": "Hamburguesa de pollo crispy con papas fritas",
+      "price": 18.0,
+      "image": "/placeholder.svg?height=200&width=300&text=Hamburguesa+crispy",
+      "category": "promos",
+      "rating": 4.6,
+      "available": true,
+      "preparationTime": 20
+    },
+    {
+      "id": "4",
+      "name": "Alitas BBQ",
+      "description": "12 alitas de pollo en salsa BBQ",
+      "price": 25.0,
+      "image": "/placeholder.svg?height=200&width=300&text=Alitas+BBQ",
+      "category": "promos",
+      "rating": 4.9,
+      "available": true,
+      "preparationTime": 18
+    },
+    {
+      "id": "5",
+      "name": "Parrilla mixta",
+      "description": "Parrilla con pollo, carne y chorizo para 2 personas",
+      "price": 45.0,
+      "image": "/placeholder.svg?height=200&width=300&text=Parrilla+mixta",
+      "category": "grill",
+      "rating": 4.9,
+      "available": true,
+      "preparationTime": 35
+    },
+    {
+      "id": "6",
+      "name": "Churrasco premium",
+      "description": "Churrasco de res con papas y ensalada",
+      "price": 28.0,
+      "image": "/placeholder.svg?height=200&width=300&text=Churrasco+premium",
+      "category": "grill",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 30
+    },
+    {
+      "id": "7",
+      "name": "Parrilla familiar",
+      "description": "Parrilla completa para toda la familia",
+      "price": 65.0,
+      "image": "/placeholder.svg?height=200&width=300&text=Parrilla+familiar",
+      "category": "grill",
+      "rating": 4.9,
+      "available": true,
+      "preparationTime": 40
+    },
+    {
+      "id": "8",
+      "name": "Anticuchos",
+      "description": "Brochetas de corazón de res marinadas",
+      "price": 22.0,
+      "image": "/placeholder.svg?height=200&width=300&text=Anticuchos",
+      "category": "grill",
+      "rating": 4.7,
+      "available": true,
+      "preparationTime": 25
+    }
+  ],
+  "paymentMethods": [
+    {
+      "id": "cash",
+      "name": "Efectivo",
+      "icon": "💵",
+      "available": true
+    },
+    {
+      "id": "card",
+      "name": "Tarjeta",
+      "icon": "💳",
+      "available": true
+    },
+    {
+      "id": "yape",
+      "name": "Yape",
+      "icon": "📱",
+      "available": true
+    },
+    {
+      "id": "plin",
+      "name": "Plin",
+      "icon": "📲",
+      "available": true
+    }
+  ],
+  "deliveryZones": [
+    {
+      "id": "zone1",
+      "name": "Centro de Lima",
+      "price": 5.0,
+      "time": "30-45 min"
+    },
+    {
+      "id": "zone2",
+      "name": "San Isidro",
+      "price": 8.0,
+      "time": "45-60 min"
+    },
+    {
+      "id": "zone3",
+      "name": "Miraflores",
+      "price": 8.0,
+      "time": "45-60 min"
+    }
+  ]
+}
