@@ -48,7 +48,7 @@ export function MenuCard({ item }: MenuCardProps) {
       return
     }
 
-    router.push(`/plate/${item.code}`)
+    router.push(`/plate/${item.id}`)
   }
 
   return (

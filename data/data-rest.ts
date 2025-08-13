@@ -36,7 +36,7 @@ export const fetchProductsAll = async (): Promise<Product[]> => {
     id: number
   }) => {
     const product: Product = {
-      id: item.id.toString(),
+      id: item.idProducto,
       code: item.codigo,
       name: item.nombre,
       description: item.descripcionCorta,
@@ -138,13 +138,10 @@ export const fetchProductById = async (id: string): Promise<Product> => {
   });
 
   if (!response.ok) {
-    console.log(response)
     throw new Error('Error fetching product');
   }
 
   const result = await response.json();
-
-  console.log(result);
 
   return {
     id: result.idProducto,
