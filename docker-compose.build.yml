@@ -4,3 +4,15 @@ services:
       context: .
       dockerfile: Dockerfile
     image: test-catalog
+
+  leatsac-services:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: leatsac-catalog
+
+  importmuneli-services:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: importmuneli-catalog
