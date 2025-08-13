@@ -44,9 +44,9 @@ export default function Component() {
         clearCart();
     };
 
-    if (isLoading) {
-        return <Welcome />;
-    }
+    // if (isLoading) {
+    //     return <Welcome />;
+    // }
 
       if (completedOrder) {
         return (

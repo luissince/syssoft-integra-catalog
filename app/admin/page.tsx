@@ -90,9 +90,9 @@ export default function Component() {
         }));
     };
 
-    if (isLoading) {
-        return <Welcome />;
-    }
+    // if (isLoading) {
+    //     return <Welcome />;
+    // }
 
     return (
         <div className="min-h-screen bg-background">
