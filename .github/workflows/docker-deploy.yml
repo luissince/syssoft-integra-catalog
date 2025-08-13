@@ -7,7 +7,7 @@ on:
       - "test"
 
 jobs:
-  build-reactjs-development:
+  build-nextjs-development:
     name: Build Catalog (Next Js)
     if: github.ref == 'refs/heads/test'
     runs-on: ubuntu-latest
@@ -53,4 +53,48 @@ jobs:
       - name: Push catalog image to ECR
         run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog:${{ matrix.environment }}-latest
 
-  
+
+  clean-ecr-images-development:
+    name: Borrar imágenes antiguas de ECR
+    if: github.ref == 'refs/heads/test'
+    runs-on: ubuntu-latest
+    needs: build-nextjs-development
+
+    strategy:
+      matrix:
+        include:
+          - environment: test
+            branch: test
+    
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+    steps:
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Instalar jq
+        run: sudo apt-get install -y jq
+
+      - name: Borrar imágenes sin tag '${{ matrix.environment }}-latest' - NextJs
+        run: |
+          REPO="syssoftintegra/catalog"
+          ENV="${{ matrix.environment }}"
+          TAG="${ENV}-latest"
+
+          aws ecr list-images --repository-name "$REPO" \
+            --query "imageIds[?type(imageTag)==`null` || imageTag!='${TAG}']" \
+            --output json > images.json
+
+          COUNT=$(jq length images.json)
+          if [ "$COUNT" -gt 0 ]; then
+            echo "🗑️ Borrando $COUNT imágenes antiguas..."
+            aws ecr batch-delete-image --repository-name "$REPO" --image-ids file://images.json
+          else
+            echo "✅ No hay imágenes antiguas para borrar en $REPO"
+          fi
