@@ -26,12 +26,12 @@ jobs:
       - name: Crear archivo .env
         run: |
           cat > .env <<EOL
-          APP_BACK_END="${{secrets.VITE_APP_BACK_END}}"
-          NEXT_PUBLIC_APP_BACK_END="${{secrets.VITE_APP_BACK_END}}"
-          AUTH_ENABLED="${{secrets.VITE_APP_BACK_END}}"
-          NEXT_PUBLIC_AUTH_ENABLED="${{secrets.VITE_APP_BACK_END}}"
-          NEXT_PUBLIC_ENV="${{secrets.VITE_APP_BACK_END}}"
-          ENV="${{secrets.VITE_APP_BACK_END}}"
+          APP_BACK_END="${{secrets.APP_BACK_END}}"
+          NEXT_PUBLIC_APP_BACK_END="${{secrets.NEXT_PUBLIC_APP_BACK_END}}"
+          AUTH_ENABLED="${{secrets.AUTH_ENABLED}}"
+          NEXT_PUBLIC_AUTH_ENABLED="${{secrets.NEXT_PUBLIC_AUTH_ENABLED}}"
+          NEXT_PUBLIC_ENV="${{secrets.NEXT_PUBLIC_ENV}}"
+          ENV="${{secrets.ENV}}"
           EOL
 
       - name: Construyendo contenedor NextJs
