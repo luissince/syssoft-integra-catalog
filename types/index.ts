@@ -1,13 +1,26 @@
+export interface Image {
+  id: string
+  url: string
+  alt: string
+}
+
 export interface MenuItem {
   id: string
   name: string
   description: string
   price: number
-  image: string
+  images: Image[]
   category: string
   rating: number
   available: boolean
   preparationTime: number
+  ingredients: string[]
+  nutritionalInfo: NutritionalInfo[]
+}
+
+export interface NutritionalInfo {
+  name: string
+  value: string | number
 }
 
 export interface Category {
@@ -39,40 +52,79 @@ export interface DeliveryZone {
 export interface Order {
   id: string
   items: CartItem[]
-  customer: {
-    name: string
-    phone: string
-    whatsapp: string
-    address: string
-    reference: string
-  }
+  customerId: string;
   payment: {
     method: string
     total: number
+    discount: number
     deliveryFee: number
   }
-  delivery: {
-    zone: string
+  delivery?: {
+    address: Address
+    zone: Zone
     time: string
-    type: "now" | "scheduled"
+    type: "delivery" | "local"
+    orderType: "now" | "scheduled"
     scheduledDate?: string
     scheduledTime?: string
   }
-  status: "pending" | "preparing" | "ready" | "delivered"
+  status: "pending" | "preparing" | "ready" | "delivered" | "cancelled"
   notes: string
-  orderNotes: string // Notas sobre lo que incluye el pedido
+  discount: number | string
+  orderNotes: string
   createdAt: string
 }
 
-export interface RestaurantData {
-  restaurant: {
+export interface Customer {
+  id: string;
+  document: string;
+  name: string;
+  phone: string;
+  whatsapp: string;
+  email?: string;
+  password?: string;
+  addresses: Address[];
+  createdAt: string;
+  updatedAt: string;
+  lastOrderId?: string;
+  totalOrders: number;
+  notes?: string;
+  role?: "admin" | "customer";
+}
+
+export interface Address {
+  id: string;
+  address: string; // "Av. 28 de mayo 123"
+  reference: string; // "Casa azul, portón negro"
+  isDefault: boolean;
+  createdAt: string;
+}
+
+export interface Zone {
+  id: string;
+  name: string;
+  price: number;
+  time: string;
+}
+
+export interface Restaurant {
+    typeDocument: string
+    document: string
+    owner: string
     name: string
-    logo: string
+    icon: Image
+    logo: Image
+    banner?: Image[]
     phone: string
     address: string
     hours: string
     whatsapp: string
-  }
+    description: string
+    keywords: string | string[]
+}
+
+export interface RestaurantData {
+  restaurant: Restaurant,
   categories: Category[]
   menuItems: MenuItem[]
   paymentMethods: PaymentMethod[]

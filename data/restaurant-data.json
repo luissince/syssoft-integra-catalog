@@ -1,120 +1,1951 @@
 {
   "restaurant": {
-    "name": "Delicious Pollos & Parrillas",
-    "logo": "🍗",
-    "phone": "+51 999 888 777",
-    "address": "Av. 28 de mayo 123, Lima",
-    "hours": "10:00 AM - 11:00 PM",
-    "whatsapp": "+51999888777"
+    "typeDocument": "RUC",
+    "document": "123456789",
+    "owner": "Eventos Esteban",
+    "name": "Cocina Vegetariana",
+    "icon": {
+      "id": "1",
+      "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+      "alt": "Pollo a la brasa"
+    },
+    "logo": {
+      "id": "1",
+      "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+      "alt": "Pollo a la brasa"
+    },
+    "banner": [
+      {
+      "id": "1",
+      "url": "https://fastly.picsum.photos/id/237/1920/510.jpg?hmac=r-nRPlor16sfoCkwQIC6ArlWVukesZ_UQ9aOKXt_eTE",
+      "alt": "Pollo a la brasa"
+    },
+    {
+      "id": "2",
+      "url": "https://fastly.picsum.photos/id/474/1920/510.jpg?hmac=axF5lOcnG_eNQGHo8abZxUe2E3jvc2c1tqOx72gDDUI",
+      "alt": "Pollo a la brasa"
+    }
+    ],
+    "phone": "964533168",
+    "address": "Huancayo - Perú",
+    "hours": "08:30 AM - 04:30 PM",
+    "whatsapp": "+51994105851",
+    "description": "Los mejores cocinas vegetarianas de la ciudad. Sabor auténtico, ingredientes frescos y el mejor servicio de delivery.",
+    "keywords": [
+      "cocina",
+      "vegetariana",
+      "perú",
+      "huancayo",
+      "delicious",
+      "restaurant",
+      "eventos esteban",
+      "eventos"
+    ]
   },
   "categories": [
     {
-      "id": "promos",
-      "name": "Promos del día",
-      "icon": "🏷️",
+      "id": "platos-fondo",
+      "name": "Platos de Fondo",
+      "icon": "🍽️",
+      "color": "green"
+    },
+    {
+      "id": "sopas",
+      "name": "Sopas",
+      "icon": "🥣",
+      "color": "lightgreen"
+    },
+    {
+      "id": "postres",
+      "name": "Postres",
+      "icon": "🍮",
       "color": "orange"
     },
     {
-      "id": "grill",
-      "name": "Grill con más variedad",
-      "icon": "🔥",
-      "color": "red"
+      "id": "bebidas",
+      "name": "Bebidas Calientes",
+      "icon": "☕",
+      "color": "teal"
     },
     {
-      "id": "chicken",
-      "name": "Chicken",
-      "icon": "🍗",
-      "color": "yellow"
+      "id": "refrescos",
+      "name": "Refrescos",
+      "icon": "🥤",
+      "color": "blue"
     }
   ],
   "menuItems": [
     {
-      "id": "1",
-      "name": "Pollo a la brasa",
-      "description": "Pollo entero a la brasa con papas fritas y ensalada",
+      "id": "PF1",
+      "name": "Cau-Cau",
+      "description": "Arroz, papa, zanahoria, alverjita y carne de soya",
       "price": 35.0,
-      "image": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
-      "category": "promos",
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
       "rating": 4.8,
       "available": true,
-      "preparationTime": 25
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
     },
     {
-      "id": "2",
-      "name": "1/4 de pollo + papas",
-      "description": "Cuarto de pollo a la brasa con papas fritas",
-      "price": 12.0,
-      "image": "/placeholder.svg?height=200&width=300&text=1/4+pollo+papas",
-      "category": "promos",
-      "rating": 4.7,
-      "available": true,
-      "preparationTime": 15
-    },
-    {
-      "id": "3",
-      "name": "Hamburguesa crispy",
-      "description": "Hamburguesa de pollo crispy con papas fritas",
-      "price": 18.0,
-      "image": "/placeholder.svg?height=200&width=300&text=Hamburguesa+crispy",
-      "category": "promos",
-      "rating": 4.6,
-      "available": true,
-      "preparationTime": 20
-    },
-    {
-      "id": "4",
-      "name": "Alitas BBQ",
-      "description": "12 alitas de pollo en salsa BBQ",
-      "price": 25.0,
-      "image": "/placeholder.svg?height=200&width=300&text=Alitas+BBQ",
-      "category": "promos",
-      "rating": 4.9,
-      "available": true,
-      "preparationTime": 18
-    },
-    {
-      "id": "5",
-      "name": "Parrilla mixta",
-      "description": "Parrilla con pollo, carne y chorizo para 2 personas",
-      "price": 45.0,
-      "image": "/placeholder.svg?height=200&width=300&text=Parrilla+mixta",
-      "category": "grill",
-      "rating": 4.9,
-      "available": true,
-      "preparationTime": 35
-    },
-    {
-      "id": "6",
-      "name": "Churrasco premium",
-      "description": "Churrasco de res con papas y ensalada",
-      "price": 28.0,
-      "image": "/placeholder.svg?height=200&width=300&text=Churrasco+premium",
-      "category": "grill",
+      "id": "PF2",
+      "name": "Cau-Cau de Brócoli",
+      "description": "Arroz, papa, zanahoria, alverjita y brócoli",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
       "rating": 4.8,
       "available": true,
-      "preparationTime": 30
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
     },
     {
-      "id": "7",
-      "name": "Parrilla familiar",
-      "description": "Parrilla completa para toda la familia",
-      "price": 65.0,
-      "image": "/placeholder.svg?height=200&width=300&text=Parrilla+familiar",
-      "category": "grill",
-      "rating": 4.9,
+      "id": "PF3",
+      "name": "Pallar con Apanado",
+      "description": "Arroz, pallar, apanado de soya",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
       "available": true,
-      "preparationTime": 40
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
     },
     {
-      "id": "8",
-      "name": "Anticuchos",
-      "description": "Brochetas de corazón de res marinadas",
-      "price": 22.0,
-      "image": "/placeholder.svg?height=200&width=300&text=Anticuchos",
-      "category": "grill",
-      "rating": 4.7,
+      "id": "PF4",
+      "name": "Olluquito",
+      "description": "Arroz, olluquito, carne de soya",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
       "available": true,
-      "preparationTime": 25
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF5",
+      "name": "Puré con Asado",
+      "description": "Arroz, papa amarilla, leche y mantequilla, asado de gluten bañado con jugo",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF6",
+      "name": "Lomo Saltado",
+      "description": "Arroz, cebolla, tomate en gajos, carne de soya y papas fritas",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF7",
+      "name": "Cabrito a la Norteña",
+      "description": "Arroz, yuca, zanahoria, alverjita, frejol, carne de soya o gluten",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF8",
+      "name": "Palta Rellena con Puré",
+      "description": "Arroz, papa amarilla, palta, zanahoria, vainita, choclo y alverjita",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF9",
+      "name": "Palta Rellena con Tallarín Rojo",
+      "description": "Tallarín en salsa de tomate, palta rellena con papa amarilla, zanahoria, vainita, choclo y alverjita",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF10",
+      "name": "Arroz a la Jardinera con Parrilla",
+      "description": "Arroz amarillo, choclo, alverjita y parrilla de carne de gluten",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF11",
+      "name": "Causa de Palta",
+      "description": "Papa amarilla, limón, aceite de soya, sal con relleno de palta y crema de soya acompañado de arroz",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF12",
+      "name": "Escabeche de Gluten",
+      "description": "Camote, cebolla en gajos, carne de gluten, huevo duro, aceituna acompañado de arroz",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF13",
+      "name": "Papita con Maní",
+      "description": "Papa en permentier, maní acompañado de arroz",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF14",
+      "name": "Chicharrón con Mote",
+      "description": "Mote reventado, chicharrón de soya o gluten acompañado de ensalada criolla",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF15",
+      "name": "Seco a la Norteña",
+      "description": "Yuca, zanahoria, alverja, carne de soya acompañado de arroz",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "platos-fondo",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF16",
+      "name": "Menestrón",
+      "description": "Yuca, fideo, zanahoria, zapallo, nabo, apio, poro, espinaca, albahaca",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "sopas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF17",
+      "name": "Aguadito de Alcachofa",
+      "description": "Alcachofa, verduras en permentier, espinaca, pimentón, choclo, arroz",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "sopas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF18",
+      "name": "Sopa Verde",
+      "description": "Papa en bastón, huevo, leche, queso, acompañado de cancha serrana",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "sopas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF19",
+      "name": "Caldo de Alcachofa",
+      "description": "Fideo munición, alcachofa, verduras para sopa en juliana y kion",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "sopas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF20",
+      "name": "Sopa de Verdura",
+      "description": "Verduras en juliana, fideo para sopa",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "sopas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF21",
+      "name": "Mondongo con Carne de Soya",
+      "description": "Mote reventado, maní, carne de soya, hierbabuena para decorar",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "sopas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF22",
+      "name": "Leche de Soya",
+      "description": "Bebida caliente a base de soya",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "bebidas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF23",
+      "name": "Avena con Maca",
+      "description": "Avena tradicional enriquecida con maca",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "bebidas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF24",
+      "name": "Quinua con Manzana",
+      "description": "Quinua cocida con manzana fresca",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "bebidas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF25",
+      "name": "Quinua con Piña",
+      "description": "Quinua cocida con trozos de piña",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "bebidas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF26",
+      "name": "Ponche de Maní",
+      "description": "Ponche tradicional a base de maní",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "bebidas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF27",
+      "name": "Emoliente Caliente",
+      "description": "Bebida herbal caliente tradicional",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "bebidas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF28",
+      "name": "Siete Semillas",
+      "description": "Bebida caliente con mezcla de granos y semillas",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "bebidas",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF29",
+      "name": "Emoliente",
+      "description": "Bebida herbal refrescante",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF30",
+      "name": "Carambola",
+      "description": "Refresco natural de carambola",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF31",
+      "name": "Chicha Morada",
+      "description": "Bebida tradicional peruana a base de maíz morado",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF32",
+      "name": "Mate de Muña",
+      "description": "Infusión refrescante de muña",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF33",
+      "name": "Mate de Cedrón",
+      "description": "Infusión refrescante de cedrón",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF34",
+      "name": "Mate de Manzanilla",
+      "description": "Infusión refrescante de manzanilla",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF35",
+      "name": "Maracuyá",
+      "description": "Refresco de maracuyá natural",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "id": "PF36",
+      "name": "Cocona",
+      "description": "Refresco amazónico de cocona",
+      "price": 35.0,
+      "images": [
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        },
+        {
+          "id": "1",
+          "url": "/placeholder.svg?height=200&width=300&text=Pollo+a+la+brasa",
+          "alt": "Pollo a la brasa"
+        }
+      ],
+      "category": "refrescos",
+      "rating": 4.8,
+      "available": true,
+      "preparationTime": 25,
+      "ingredients": [
+        "arroz",
+        "papa",
+        "zanahoria",
+        "alverjita",
+        "carne de soya"
+      ],
+      "nutritionalInfo": [
+        {
+          "name": "Calorías",
+          "value": 100
+        },
+        {
+          "name": "Proteínas",
+          "value": 100
+        },
+        {
+          "name": "Fibra",
+          "value": 100
+        },
+        {
+          "name": "Irradiación",
+          "value": 200
+        }
+      ]
     }
   ],
   "paymentMethods": [

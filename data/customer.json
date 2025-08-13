@@ -1,0 +1,52 @@
+{
+  "list": [
+    {
+      "id": "1",
+      "document": "12345678",
+      "name": "Luis",
+      "phone": "964533168",
+      "whatsapp": "994105851",
+      "email": "admin@gmail.com",
+      "password": "admin",
+      "addresses": [
+        {
+          "id": "1",
+          "address": "Av. 28 de mayo 123",
+          "reference": "Casa azul, portón negro",
+          "isDefault": true,
+          "createdAt": "2023-01-01T00:00:00.000Z"
+        }
+      ],
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z",
+      "lastOrderId": "1",
+      "totalOrders": 1,
+      "notes": "Incluye salsas extra, sin picante, para celebración...",
+      "role": "admin"
+    },
+    {
+      "id": "2",
+      "document": "12345670",
+      "name": "Martin",
+      "phone": "964533168",
+      "whatsapp": "994105851",
+      "email": "customer@gmail.com",
+      "password": "customer",
+      "addresses": [
+        {
+          "id": "1",
+          "address": "Av. 28 de mayo 123",
+          "reference": "Casa azul, portón negro",
+          "isDefault": true,
+          "createdAt": "2023-01-01T00:00:00.000Z"
+        }
+      ],
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z",
+      "lastOrderId": "1",
+      "totalOrders": 1,
+      "notes": "Incluye salsas extra, sin picante, para celebración...",
+      "role": "customer"
+    }
+  ]
+}

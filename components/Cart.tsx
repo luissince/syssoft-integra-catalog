@@ -1,5 +1,4 @@
 "use client"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -32,56 +31,63 @@ export function Cart({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartP
   return (
     <Card className="bg-card border-border">
       <CardHeader className="pb-4">
-        <CardTitle className="text-foreground flex items-center font-display">
-          <ShoppingCart className="w-5 h-5 mr-2 text-primary" />
-          Mi Pedido ({cart.length} items)
+        <CardTitle className="text-foreground flex items-center justify-between font-display">
+          <div className="flex items-center">
+            <ShoppingCart className="w-5 h-5 mr-2 text-primary" />
+            <span>Mi Pedido ({cart.length} items)</span>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-2">
           {cart.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg border border-border/50"
-            >
-              <Image
-                src={item.image || "/placeholder.svg"}
-                alt={item.name}
-                width={60}
-                height={60}
-                className="rounded-lg object-cover"
-              />
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-foreground truncate">{item.name}</h4>
-                <p className="text-sm text-primary font-semibold">S/. {item.price.toFixed(2)}</p>
-                {item.notes && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">Nota: {item.notes}</p>}
+            <div key={item.id} className="flex flex-col space-y-3 p-3 bg-muted/50 rounded-lg border border-border/50">
+              <div className="flex items-center space-x-3">
+                <Image
+                  src={item.images[0].url || "/placeholder.svg"}
+                  alt={item.name}
+                  width={60}
+                  height={60}
+                  className="rounded-lg object-cover"
+                />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-foreground truncate">{item.name}</h4>
+                  <p className="text-sm text-primary font-semibold">S/. {item.price.toFixed(2)}</p>
+                  {item.notes && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">Nota: {item.notes}</p>}
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </Button>
+                  <span className="w-8 text-center text-foreground font-medium">{item.quantity}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </div>
                 <Button
                   size="sm"
-                  variant="outline"
-                  onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                  variant="destructive"
+                  onClick={() => onRemoveItem(item.id)}
                   className="h-8 w-8 p-0"
                 >
-                  <Minus className="w-3 h-3" />
-                </Button>
-                <span className="w-8 text-center text-foreground font-medium">{item.quantity}</span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                  className="h-8 w-8 p-0"
-                >
-                  <Plus className="w-3 h-3" />
+                  <Trash2 className="w-3 h-3" />
                 </Button>
               </div>
-              <Button size="sm" variant="destructive" onClick={() => onRemoveItem(item.id)} className="h-8 w-8 p-0">
-                <Trash2 className="w-3 h-3" />
-              </Button>
             </div>
           ))}
         </div>
-
         <div className="border-t border-border pt-4 space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold text-foreground font-display">Total:</span>
@@ -98,5 +104,6 @@ export function Cart({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartP
         </div>
       </CardContent>
     </Card>
+
   )
 }
