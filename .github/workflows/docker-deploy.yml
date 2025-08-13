@@ -92,7 +92,7 @@ jobs:
           services:
             ${NAME_SERVICE}:
               image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/syssoftintegra/catalog:${NAME_SERVICE}-latest
-              container_name: ${NAME_SERVICE}-frontend
+              container_name: ${NAME_SERVICE}-catalog
               restart: always
               networks:
                 - luis
