@@ -221,7 +221,7 @@ jobs:
     name: Borrar imágenes antiguas de ECR
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    needs: build-nextjs-production
+    needs: deploy-nextjs-production
 
     strategy:
       matrix:
@@ -266,7 +266,7 @@ jobs:
     name: Borrar imágenes antiguas de ECR
     if: github.ref == 'refs/heads/test'
     runs-on: ubuntu-latest
-    needs: build-nextjs-development
+    needs: deploy-nextjs-development
 
     strategy:
       matrix:
