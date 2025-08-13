@@ -9,8 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Star, Plus, Minus, Clock } from "lucide-react"
-import type { MenuItem } from "@/types"
+import { Star, Plus, Minus } from "lucide-react"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Product } from "@/types/api-type"
@@ -48,7 +47,7 @@ export function MenuCard({ item }: MenuCardProps) {
       return
     }
 
-    router.push(`/plate/${item.id}`)
+    router.push(`/product/${item.id}`)
   }
 
   return (

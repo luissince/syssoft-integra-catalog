@@ -8,7 +8,6 @@ import { Search, X } from "lucide-react";
 import { MenuCard } from "@/components/MenuCard";
 import type { Order } from "@/types";
 import Welcome from "@/components/Welcome";
-import { useRouter } from "next/navigation";
 import { NavPrimary } from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Branch, Category, Company, CompanyBanner, Product, Whatsapp } from "@/types/api-type";
@@ -168,7 +167,7 @@ export default function HomeComponent({
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div>
-                            <h1 className="text-2xl md:text-4xl font-bold mb-4">
+                            <h1 className="text-2xl md:text-4xl font-bold mb-4 font-display">
                                 <span className="text-primary drop-shadow-sm">{company.name}</span>
                             </h1>
                             <p className="text-muted-foreground text-lg mb-6 leading-relaxed drop-shadow-sm">

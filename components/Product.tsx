@@ -3,24 +3,9 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { 
-  Star, 
-  Clock, 
-  Plus, 
-  Minus, 
-  ShoppingCart, 
-  Users, 
-  Flame, 
-  Heart,
-  Share2,
+import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
@@ -28,7 +13,6 @@ import {
   ZoomOut,
   X,
   Maximize2,
-  ArrowLeft,
   ChevronRight as ChevronRightBreadcrumb,
   ArrowRight
 } from "lucide-react"
@@ -40,6 +24,7 @@ import Welcome from "@/components/Welcome"
 import { NavSecondary } from "@/components/Nav"
 import { Branch, Company, Product } from "@/types/api-type"
 import { cn } from "@/lib/utils"
+import { MenuCard } from "./MenuCard"
 
 interface ProductImage {
   id: string
@@ -49,7 +34,7 @@ interface ProductImage {
   height: number
 }
 
-interface PropsPlateComponent {
+interface PropsProductComponent {
   company: Company
   branch: Branch
   product: Product
@@ -57,16 +42,18 @@ interface PropsPlateComponent {
   authEnabled?: boolean
 }
 
-// Componente de galería de imágenes integrado
-function PlateImageGallery({ 
-  images, 
-  plateName, 
-  outOfStock = false 
-}: { 
+interface PropsProductImageGallery {
   images: ProductImage[]
-  plateName: string
-  outOfStock?: boolean 
-}) {
+  productName: string
+  outOfStock?: boolean
+}
+
+// Componente de galería de imágenes integrado
+function ProductImageGallery({
+  images,
+  productName,
+  outOfStock = false
+}: PropsProductImageGallery) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [zoomLevel, setZoomLevel] = useState(1)
@@ -110,12 +97,12 @@ function PlateImageGallery({
       <div className="relative aspect-square rounded-xl overflow-hidden shadow-lg mb-4 group">
         <Image
           src={safeImages[currentImageIndex].url || "/placeholder.svg"}
-          alt={plateName}
+          alt={productName}
           fill
           className={cn("object-cover", outOfStock ? "opacity-70" : "")}
           priority
         />
-        
+
         {/* Overlay para pantalla completa */}
         <button
           onClick={handleOpenModal}
@@ -177,7 +164,7 @@ function PlateImageGallery({
             >
               <Image
                 src={image.url || "/placeholder.svg"}
-                alt={`${plateName} - vista ${index + 1}`}
+                alt={`${productName} - vista ${index + 1}`}
                 fill
                 className="object-cover"
               />
@@ -192,7 +179,7 @@ function PlateImageGallery({
           <div className="relative w-full h-full flex flex-col">
             {/* Controles superiores */}
             <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 bg-black/50">
-              <div className="text-white font-medium truncate max-w-[50%]">{plateName}</div>
+              <div className="text-white font-medium truncate max-w-[50%]">{productName}</div>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -231,7 +218,7 @@ function PlateImageGallery({
               <div className="transition-transform duration-100 ease-out" style={{ transform: `scale(${zoomLevel})` }}>
                 <Image
                   src={safeImages[currentImageIndex].url || "/placeholder.svg"}
-                  alt={`${plateName} - imagen ${currentImageIndex + 1}`}
+                  alt={`${productName} - imagen ${currentImageIndex + 1}`}
                   width={1200}
                   height={800}
                   className="max-h-[80vh] w-auto object-contain"
@@ -298,17 +285,17 @@ function PlateImageGallery({
   )
 }
 
-export default function PlateComponent({ company, branch, product, relatedProducts, authEnabled }: PropsPlateComponent) {
+export default function ProductComponent({ company, branch, product, relatedProducts, authEnabled }: PropsProductComponent) {
   const params = useParams()
   const router = useRouter()
   const { addToCart } = useCart()
   const { isAuthenticated } = useAuth()
-//   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
+  //   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { toast } = useToast()
 
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState("")
-//   const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.id) || false)
+  //   const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.id) || false)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -365,7 +352,7 @@ export default function PlateComponent({ company, branch, product, relatedProduc
 
   const handleWishlistToggle = () => {
     // if (!addToWishlist || !removeFromWishlist) return
-    
+
     // if (isWishlisted) {
     //   removeFromWishlist(product.id)
     //   setIsWishlisted(false)
@@ -444,10 +431,10 @@ export default function PlateComponent({ company, branch, product, relatedProduc
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Galería de imágenes */}
           <div>
-            <PlateImageGallery 
-              images={images} 
-              plateName={product.name} 
-              outOfStock={isOutOfStock} 
+            <ProductImageGallery
+              images={images}
+              productName={product.name}
+              outOfStock={isOutOfStock}
             />
           </div>
 
@@ -584,7 +571,7 @@ export default function PlateComponent({ company, branch, product, relatedProduc
                       Pedir ahora
                     </Button>
                   )} */}
-                  
+
                   <div className="flex gap-2 mt-2 sm:mt-0">
                     {/* <Button
                       variant={isWishlisted ? "default" : "outline"}
@@ -645,7 +632,7 @@ export default function PlateComponent({ company, branch, product, relatedProduc
               <TabsTrigger value="details">Detalles</TabsTrigger>
               {/* <TabsTrigger value="nutrition">Información Nutricional</TabsTrigger> */}
             </TabsList>
-            
+
             <TabsContent value="description" className="mt-6">
               <div className="max-w-none">
                 <p className="text-base leading-relaxed">
@@ -653,7 +640,7 @@ export default function PlateComponent({ company, branch, product, relatedProduc
                 </p>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="details" className="mt-6">
               <div className="max-w-none">
                 {product.details ? (
@@ -672,7 +659,7 @@ export default function PlateComponent({ company, branch, product, relatedProduc
                 )}
               </div>
             </TabsContent>
-            
+
             {/* <TabsContent value="nutrition" className="mt-6">
               <div className="max-w-none">
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -712,35 +699,39 @@ export default function PlateComponent({ company, branch, product, relatedProduc
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.slice(0, 4).map((item) => (
-                <Card
-                  key={item.id}
-                  className="group bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer"
-                  onClick={() => router.push(`/plato/${item.id}`)}
-                >
-                  <CardContent className="p-0">
-                    <div className="relative overflow-hidden">
-                      <Image
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.name}
-                        width={300}
-                        height={200}
-                        className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute top-3 right-3">
-                        <Badge className="bg-primary text-primary-foreground">
-                          <Star className="w-3 h-3 mr-1 fill-current" />
-                          4.8
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg text-foreground mb-2 font-display">{item.name}</h3>
-                      <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{item.description}</p>
-                      <div className="text-primary font-bold text-xl font-display">S/. {item.price.toFixed(2)}</div>
-                    </div>
-                  </CardContent>
-                </Card>
+              {relatedProducts.slice(0, 4).map((item, index) => (
+                <MenuCard
+                  key={index}
+                  item={item}
+                />
+                // <Card
+                //   key={item.id}
+                //   className="group bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer"
+                //   onClick={() => router.push(`/plato/${item.id}`)}
+                // >
+                //   <CardContent className="p-0">
+                //     <div className="relative overflow-hidden">
+                //       <Image
+                //         src={item.image || "/placeholder.svg"}
+                //         alt={item.name}
+                //         width={300}
+                //         height={200}
+                //         className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                //       />
+                //       <div className="absolute top-3 right-3">
+                //         <Badge className="bg-primary text-primary-foreground">
+                //           <Star className="w-3 h-3 mr-1 fill-current" />
+                //           4.8
+                //         </Badge>
+                //       </div>
+                //     </div>
+                //     <div className="p-4">
+                //       <h3 className="font-semibold text-lg text-foreground mb-2 font-display">{item.name}</h3>
+                //       <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{item.description}</p>
+                //       <div className="text-primary font-bold text-xl font-display">S/. {item.price.toFixed(2)}</div>
+                //     </div>
+                //   </CardContent>
+                // </Card>
               ))}
             </div>
           </div>

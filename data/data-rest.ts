@@ -199,31 +199,46 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
   const result = await response.json();
 
   return result.map((item: {
-    id: number,
     idProducto: string,
+    nombre: string,
     codigo: string,
     sku: string,
     codigoBarras: string,
-    nombre: string,
     descripcionCorta: string,
+    descripcionLarga: string,
     precio: number,
     imagen: string,
+    cantidad: number,
+    servicio: number,
+
     idCategoria: string,
-    nombreCategoria: string,
+    categoriaNombre: string,
+
+    idMarca: string,
+    marcaNombre: string,
+
+    idMedida: string,
+    nombreMedida: string,
   }) => {
     return {
-      id: item.id,
+      id: item.idProducto,
       code: item.codigo,
       name: item.nombre,
       description: item.descripcionCorta,
+      descriptionLong: item.descripcionLarga,
       price: item.precio,
       idCategory: item.idCategoria,
-      category: { id: item.idCategoria, name: item.nombreCategoria },
+      idBrand: item.idMarca,
       image: item.imagen,
-      discount: 0,
-      stock: 0,
+      difficulty: "hard",
       isNew: true,
-      isService: false
+      discount: 0,
+      stock: item.cantidad,
+      oldPrice: 0,
+      isService: item.servicio === 1 ? true : false,
+      category: { id: item.idCategoria, name: item.categoriaNombre },
+      brand: { id: item.idMarca, name: item.marcaNombre },
+      measurement: { id: item.idMedida, name: item.nombreMedida },
     }
   });
 }
