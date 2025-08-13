@@ -12,6 +12,13 @@ import { useRouter } from "next/navigation";
 import { NavPrimary } from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Branch, Category, Company, CompanyBanner, Product, Whatsapp } from "@/types/api-type";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 interface HomeComponentProps {
     company: Company;
@@ -23,24 +30,25 @@ interface HomeComponentProps {
     authEnabled?: boolean; // Pasar como prop desde el servidor
 }
 
-export default function HomeComponent({ 
-    company, 
-    categories, 
-    banners, 
-    whatsapp, 
-    branch, 
+export default function HomeComponent({
+    company,
+    categories,
+    banners,
+    whatsapp,
+    branch,
     initialProducts,
-    authEnabled = false 
+    authEnabled = false
 }: HomeComponentProps) {
-    const router = useRouter();
     const [orders, setOrders] = useState<Order[]>([]);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [ordersLoaded, setOrdersLoaded] = useState(false);
-    const [visibleItems, setVisibleItems] = useState(4);
-    
+    const [itemsPerPage, setItemsPerPage] = useState(6);
+    const [visibleItems, setVisibleItems] = useState(6);
+
+
     // Estado para controlar si el componente está montado (evita hidratación)
     const [isMounted, setIsMounted] = useState(false);
 
@@ -64,7 +72,7 @@ export default function HomeComponent({
     // Load orders only after component is mounted
     useEffect(() => {
         if (!isMounted) return;
-        
+
         const loadOrders = async () => {
             try {
                 const savedOrders = localStorage.getItem("orders");
@@ -78,7 +86,7 @@ export default function HomeComponent({
                 setOrdersLoaded(true);
             }
         };
-        
+
         loadOrders();
     }, [isMounted]);
 
@@ -118,7 +126,7 @@ export default function HomeComponent({
     };
 
     const loadMoreItems = () => {
-        setVisibleItems(prevVisibleItems => prevVisibleItems + 4);
+        setVisibleItems(prevVisibleItems => prevVisibleItems + itemsPerPage);
     };
 
     // Show loading component while hydrating or loading
@@ -143,9 +151,8 @@ export default function HomeComponent({
                         {banners.map((banner, index) => (
                             <div
                                 key={banner.id}
-                                className={`absolute inset-0 transition-opacity duration-1000 ${
-                                    index === currentBannerIndex ? 'opacity-70' : 'opacity-0'
-                                }`}
+                                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentBannerIndex ? 'opacity-70' : 'opacity-0'
+                                    }`}
                                 style={{
                                     backgroundImage: `url(${banner.url})`,
                                     backgroundSize: 'cover',
@@ -161,7 +168,7 @@ export default function HomeComponent({
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div>
-                            <h1 className="text-4xl md:text-6xl font-bold mb-4 font-display">
+                            <h1 className="text-2xl md:text-4xl font-bold mb-4">
                                 <span className="text-primary drop-shadow-sm">{company.name}</span>
                             </h1>
                             <p className="text-muted-foreground text-lg mb-6 leading-relaxed drop-shadow-sm">
@@ -177,11 +184,10 @@ export default function HomeComponent({
                             <button
                                 key={index}
                                 onClick={() => setCurrentBannerIndex(index)}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                    index === currentBannerIndex
-                                        ? 'bg-primary scale-125'
-                                        : 'bg-white/50 hover:bg-white/70'
-                                }`}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentBannerIndex
+                                    ? 'bg-primary scale-125'
+                                    : 'bg-white/50 hover:bg-white/70'
+                                    }`}
                             />
                         ))}
                     </div>
@@ -201,25 +207,74 @@ export default function HomeComponent({
                                 </Badge>
                             </div>
 
-                            <div className="relative w-full lg:w-80">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                <Input
-                                    type="text"
-                                    placeholder="Buscar productos..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 pr-10 bg-background border-border focus:border-primary"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        onClick={clearSearch}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                                        aria-label="Limpiar búsqueda"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                )}
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground">Mostrar:</span>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="h-8 px-2 text-sm">
+                                            {itemsPerPage} productos
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-32">
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                setItemsPerPage(6);
+                                                setVisibleItems(6);
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            6 productos
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                setItemsPerPage(12);
+                                                setVisibleItems(12);
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            12 productos
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                setItemsPerPage(24);
+                                                setVisibleItems(24);
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            24 productos
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                setItemsPerPage(48);
+                                                setVisibleItems(48);
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            48 productos
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
+                        </div>
+
+                        <div className="relative w-full mb-6">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                                type="text"
+                                placeholder="Buscar productos..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-10 pr-10 bg-background border-border focus:border-primary"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={clearSearch}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    aria-label="Limpiar búsqueda"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
                         </div>
 
                         {filteredItems.length === 0 && searchQuery && (

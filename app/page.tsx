@@ -13,8 +13,6 @@ export default async function Home() {
 
   const branch = branches.find((branch) => branch.primary === true)!;
 
-  console.log(products);
-
   const authEnabled = process.env.APP_BACK_END === "true";
 
   return (

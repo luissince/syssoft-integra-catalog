@@ -122,7 +122,7 @@ export function NavPrimary({ company, categories, whatsapp, branch, selectedCate
                         <div className="lg:hidden">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm">
+                                    <Button variant="outline">
                                         <Phone className="w-4 h-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
