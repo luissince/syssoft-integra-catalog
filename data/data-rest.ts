@@ -43,8 +43,8 @@ export const fetchProductsAll = async (): Promise<Product[]> => {
       price: item.precio,
       idCategory: item.idCategoria,
       category: { id: item.idCategoria, name: item.nombreCategoria },
-      idBrand: item.idMedida,
-      brand: { id: item.idMedida, name: item.nombreMedida },
+      idMeasurement: item.idMedida,
+      measurement: { id: item.idMedida, name: item.nombreMedida },
       image: item.imagen,
       difficulty: "hard",
       discount: 0,
@@ -93,6 +93,8 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
     imagen: string,
     idCategoria: string,
     nombreCategoria: string,
+    idMedida: string,
+    nombreMedida: string,
     cantidad: number;
     id: number
   }) => {
@@ -104,6 +106,8 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
       price: item.precio,
       idCategory: item.idCategoria,
       category: { id: item.idCategoria, name: item.nombreCategoria },
+      idMeasurement: item.idMedida,
+      measurement: { id: item.idMedida, name: item.nombreMedida },
       image: item.imagen,
       difficulty: "hard",
       discount: 0,
@@ -134,10 +138,13 @@ export const fetchProductById = async (id: string): Promise<Product> => {
   });
 
   if (!response.ok) {
+    console.log(response)
     throw new Error('Error fetching product');
   }
 
   const result = await response.json();
+
+  console.log(result);
 
   return {
     id: result.idProducto,
@@ -157,6 +164,7 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     isService: result.servicio === 1 ? true : false,
     category: { id: result.categoria.idCategoria, name: result.categoria.nombre },
     brand: { id: result.marca.idMarca, name: result.marca.nombre },
+    measurement: { id: result.medida.idMedida, name: result.medida.nombre },
     details: result.detalles.map((item: { id: string, nombre: string, valor: string }) => ({ id: item.id, name: item.nombre, value: item.valor })),
     images: result.imagenes.map((image: any) => {
       return {

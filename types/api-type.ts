@@ -21,6 +21,7 @@ export interface Product {
   price: number
   idCategory: string
   idBrand?: string
+  idMeasurement?: string
   image: string
   difficulty: "easy" | "medium" | "hard"
   isNew?: boolean
@@ -30,11 +31,17 @@ export interface Product {
   isService?: boolean 
   brand?: Brand
   category?: Category
+  measurement?: Measurement
   images?: ProductImage[],
   details?: ProductDetail[],
   colors?: Attribute[],
   sizes?: Attribute[],
   flavors?: Attribute[],
+}
+
+export interface Measurement {
+  id: string
+  name: string
 }
 
 export interface Category {

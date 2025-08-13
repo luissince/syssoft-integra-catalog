@@ -48,7 +48,7 @@ export function MenuCard({ item }: MenuCardProps) {
       return
     }
 
-    // router.push(`/plate/${item.id}`)
+    router.push(`/plate/${item.code}`)
   }
 
   return (
@@ -97,7 +97,7 @@ export function MenuCard({ item }: MenuCardProps) {
                   No disponible
                 </Badge>
               }
-              <div className="text-blue-600 font-bold text-base">S/. {item.price.toFixed(2)} x <small>{item.brand?.name}</small></div>
+              <div className="text-blue-600 font-bold text-base">S/. {item.price.toFixed(2)} x <small>{item.measurement?.name}</small></div>
             </div>
             {
               authEnabled && (
