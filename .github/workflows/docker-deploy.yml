@@ -1,1 +1,56 @@
+name: Docker Image CI - SysSoftIntegra Catalog
 
+on:
+  push:
+    branches: 
+      - "master"
+      - "test"
+
+jobs:
+  build-reactjs-development:
+    name: Build Catalog (Next Js)
+    if: github.ref == 'refs/heads/test'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - environment: test
+            service: test-services
+  
+    environment: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Crear archivo .env
+        run: |
+          cat > .env <<EOL
+          APP_BACK_END="${{secrets.VITE_APP_BACK_END}}"
+          NEXT_PUBLIC_APP_BACK_END="${{secrets.VITE_APP_BACK_END}}"
+          AUTH_ENABLED="${{secrets.VITE_APP_BACK_END}}"
+          NEXT_PUBLIC_AUTH_ENABLED="${{secrets.VITE_APP_BACK_END}}"
+          NEXT_PUBLIC_ENV="${{secrets.VITE_APP_BACK_END}}"
+          ENV="${{secrets.VITE_APP_BACK_END}}"
+          EOL
+
+      - name: Construyendo contenedor NextJs
+        run: docker compose -f docker-compose.build.yml build ${{ matrix.service }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1 
+      
+      - name: Tag catalog image
+        run: docker tag ${{ matrix.environment }}-catalog ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog:${{ matrix.environment }}-latest
+
+      - name: Push catalog image to ECR
+        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog:${{ matrix.environment }}-latest
+
+  
