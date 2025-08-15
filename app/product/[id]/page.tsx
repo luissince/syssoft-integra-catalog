@@ -30,8 +30,6 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   // Cargar productos relacionados después de confirmar que el producto existe
   const relatedProducts = await getProductsRelated(product.id, product.idCategory);
 
-  console.log(relatedProducts);
-
   const branch = branches.find((branch) => branch.primary === true)!;
 
   // Procesar variable de entorno en el servidor

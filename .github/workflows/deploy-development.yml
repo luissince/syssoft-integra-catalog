@@ -105,11 +105,10 @@ jobs:
       - name: Eliminar Compose temporal
         run: rm docker-compose-${{ matrix.environment }}.yml
 
-      - name: Eliminar imágenes locales
+      - name: Eliminar imágenes locales y builder
         run: docker builder prune --all || true
   
 
-    
   clean-ecr-images-development:
     name: Borrar imágenes antiguas de ECR
     runs-on: ubuntu-latest

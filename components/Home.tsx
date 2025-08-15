@@ -144,7 +144,7 @@ export default function HomeComponent({
                 setSelectedCategory={setSelectedCategory}
             />
 
-            <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background py-8 md:py-12 border-b border-border overflow-hidden">
+            <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background py-10 md:py-14 border-b border-border">
                 {banners.length > 0 && (
                     <div className="absolute inset-0">
                         {banners.map((banner, index) => (
@@ -166,11 +166,11 @@ export default function HomeComponent({
 
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="grid md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <h1 className="text-2xl md:text-4xl font-bold mb-4 font-display">
+                        <div className="flex flex-col gap-4">
+                            <h1 className="text-2xl md:text-4xl font-bold font-display">
                                 <span className="text-primary drop-shadow-sm">{company.name}</span>
                             </h1>
-                            <p className="text-muted-foreground text-lg mb-6 leading-relaxed drop-shadow-sm">
+                            <p className="text-muted-foreground text-lg leading-relaxed drop-shadow-sm">
                                 {company.information}
                             </p>
                         </div>
