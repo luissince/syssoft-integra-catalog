@@ -8,7 +8,11 @@ import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/context/AuthContext"
-import { getCompanyInfo } from "@/lib/api"
+import { getCompanyInfo, getCurrencyInfo, getWhatsappInfo } from "@/lib/api"
+import { WishlistProvider } from "@/context/WishlistContext"
+import { CurrencyProvider } from "@/context/CurrencyContext"
+import WhatsAppButton from "@/components/WhatsAppButton"
+import ContactButton from "@/components/ContactButton"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,7 +25,6 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   display: "swap",
 })
-
 
 export async function generateMetadata(): Promise<Metadata> {
   const company = await getCompanyInfo();
@@ -44,11 +47,14 @@ export const viewport: Viewport = {
   userScalable: false,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const currency = await getCurrencyInfo();
+  const whatsapp = await getWhatsappInfo();
+
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -63,12 +69,18 @@ export default function RootLayout({
         `}</style>
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange={false}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
           <AuthProvider>
-            <CartProvider>
-              {children}
-              <Toaster />
-            </CartProvider>
+            <CurrencyProvider initialCurrency={currency}>
+              <CartProvider>
+                <WishlistProvider>
+                  {children}
+                  <Toaster />
+                  <WhatsAppButton whatsapp={whatsapp} />
+                  <ContactButton />
+                </WishlistProvider>
+              </CartProvider>
+            </CurrencyProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

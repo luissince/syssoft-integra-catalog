@@ -1,45 +1,75 @@
-import { useState } from "react";
+import { use, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User } from "lucide-react";
+import { Eye, EyeOff, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { RegisterCard } from "./RegisterCard";
+import { useToast } from "@/hooks/use-toast";
 
 export function LoginCard() {
+  const { toast } = useToast();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const refEmail = useRef<HTMLInputElement>(null);
+  const refPassword = useRef<HTMLInputElement>(null);
+
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (loading) {
       return;
     }
 
-    if (!email || !password) {
-      alert("Por favor, rellene todos los campos");
+    // Validación del email
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "Ingrese su correo electrónico",
+        variant: "destructive", // Estilo de error
+      });
+      refEmail.current?.focus();
+      return;
+    }
+
+    // Validación de la contraseña
+    if (!password) {
+      toast({
+        title: "Error",
+        description: "Ingrese su contraseña",
+        variant: "destructive",
+      });
+      refPassword.current?.focus();
       return;
     }
 
     setLoading(true);
+    const result = await login(email, password);
 
-    const success = login(email, password);
-    if (!success) {
-      alert("Credenciales incorrectas");
+    // Error en la consulta
+    if (typeof result === "string") {
+      toast({
+        title: "Error de autenticación",
+        description: result,
+        variant: "destructive",
+      });
       setLoading(false);
+      refEmail.current?.focus();
       return;
     }
 
+    // Éxito
     setEmail("");
     setPassword("");
     setLoading(false);
     setIsDialogOpen(false);
   };
+
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -57,9 +87,10 @@ export function LoginCard() {
         </DialogHeader>
         <form className="space-y-4 py-4" onSubmit={handleLogin}>
           <div>
-            <Label className="text-foreground font-medium">Email</Label>
+            <Label className="text-foreground font-medium">Correo Electrónico</Label>
             <Input
               type="text"
+              ref={refEmail}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 bg-muted border-border text-foreground"
@@ -68,17 +99,32 @@ export function LoginCard() {
           </div>
           <div>
             <Label className="text-foreground font-medium">Contraseña</Label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 bg-muted border-border text-foreground"
-              placeholder="Ingrese su contraseña"
-            />
+            <div className="relative mt-2">
+              <Input
+                id="password"
+                ref={refPassword}
+                type={showPassword ? "text" : "password"}
+                value={password}
+                placeholder="Ingrese su contraseña"
+                onChange={(e) => setPassword(e.target.value )}
+                className="bg-muted border-border text-foreground pr-10"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+                )}
+              </button>
+            </div>
           </div>
           <DialogFooter>
-            <div className="flex justify-between w-full">
-              <RegisterCard />
+            <div className="flex justify-end w-full">
+              {/* <RegisterCard /> */}
               <Button
                 type="submit"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"

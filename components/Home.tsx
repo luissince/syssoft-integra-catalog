@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
 import { MenuCard } from "@/components/MenuCard";
-import type { Order } from "@/types";
 import Welcome from "@/components/Welcome";
 import { NavPrimary } from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -17,7 +16,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { CartList } from "./CartList";
+import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface HomeComponentProps {
     company: Company;
@@ -38,18 +40,20 @@ export default function HomeComponent({
     initialProducts,
     authEnabled = false
 }: HomeComponentProps) {
-    const [orders, setOrders] = useState<Order[]>([]);
+
+    const router = useRouter();
+
     const [selectedCategory, setSelectedCategory] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
-    const [ordersLoaded, setOrdersLoaded] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(6);
     const [visibleItems, setVisibleItems] = useState(6);
 
+    const { cart, updateQuantity, removeFromCart, addToCart } = useCart();
 
     // Estado para controlar si el componente está montado (evita hidratación)
     const [isMounted, setIsMounted] = useState(false);
+    const { currency } = useCurrency();
 
     // Efecto para marcar el componente como montado
     useEffect(() => {
@@ -67,48 +71,6 @@ export default function HomeComponent({
             return () => clearInterval(interval);
         }
     }, [banners.length]);
-
-    // Load orders only after component is mounted
-    useEffect(() => {
-        if (!isMounted) return;
-
-        const loadOrders = async () => {
-            try {
-                const savedOrders = localStorage.getItem("orders");
-                if (savedOrders) {
-                    const parsedOrders = JSON.parse(savedOrders);
-                    setOrders(parsedOrders);
-                }
-            } catch (error) {
-                console.error("Error loading orders:", error);
-            } finally {
-                setOrdersLoaded(true);
-            }
-        };
-
-        loadOrders();
-    }, [isMounted]);
-
-    // Save orders to localStorage
-    useEffect(() => {
-        if (ordersLoaded && isMounted) {
-            try {
-                localStorage.setItem("orders", JSON.stringify(orders));
-            } catch (error) {
-                console.error("Error saving orders:", error);
-            }
-        }
-    }, [orders, ordersLoaded, isMounted]);
-
-    // Loading state management
-    useEffect(() => {
-        if (ordersLoaded && selectedCategory) {
-            const timer = setTimeout(() => {
-                setIsLoading(false);
-            }, 500);
-            return () => clearTimeout(timer);
-        }
-    }, [ordersLoaded, selectedCategory]);
 
     // Filter products
     const filteredItems = initialProducts.filter((item) => {
@@ -129,7 +91,7 @@ export default function HomeComponent({
     };
 
     // Show loading component while hydrating or loading
-    if (isLoading || !isMounted) {
+    if (!isMounted) {
         return <Welcome company={company} branch={branch} />;
     }
 
@@ -140,11 +102,12 @@ export default function HomeComponent({
                 categories={categories}
                 whatsapp={whatsapp}
                 branch={branch}
+                authEnabled={authEnabled}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
             />
 
-            <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background py-10 md:py-14 border-b border-border">
+            <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background py-16 md:py-20 border-b border-border">
                 {banners.length > 0 && (
                     <div className="absolute inset-0">
                         {banners.map((banner, index) => (
@@ -194,8 +157,8 @@ export default function HomeComponent({
             </section>
 
             <div className="flex-1 flex">
-                <div className="container mx-auto px-4 py-8 flex gap-8 h-full">
-                    <div className="flex-1 min-w-0">
+                <div className="container mx-auto py-8 px-4 flex gap-8 h-full">
+                    <div className="flex-1">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-4">
                             <div>
                                 <h2 className="text-3xl font-bold text-foreground font-display">
@@ -300,6 +263,9 @@ export default function HomeComponent({
                                 <MenuCard
                                     key={item.id}
                                     item={item}
+                                    onAddToCart={addToCart}
+                                    currency={currency}
+                                    authEnabled={authEnabled}
                                 />
                             ))}
                         </div>
@@ -315,9 +281,14 @@ export default function HomeComponent({
                     </div>
 
                     {authEnabled && (
-                        <div className="w-80 hidden lg:block">
-                            <div className="sticky top-24">
-                                {/* Cart component would go here */}
+                        <div className="w-auto hidden lg:block">
+                            <div className="sticky">
+                                <CartList
+                                    cart={cart}
+                                    onUpdateQuantity={updateQuantity}
+                                    onRemoveItem={removeFromCart}
+                                    onCheckout={() => router.push("/checkout")}
+                                />
                             </div>
                         </div>
                     )}
