@@ -26,7 +26,6 @@ Crea un archivo `.env.local` en la raíz:
 APP_BACK_END="http://localhost:5002"
 NEXT_PUBLIC_APP_BACK_END="http://localhost:5002"
 AUTH_ENABLED=false
-NEXT_PUBLIC_AUTH_ENABLED=false
 NEXT_PUBLIC_ENV=development
 ENV=development
 ````
@@ -35,7 +34,7 @@ ENV=development
 
 * `APP_BACK_END`: Base URL para peticiones **del servidor** (SSR/acciones).
 * `NEXT_PUBLIC_APP_BACK_END`: Base URL para peticiones **del cliente** (expuesta).
-* `AUTH_ENABLED` / `NEXT_PUBLIC_AUTH_ENABLED`: Activan o desactivan autenticación (server/client).
+* `AUTH_ENABLED`: Activan o desactivan autenticación (server/client).
 * `ENV` / `NEXT_PUBLIC_ENV`: Modo de ejecución/etiquetado del entorno.
 
 > En producción usa HTTPS y dominio real en `*_APP_BACK_END`.
@@ -299,7 +298,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## 🔐 Autenticación (flag)
 
-* Con `AUTH_ENABLED=false` / `NEXT_PUBLIC_AUTH_ENABLED=false`, el cliente **no** enviará tokens.
+* Con `AUTH_ENABLED=false`, el cliente **no** enviará tokens.
 * Si el backend exige auth:
 
   1. Pon `AUTH_ENABLED=true` y agrega el header `Authorization` en `apiFetch`.

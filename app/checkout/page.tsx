@@ -1,80 +1,29 @@
-"use client";
-import { useState, useEffect } from "react";
-import { CheckoutForm } from "@/components/CheckoutForm";
-import type { Order } from "@/types";
-import restaurantData from "@/data/restaurant-data.json";
-import { useCart } from "@/context/CartContext";
-import { useAuth } from "@/context/AuthContext";
+import { getBranches, getCompanyInfo, getListTypeDocument, getTaxes } from "@/lib/api";
+import CheckoutComponent from "@/components/Checkout";
+import { Suspense } from "react";
 import Welcome from "@/components/Welcome";
-import { useRouter } from "next/navigation";
-import { OrderCompletion } from "@/components/OrderCompletion";
-import { NavSecondary } from "@/components/Nav";
 
-export default function Component() {
-    const router = useRouter()
-    const { isAuthenticated, user } = useAuth();
-    const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
-    const [orders, setOrders] = useState<Order[]>([]);
+export default async function CheckoutPage() {
+    const company = await getCompanyInfo();
+    const branches = await getBranches();
+    const taxes = await getTaxes();
+    const listTypeDocument = await getListTypeDocument();
 
-    const [isLoading, setIsLoading] = useState(true);
+    const branch = branches.find((branch) => branch.primary === true)!;
+    const tax = taxes.find((tax) => tax.prefered === true)!;
 
-    const { cart, clearCart } = useCart();
-
-    useEffect(() => {
-        const loadOrders = async () => {
-            try {
-                const savedOrders = localStorage.getItem("orders");
-                if (savedOrders) {
-                    const parsedOrders = JSON.parse(savedOrders);
-                    setOrders(parsedOrders);
-                }
-                setIsLoading(false);
-            } catch (error) {
-                setIsLoading(false);
-            }
-        };
-
-        loadOrders();
-    }, []);
-
-    const handleSubmitOrder = (orderData: Order) => {
-        const newOrders = [...orders, orderData];
-        setCompletedOrder(orderData);
-        localStorage.setItem("orders", JSON.stringify(newOrders));
-        clearCart();
-    };
-
-    // if (isLoading) {
-    //     return <Welcome />;
-    // }
-
-      if (completedOrder) {
-        return (
-          <OrderCompletion
-            order={completedOrder}
-            restaurant={restaurantData.restaurant}
-            onBackToMenu={() => router.push("/")}
-          />
-        );
-      }
+    const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <NavSecondary />
-            
-            {/* Body */}
-            <div className="container mx-auto p-4">
-                <CheckoutForm
-                    isAuthenticated={isAuthenticated}
-                    user={user!}
-                    cart={cart}
-                    paymentMethods={restaurantData.paymentMethods}
-                    deliveryZones={restaurantData.deliveryZones}
-                    onSubmitOrder={handleSubmitOrder}
-                    onBack={() => router.push("/")}
-                />
-            </div>
-        </div>
+        <Suspense fallback={<Welcome company={company} branch={branch} />}>
+            <CheckoutComponent
+                listTypeDocument={listTypeDocument}
+                company={company}
+                branch={branch}
+                branches={branches}
+                tax={tax}
+                authEnabled={authEnabled}
+            />
+        </Suspense>
     );
 }

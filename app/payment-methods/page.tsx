@@ -14,7 +14,11 @@ import {
 import { useRouter } from "next/navigation";
 import { NavSecondary } from "@/components/Nav";
 
-export default function PaymentMethodsPage() {
+interface PaymentMethodsPageProps {
+    authEnabled: boolean;
+}
+
+export default function PaymentMethodsPage({ authEnabled }: PaymentMethodsPageProps) {
     const router = useRouter();
     const [copiedText, setCopiedText] = useState<string | null>(null);
 
@@ -117,7 +121,7 @@ export default function PaymentMethodsPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <NavSecondary title="Métodos de Pago" />
+            <NavSecondary title="Métodos de Pago" authEnabled={authEnabled} />
 
             <div className="container mx-auto px-4 py-8">
                 <div className="grid gap-8">

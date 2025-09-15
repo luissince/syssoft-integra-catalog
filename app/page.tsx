@@ -13,7 +13,7 @@ export default async function Home() {
 
   const branch = branches.find((branch) => branch.primary === true)!;
 
-  const authEnabled = process.env.APP_BACK_END === "true";
+  const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
     <Suspense fallback={<Welcome company={company} branch={branch} />}>

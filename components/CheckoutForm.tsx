@@ -1,172 +1,636 @@
-import type React from "react"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Calendar, Clock, Package, Truck, Home } from "lucide-react"
-import type { CartItem, PaymentMethod, DeliveryZone, Order, Customer, Address } from "@/types"
-import customers from "@/data/customer.json";
+import React from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { PaymentMethod } from "@/types";
+import { Branch, Cart, Currency, Tax, TypeDocument } from "@/types/api-type";
+import {
+  TYPE_DELIVERY,
+} from "@/constants/type-delivery";
+import {
+  currentDate,
+  formatCurrency,
+  isValidEmail,
+  keyNumberInteger,
+  keyNumberPhone,
+  timeSlots,
+} from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Image from "next/image";
+import { getPaymentReceipts } from "@/lib/api";
+import { useAlert } from "@/hooks/use-alert";
+import { useAuth } from "@/context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
+import { FormOrder } from "@/types/form";
 
 interface CheckoutFormProps {
-  isAuthenticated: boolean
-  user: Customer
-  cart: CartItem[]
-  paymentMethods: PaymentMethod[]
-  deliveryZones: DeliveryZone[]
-  onSubmitOrder: (orderData: any) => void
-  onBack: () => void
+  listTypeDocument: TypeDocument[];
+  branches: Branch[];
+  tax: Tax;
+  currency: Currency;
+  cart: Cart[];
+  paymentMethods: PaymentMethod[];
+  onSubmitOrder: (orderData: FormOrder) => void;
+  onBack: () => void;
 }
 
-export function CheckoutForm({ isAuthenticated, user, cart, paymentMethods, deliveryZones, onSubmitOrder, onBack }: CheckoutFormProps) {
-  const [formData, setFormData] = useState({
-    id: user?.id || "",
-    document: user?.document || "",
-    name: user?.name || "",
-    phone: user?.phone || "",
-    whatsapp: user?.whatsapp || "",
-    address: user?.addresses.find(addr => addr.isDefault)?.address || "",
-    reference: user?.addresses.find(addr => addr.isDefault)?.reference || "",
-    paymentMethod: "",
-    deliveryZone: "",
-    deliveryType: "delivery", // Nuevo campo para el tipo de entrega
-    notes: "",
-    orderType: "now",
-    scheduledDate: "",
-    scheduledTime: "",
-    orderNotes: "",
-    discount: "0",
-  })
+export function CheckoutForm({
+  listTypeDocument,
+  branches,
+  tax,
+  currency,
+  cart,
+  paymentMethods,
+  onSubmitOrder,
+  onBack,
+}: CheckoutFormProps) {
+  const isMobile = useIsMobile();
+  const alert = useAlert();
+  const { user } = useAuth();
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const discountPercentage = parseFloat(formData.discount) || 0
-  const discountedSubtotal = subtotal * (1 - discountPercentage / 100)
-  const selectedZone = deliveryZones.find((zone) => zone.id === formData.deliveryZone)
-  const deliveryFee = formData.deliveryType === "delivery" ? (selectedZone?.price || 0) : 0
-  const total = discountedSubtotal + deliveryFee
+  const [formData, setFormData] = useState<{
+    idTypeDelivery: string;
+    idTypeDocument: string;
+    document: string;
+    name: string;
+    phone: string;
+    whatsapp: string;
+    scheduledDate: string;
+    scheduledTime: string;
+    address: string;
+    reference: string;
+    email: string;
+    password: string;
+    validationPassword: string;
+    idBranch: string;
+    paymentMethodReference: string;
+    orderNotes: string;
+    instructions: string;
+  }>({
+    idTypeDelivery: TYPE_DELIVERY.DELIVERY_NOW.id,
+    idTypeDocument: "",
+    document: user?.document || "",
+    name: user?.information || "",
+    phone: user?.cellular || "",
+    whatsapp: user?.phone || "",
+    scheduledDate: currentDate(),
+    scheduledTime: "",
+    address: user?.address || "",
+    reference: "",
+    email: user?.email || "",
+    password: "",
+    validationPassword: "",
+    idBranch: "",
+    paymentMethodReference: "",
+    orderNotes: "",
+    instructions: "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showValidationPassword, setShowValidationPassword] = useState(false);
+
+  const refTypeDocument = React.useRef<HTMLButtonElement>(null);
+  const refDocument = React.useRef<HTMLInputElement>(null);
+  const refName = React.useRef<HTMLInputElement>(null);
+  const refPhone = React.useRef<HTMLInputElement>(null);
+  const refEmail = React.useRef<HTMLInputElement>(null);
+  const refPassword = React.useRef<HTMLInputElement>(null);
+  const refValidationPassword = React.useRef<HTMLInputElement>(null);
+  const refWhastapp = React.useRef<HTMLInputElement>(null);
+  const refAddress = React.useRef<HTMLInputElement>(null);
+  const refBranch = React.useRef<HTMLButtonElement>(null);
+  const refScheduledDate = React.useRef<HTMLInputElement>(null);
+  const refScheduledTime = React.useRef<HTMLButtonElement>(null);
+
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      const address = user.addresses.find(addr => addr.isDefault) || user.addresses[0]
+    setFormData((prev) => ({
+      ...prev,
+      document: user?.document || "",
+      name: user?.information || "",
+      phone: user?.cellular || "",
+      whatsapp: user?.phone || "",
+      address: user?.address || "",
+      email: user?.email || "",
+    }));
+  }, [user]);
+
+  useEffect(() => {
+    if (branches.length === 1) {
       setFormData((prev) => ({
         ...prev,
-        id: user.id || "",
-        document: user.document || "",
-        name: user.name || "",
-        phone: user.phone || "",
-        whatsapp: user.whatsapp || "",
-        address: address?.address || "",
-        reference: address?.reference || "",
-      }))
+        idBranch: branches[0].id,
+      }));
     }
-  }, [isAuthenticated, user])
+  }, [branches]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const customer = customers.list.find(item => item.id === formData.id)
-    const address: Address = {
-      id: "",
-      address: formData.address,
-      reference: formData.reference,
-      isDefault: true,
-      createdAt: new Date().toISOString(),
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const paymentReceipts = await getPaymentReceipts(formData.idBranch);
+
+    const paymentReceipt = paymentReceipts.find(
+      (paymentReceipt) => paymentReceipt.prefered === true
+    );
+
+    if (!paymentReceipt) {
+      alert.warning(
+        {
+          message:
+            "No se encontró un comprobante preferido para la sucursal seleccionada.",
+        },
+        () => {}
+      );
+      return;
     }
 
-    const orderData = {
-      id: Date.now().toString(),
-      items: cart,
-      customerId: customer?.id,
-      payment: {
-        method: formData.paymentMethod,
-        total,
-        deliveryFee,
-        discount: discountPercentage,
+    if (
+      Object.values(TYPE_DELIVERY).find((t) => t.id === formData.idTypeDelivery)
+        ?.isScheduled &&
+      formData.scheduledDate === ""
+    ) {
+      alert.warning(
+        {
+          message: "Por favor, introduce la fecha de programación.",
+        },
+        () => {
+          refScheduledDate.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (
+      Object.values(TYPE_DELIVERY).find((t) => t.id === formData.idTypeDelivery)
+        ?.isScheduled &&
+      formData.scheduledTime === ""
+    ) {
+      alert.warning(
+        {
+          message: "Por favor, introduce la hora de programación.",
+        },
+        () => {
+          refScheduledTime.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.idTypeDocument === "") {
+      alert.warning(
+        {
+          message: "Por favor, selecciona el tipo de documento.",
+        },
+        () => {
+          refTypeDocument.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.document === "") {
+      alert.warning(
+        {
+          message: "Por favor, introduce el número de documento.",
+        },
+        () => {
+          refDocument.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.name === "") {
+      alert.warning(
+        {
+          message: "Por favor, introduce el nombre.",
+        },
+        () => {
+          refName.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.phone === "") {
+      alert.warning(
+        {
+          message: "Por favor, introduce el número de teléfono.",
+        },
+        () => {
+          refPhone.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.whatsapp === "") {
+      alert.warning(
+        {
+          message: "Por favor, introduce el número de WhatsApp.",
+        },
+        () => {
+          refWhastapp.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      alert.warning(
+        {
+          message: "Por favor, introduce el correo electrónico.",
+        },
+        () => {
+          refEmail.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.password === "") {
+      alert.warning(
+        {
+          message: "Por favor, introduce la contraseña.",
+        },
+        () => {
+          refPassword.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.password !== formData.validationPassword) {
+      alert.warning(
+        {
+          message: "Las contraseñas no coinciden.",
+        },
+        () => {
+          refPassword.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (
+      (formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
+        formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_SCHEDULED.id) &&
+      formData.address === ""
+    ) {
+      alert.warning(
+        {
+          message: "Por favor, introduce la dirección.",
+        },
+        () => {
+          refAddress.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (formData.idBranch === "") {
+      alert.warning(
+        {
+          message: "Por favor, selecciona una sucursal.",
+        },
+        () => {
+          refBranch.current?.focus();
+        }
+      );
+      return;
+    }
+
+    if (currency === null) {
+      alert.warning({
+        message: "No se puedo obtener información de la moneda seleccionada.",
+      });
+      return;
+    }
+
+    const orderData: FormOrder = {
+      cliente: {
+        idTipoDocumento: formData.idTypeDocument,
+        documento: formData.document,
+        informacion: formData.name,
+        telefono: formData.phone,
+        celular: formData.whatsapp,
+        email: formData.email,
+        clave: formData.password,
+        direccion: formData.address,
       },
-      delivery: {
-        type: formData.deliveryType,
-        address: formData.deliveryType === "delivery" ? address : null,
-        zone: formData.deliveryType === "delivery" ? selectedZone : null,
-        time: formData.deliveryType === "delivery" ? (selectedZone?.time || "") : "",
-        orderType: formData.orderType,
-        scheduledDate: formData.scheduledDate,
-        scheduledTime: formData.scheduledTime,
-      },
-      status: "pending" as const,
-      notes: formData.notes,
-      discount: formData.discount,
-      orderNotes: formData.orderNotes,
-      createdAt: new Date().toISOString(),
-    } as Order
 
-    onSubmitOrder(orderData)
-  }
+      idComprobante: paymentReceipt.idPaymentReceipt,
+      idMoneda: currency?.idCurrency!,
+      idSucursal: formData.idBranch,
+      idUsuario: "US0001",
+      nota: formData.orderNotes,
+      observacion: "",
+      instruccion: formData.instructions,
 
-  const isFormValid =
-    formData.document &&
-    formData.name &&
-    formData.phone &&
-    formData.whatsapp &&
-    (formData.deliveryType === "delivery" ? formData.address && formData.deliveryZone : true) &&
-    formData.paymentMethod &&
-    (formData.orderType === "now" || (formData.scheduledDate && formData.scheduledTime))
+      idTipoEntrega: formData.idTypeDelivery,
+      idTipoPedido: Object.values(TYPE_DELIVERY).find(
+        (t) => t.id === formData.idTypeDelivery
+      )?.isScheduled
+        ? "TP0002"
+        : "TP0001",
+      fechaPedido: formData.scheduledDate,
+      horaPedido: formData.scheduledTime,
 
-  const timeSlots = []
-  for (let hour = 10; hour <= 22; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      const timeString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
-      timeSlots.push(timeString)
-    }
-  }
+      entrega:
+        formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
+        formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_SCHEDULED.id
+          ? {
+              email: formData.email,
+              telefono: formData.phone,
+              celular: formData.whatsapp,
+              direccion: formData.address,
+              referencia: formData.reference,
+            }
+          : null,
+
+      detalles: cart.map((item) => ({
+        cantidad: item.quantity,
+        codigo: item.code,
+        id: item.id,
+        idImpuesto: tax.idTax!,
+        idMedida: item.measurement?.id!,
+        idProducto: item.id,
+        imagen: item.image,
+        nombre: item.name,
+        nombreImpuesto: "",
+        nombreMedida: "",
+        porcentajeImpuesto: 0,
+        precio: item.price,
+      })),
+    };
+
+    onSubmitOrder(orderData);
+  };
+
+  // const isFormValid =
+  //   formData.document &&
+  //   formData.name &&
+  //   formData.phone &&
+  //   formData.whatsapp &&
+  //   (formData.deliveryType === TYPE_DELIVERY.DELIVERY.id ? formData.address && formData.deliveryZone : true) &&
+  //   formData.paymentMethod &&
+  //   (formData.orderType === "now" || (formData.scheduledDate && formData.scheduledTime))
 
   return (
     <div className="grid lg:grid-cols-2 gap-8">
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground font-display text-xl">Información de Entrega</CardTitle>
+          <CardTitle className="text-foreground font-display text-xl">
+            Información de Entrega
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Tipo de Entrega */}
+            {/* Cómo quieres recibir tu pedido */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Tipo de Entrega</h3>
+              <h3 className="font-semibold text-foreground font-display">
+                ¿Cómo quieres recibir tu pedido?
+              </h3>
+
               <RadioGroup
-                value={formData.deliveryType}
-                onValueChange={(value) => setFormData({ ...formData, deliveryType: value })}
+                value={formData.idTypeDelivery}
+                onValueChange={(value) => {
+                  setFormData({ ...formData, idTypeDelivery: value });
+                }}
                 className="space-y-3"
               >
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="delivery" id="delivery" />
-                  <Label htmlFor="delivery" className="text-foreground flex items-center cursor-pointer">
-                    <Truck className="w-4 h-4 mr-2 text-primary" />
-                    Delivery
-                  </Label>
+                {/* Entrega Inmediata */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Entrega Inmediata
+                  </h4>
+
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem
+                      value={TYPE_DELIVERY.DELIVERY_NOW.id}
+                      id="delivery-now"
+                    />
+                    <Label
+                      htmlFor="delivery-now"
+                      className="text-foreground flex items-center cursor-pointer"
+                    >
+                      {TYPE_DELIVERY.DELIVERY_NOW.icon}
+                      <div>
+                        <span className="font-medium">
+                          {TYPE_DELIVERY.DELIVERY_NOW.name}
+                        </span>
+                        <span className="block text-sm text-muted-foreground">
+                          {TYPE_DELIVERY.DELIVERY_NOW.description}
+                        </span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem
+                      value={TYPE_DELIVERY.PICKUP_NOW.id}
+                      id="pickup-now"
+                    />
+                    <Label
+                      htmlFor="pickup-now"
+                      className="text-foreground flex items-center cursor-pointer"
+                    >
+                      {TYPE_DELIVERY.PICKUP_NOW.icon}
+                      <div>
+                        <span className="font-medium">
+                          {TYPE_DELIVERY.PICKUP_NOW.name}
+                        </span>
+                        <span className="block text-sm text-muted-foreground">
+                          {TYPE_DELIVERY.PICKUP_NOW.description}
+                        </span>
+                      </div>
+                    </Label>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="local" id="local" />
-                  <Label htmlFor="local" className="text-foreground flex items-center cursor-pointer">
-                    <Home className="w-4 h-4 mr-2 text-primary" />
-                    Recojo en Local
-                  </Label>
+
+                {/* Entrega Programada */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Entrega Programada
+                  </h4>
+
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem
+                      value={TYPE_DELIVERY.DELIVERY_SCHEDULED.id}
+                      id="delivery-scheduled"
+                    />
+                    <Label
+                      htmlFor="delivery-scheduled"
+                      className="text-foreground flex items-center cursor-pointer"
+                    >
+                      {TYPE_DELIVERY.DELIVERY_SCHEDULED.icon}
+                      <div>
+                        <span className="font-medium">
+                          {TYPE_DELIVERY.DELIVERY_SCHEDULED.name}
+                        </span>
+                        <span className="block text-sm text-muted-foreground">
+                          {TYPE_DELIVERY.DELIVERY_SCHEDULED.description}
+                        </span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem
+                      value={TYPE_DELIVERY.PICKUP_SCHEDULED.id}
+                      id="pickup-scheduled"
+                    />
+                    <Label
+                      htmlFor="pickup-scheduled"
+                      className="text-foreground flex items-center cursor-pointer"
+                    >
+                      {TYPE_DELIVERY.PICKUP_SCHEDULED.icon}
+                      <div>
+                        <span className="font-medium">
+                          {TYPE_DELIVERY.PICKUP_SCHEDULED.name}
+                        </span>
+                        <span className="block text-sm text-muted-foreground">
+                          {TYPE_DELIVERY.PICKUP_SCHEDULED.description}
+                        </span>
+                      </div>
+                    </Label>
+                  </div>
                 </div>
               </RadioGroup>
+
+              {/* Campos de fecha y hora para pedidos programados */}
+              {Object.values(TYPE_DELIVERY).find(
+                (t) => t.id === formData.idTypeDelivery
+              )?.isScheduled && (
+                <div className="bg-muted/50 p-4 rounded-lg border border-border/50 ml-6">
+                  <h5 className="font-medium text-foreground mb-3">
+                    Programar para:
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label
+                        htmlFor="scheduledDate"
+                        className="text-foreground font-medium text-sm"
+                      >
+                        Fecha *
+                      </Label>
+                      <Input
+                        id="scheduledDate"
+                        ref={refScheduledDate}
+                        type="date"
+                        value={formData.scheduledDate}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            scheduledDate: e.target.value,
+                          })
+                        }
+                        className="bg-background border-border text-foreground mt-2"
+                        min={new Date().toISOString().split("T")[0]}
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="scheduledTime"
+                        className="text-foreground font-medium text-sm"
+                      >
+                        Hora *
+                      </Label>
+                      <Select
+                        value={formData.scheduledTime}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, scheduledTime: value })
+                        }
+                      >
+                        <SelectTrigger
+                          ref={refScheduledTime}
+                          className="bg-background border-border text-foreground mt-2"
+                        >
+                          <SelectValue placeholder="Seleccionar hora" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card border-border max-h-48">
+                          {timeSlots().map((time) => (
+                            <SelectItem
+                              key={time}
+                              value={time}
+                              className="text-foreground"
+                            >
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Información del cliente */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Datos del Cliente</h3>
+              <h3 className="font-semibold text-foreground font-display">
+                Datos del Cliente
+              </h3>
+
+              <div className="space-y-4">
+                <Label className="text-foreground font-medium">
+                  Tipo de Documento *
+                </Label>
+                <Select
+                  value={formData.idTypeDocument}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, idTypeDocument: value })
+                  }
+                >
+                  <SelectTrigger
+                    ref={refTypeDocument}
+                    className="bg-muted border-border text-foreground mt-2"
+                  >
+                    <SelectValue placeholder="Selecciona el tipo de documento" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border">
+                    {listTypeDocument.map((typeDoc) => (
+                      <SelectItem
+                        key={typeDoc.id}
+                        value={typeDoc.id}
+                        className="text-foreground"
+                      >
+                        {typeDoc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
                 <Label htmlFor="name" className="text-foreground font-medium">
                   N° de Documento *
                 </Label>
                 <Input
                   id="document"
+                  ref={refDocument}
+                  type={isMobile ? "tel" : "text"}
                   value={formData.document}
-                  onChange={(e) => setFormData({ ...formData, document: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, document: e.target.value })
+                  }
+                  onKeyDown={!isMobile ? keyNumberInteger : undefined}
                   className="bg-muted border-border text-foreground mt-2"
-                  required
                 />
               </div>
               <div>
@@ -175,155 +639,244 @@ export function CheckoutForm({ isAuthenticated, user, cart, paymentMethods, deli
                 </Label>
                 <Input
                   id="name"
+                  ref={refName}
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="bg-muted border-border text-foreground mt-2"
-                  required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="phone" className="text-foreground font-medium">
-                    Teléfono *
+                  <Label
+                    htmlFor="phone"
+                    className="text-foreground font-medium"
+                  >
+                    Número de celular *
                   </Label>
                   <Input
                     id="phone"
+                    ref={refPhone}
+                    type={isMobile ? "tel" : "text"}
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                    onKeyDown={!isMobile ? keyNumberPhone : undefined}
                     className="bg-muted border-border text-foreground mt-2"
-                    required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="whatsapp" className="text-foreground font-medium">
+                  <Label
+                    htmlFor="whatsapp"
+                    className="text-foreground font-medium"
+                  >
                     WhatsApp *
                   </Label>
                   <Input
                     id="whatsapp"
+                    ref={refWhastapp}
+                    type={isMobile ? "tel" : "text"}
                     value={formData.whatsapp}
-                    onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, whatsapp: e.target.value })
+                    }
+                    onKeyDown={!isMobile ? keyNumberPhone : undefined}
                     className="bg-muted border-border text-foreground mt-2"
                     placeholder="Ej: +51999888777"
-                    required
                   />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="email" className="text-foreground font-medium">
+                  Correo Electrónico *
+                </Label>
+                <Input
+                  id="email"
+                  ref={refEmail}
+                  type={isMobile ? "email" : "text"}
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="bg-muted border-border text-foreground mt-2"
+                />
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="password"
+                  className="text-foreground font-medium"
+                >
+                  Contraseña de la cuenta *
+                </Label>
+                <div className="relative mt-2">
+                  <Input
+                    id="password"
+                    ref={refPassword}
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    className="bg-muted border-border text-foreground pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="validationPassword"
+                  className="text-foreground font-medium"
+                >
+                  Validar contraseña *
+                </Label>
+                <div className="relative mt-2">
+                  <Input
+                    id="validationPassword"
+                    ref={refValidationPassword}
+                    type={showValidationPassword ? "text" : "password"}
+                    value={formData.validationPassword}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        validationPassword: e.target.value,
+                      })
+                    }
+                    className="bg-muted border-border text-foreground pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                    onClick={() =>
+                      setShowValidationPassword(!showValidationPassword)
+                    }
+                  >
+                    {showValidationPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
 
             {/* Dirección de entrega */}
-            {formData.deliveryType === "delivery" && (
+            {(formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
+              formData.idTypeDelivery ===
+                TYPE_DELIVERY.DELIVERY_SCHEDULED.id) && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-foreground font-display">Dirección de Entrega</h3>
+                <h3 className="font-semibold text-foreground font-display">
+                  Dirección de Entrega
+                </h3>
                 <div>
-                  <Label htmlFor="address" className="text-foreground font-medium">
+                  <Label
+                    htmlFor="address"
+                    className="text-foreground font-medium"
+                  >
                     Dirección *
                   </Label>
                   <Input
                     id="address"
+                    ref={refAddress}
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
                     className="bg-muted border-border text-foreground mt-2"
-                    required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="reference" className="text-foreground font-medium">
+                  <Label
+                    htmlFor="reference"
+                    className="text-foreground font-medium"
+                  >
                     Referencia
                   </Label>
                   <Input
                     id="reference"
                     value={formData.reference}
-                    onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, reference: e.target.value })
+                    }
                     className="bg-muted border-border text-foreground mt-2"
                     placeholder="Ej: Casa azul, portón negro"
                   />
                 </div>
-                <div>
-                  <Label className="text-foreground font-medium">Zona de entrega *</Label>
+                {/* <div>
+                  <Label className="text-foreground font-medium">Sucursal *</Label>
                   <Select
-                    value={formData.deliveryZone}
-                    onValueChange={(value) => setFormData({ ...formData, deliveryZone: value })}
+                    value={formData.idBranch}
+                    onValueChange={(value) => setFormData({ ...formData, idBranch: value })}
                   >
                     <SelectTrigger className="bg-muted border-border text-foreground mt-2">
-                      <SelectValue placeholder="Selecciona tu zona" />
+                      <SelectValue placeholder="Selecciona tu sucursal" />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
+                    <SelectContent className="bg-card border-border">                    
                       {deliveryZones.map((zone) => (
                         <SelectItem key={zone.id} value={zone.id} className="text-foreground">
-                          {zone.name} - S/. {zone.price.toFixed(2)} ({zone.time})
+                          {zone.name} - {formatCurrency(zone.price, currency!.code)} ({zone.time})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
               </div>
             )}
 
-            {/* Tipo de pedido */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Tipo de Pedido</h3>
-              <RadioGroup
-                value={formData.orderType}
-                onValueChange={(value) => setFormData({ ...formData, orderType: value })}
-                className="space-y-3"
+            {/* {
+              formData.idTypeDelivery === TYPE_DELIVERY.RECOJO_LOCAL.id && ( */}
+            <div>
+              <Label className="text-foreground font-medium">Sucursal *</Label>
+              <Select
+                value={formData.idBranch}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, idBranch: value })
+                }
               >
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="now" id="now" />
-                  <Label htmlFor="now" className="text-foreground flex items-center cursor-pointer">
-                    <Clock className="w-4 h-4 mr-2 text-primary" />
-                    Entregar ahora
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="scheduled" id="scheduled" />
-                  <Label htmlFor="scheduled" className="text-foreground flex items-center cursor-pointer">
-                    <Calendar className="w-4 h-4 mr-2 text-primary" />
-                    Programar entrega
-                  </Label>
-                </div>
-              </RadioGroup>
-              {formData.orderType === "scheduled" && (
-                <div className="grid grid-cols-2 gap-4 ml-6">
-                  <div>
-                    <Label htmlFor="scheduledDate" className="text-foreground font-medium">
-                      Fecha *
-                    </Label>
-                    <Input
-                      id="scheduledDate"
-                      type="date"
-                      value={formData.scheduledDate}
-                      onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
-                      className="bg-muted border-border text-foreground mt-2"
-                      min={new Date().toISOString().split("T")[0]}
-                      required={formData.orderType === "scheduled"}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="scheduledTime" className="text-foreground font-medium">
-                      Hora *
-                    </Label>
-                    <Select
-                      value={formData.scheduledTime}
-                      onValueChange={(value) => setFormData({ ...formData, scheduledTime: value })}
+                <SelectTrigger
+                  ref={refBranch}
+                  className="bg-muted border-border text-foreground mt-2"
+                >
+                  <SelectValue placeholder="Selecciona tu sucursal" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  {branches.map((branch) => (
+                    <SelectItem
+                      key={branch.id}
+                      value={branch.id}
+                      className="text-foreground"
                     >
-                      <SelectTrigger className="bg-muted border-border text-foreground mt-2">
-                        <SelectValue placeholder="Seleccionar hora" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border max-h-48">
-                        {timeSlots.map((time) => (
-                          <SelectItem key={time} value={time} className="text-foreground">
-                            {time}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              )}
+                      {branch.name}
+                    </SelectItem>
+                  ))}
+                  {/* {deliveryZones.map((zone) => (
+                        <SelectItem key={zone.id} value={zone.id} className="text-foreground">
+                          {zone.name} -  {formatCurrency(zone.price, currency!.code)} ({zone.time})
+                        </SelectItem>
+                        
+                      ))} */}
+                </SelectContent>
+              </Select>
             </div>
+            {/* )
+            } */}
 
             {/* Descuento */}
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <h3 className="font-semibold text-foreground font-display">Descuento</h3>
               <div>
                 <Label htmlFor="discount" className="text-foreground font-medium">
@@ -340,17 +893,17 @@ export function CheckoutForm({ isAuthenticated, user, cart, paymentMethods, deli
                   placeholder="Ej: 10"
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Método de pago */}
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <h3 className="font-semibold text-foreground font-display">Método de Pago</h3>
               <p className="text-sm text-muted-foreground">
                 Los pagos son referenciales. Aún no se aceptan pagos en línea. Al momento de recoger su pedido, se le proporcionará toda la información necesaria para realizar el pago.
               </p>
               <RadioGroup
-                value={formData.paymentMethod}
-                onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}
+                value={formData.paymentMethodReference}
+                onValueChange={(value) => setFormData({ ...formData, paymentMethodReference: value })}
                 className="space-y-3"
               >
                 {paymentMethods
@@ -365,32 +918,44 @@ export function CheckoutForm({ isAuthenticated, user, cart, paymentMethods, deli
                     </div>
                   ))}
               </RadioGroup>
-            </div>
+            </div> */}
 
             {/* Notas del pedido */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Información Adicional</h3>
+              <h3 className="font-semibold text-foreground font-display">
+                Información Adicional
+              </h3>
               <div>
-                <Label htmlFor="orderNotes" className="text-foreground font-medium">
+                <Label
+                  htmlFor="orderNotes"
+                  className="text-foreground font-medium"
+                >
                   Notas sobre el pedido
                 </Label>
                 <Textarea
                   id="orderNotes"
                   value={formData.orderNotes}
-                  onChange={(e) => setFormData({ ...formData, orderNotes: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orderNotes: e.target.value })
+                  }
                   className="bg-muted border-border text-foreground placeholder:text-muted-foreground mt-2"
-                  placeholder="Ej: Incluye salsas extra, sin picante, para celebración..."
+                  placeholder="Ej: Incluir adicionales..."
                   rows={3}
                 />
               </div>
               <div>
-                <Label htmlFor="notes" className="text-foreground font-medium">
+                <Label
+                  htmlFor="instructions"
+                  className="text-foreground font-medium"
+                >
                   Instrucciones de entrega
                 </Label>
                 <Textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  id="instructions"
+                  value={formData.instructions}
+                  onChange={(e) =>
+                    setFormData({ ...formData, instructions: e.target.value })
+                  }
                   className="bg-muted border-border text-foreground placeholder:text-muted-foreground mt-2"
                   placeholder="Instrucciones especiales para la entrega..."
                   rows={3}
@@ -399,12 +964,17 @@ export function CheckoutForm({ isAuthenticated, user, cart, paymentMethods, deli
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={onBack} className="flex-1 bg-transparent">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onBack}
+                className="flex-1 bg-transparent"
+              >
                 Volver
               </Button>
               <Button
                 type="submit"
-                disabled={!isFormValid}
+                // disabled={!isFormValid}
                 className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Confirmar Pedido
@@ -415,19 +985,39 @@ export function CheckoutForm({ isAuthenticated, user, cart, paymentMethods, deli
       </Card>
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground font-display text-xl">Resumen del Pedido</CardTitle>
+          <CardTitle className="text-foreground font-display text-xl">
+            Resumen del Pedido
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-2">
             {cart.map((item) => (
-              <div key={item.id} className="flex justify-between items-center py-3 border-b border-border">
-                <div>
-                  <p className="text-foreground font-medium">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">Cantidad: {item.quantity}</p>
-                  {item.notes && <p className="text-xs text-primary mt-1">Nota: {item.notes}</p>}
+              <div
+                key={item.id}
+                className="flex justify-between items-center py-3 border-b border-border"
+              >
+                <div className="flex items-center space-x-3">
+                  <Image
+                    src={item.image || "/placeholder.svg"}
+                    alt={item.name}
+                    width={60}
+                    height={60}
+                    className="rounded-lg object-cover"
+                  />
+                  <div>
+                    <p className="text-foreground font-medium">{item.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Cantidad: {item.quantity}
+                    </p>
+                    {item.notes && (
+                      <p className="text-xs text-primary mt-1">
+                        Nota: {item.notes}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <span className="text-primary font-bold font-display">
-                  S/. {(item.price * item.quantity).toFixed(2)}
+                  {formatCurrency(item.price * item.quantity, currency!.code)}
                 </span>
               </div>
             ))}
@@ -435,72 +1025,82 @@ export function CheckoutForm({ isAuthenticated, user, cart, paymentMethods, deli
           <div className="space-y-3 pt-4 border-t border-border">
             <div className="flex justify-between text-foreground">
               <span>Subtotal:</span>
-              <span>S/. {subtotal.toFixed(2)}</span>
+              <span>{formatCurrency(subtotal, currency!.code)}</span>
             </div>
-            {discountPercentage > 0 && (
+            {/* {discountPercentage > 0 && (
               <div className="flex justify-between text-foreground">
                 <span>Descuento ({discountPercentage}%):</span>
-                <span>-S/. {(subtotal * discountPercentage / 100).toFixed(2)}</span>
+                <span>-{formatCurrency((subtotal * discountPercentage / 100), currency!.code)}</span>
               </div>
-            )}
-            <div className="flex justify-between text-foreground">
+            )} */}
+            {/* <div className="flex justify-between text-foreground">
               <span>Subtotal con descuento:</span>
-              <span>S/. {discountedSubtotal.toFixed(2)}</span>
-            </div>
-            {formData.deliveryType === "delivery" && (
+              <span>{formatCurrency(discountedSubtotal, currency!.code)}</span>
+            </div> */}
+            {/* {formData.deliveryType === TYPE_DELIVERY.DELIVERY.id && (
               <div className="flex justify-between text-foreground">
                 <span>Delivery:</span>
-                <span>S/. {deliveryFee.toFixed(2)}</span>
+                <span>{formatCurrency(deliveryFee, currency!.code)}</span>
               </div>
-            )}
-            <div className="flex justify-between text-xl font-bold text-primary pt-3 border-t border-border font-display">
+            )} */}
+            {/* <div className="flex justify-between text-xl font-bold text-primary pt-3 border-t border-border font-display">
               <span>Total:</span>
-              <span>S/. {total.toFixed(2)}</span>
-            </div>
+              <span>{formatCurrency(total, currency!.code)}</span>
+            </div> */}
           </div>
           {/* Información de entrega */}
           <div className="space-y-3 pt-4 border-t border-border">
-            {formData.deliveryType === "delivery" && selectedZone && (
-              <div className="bg-muted/50 p-4 rounded-lg border border-border/50">
-                <div className="flex items-center mb-2">
-                  <Package className="w-4 h-4 text-primary mr-2" />
-                  <span className="font-medium text-foreground">Información de entrega</span>
-                </div>
-                <p className="text-foreground text-sm">
-                  <strong>Tiempo estimado:</strong> <span className="text-primary">{selectedZone.time}</span>
-                </p>
-                {formData.orderType === "scheduled" && formData.scheduledDate && formData.scheduledTime && (
-                  <p className="text-foreground text-sm">
-                    <strong>Entrega programada:</strong>{" "}
-                    <span className="text-primary">
-                      {new Date(formData.scheduledDate).toLocaleDateString()} a las {formData.scheduledTime}
-                    </span>
-                  </p>
-                )}
+            <div className="bg-muted/50 p-4 rounded-lg border border-border/50">
+              <div className="flex items-center mb-2">
+                {
+                  Object.values(TYPE_DELIVERY).find(
+                    (t) => t.id === formData.idTypeDelivery
+                  )?.icon
+                }
+                <span className="font-medium text-foreground">
+                  {
+                    Object.values(TYPE_DELIVERY).find(
+                      (t) => t.id === formData.idTypeDelivery
+                    )?.name
+                  }
+                </span>
               </div>
-            )}
-            {formData.deliveryType === "local" && (
-              <div className="bg-muted/50 p-4 rounded-lg border border-border/50">
-                <div className="flex items-center mb-2">
-                  <Home className="w-4 h-4 text-primary mr-2" />
-                  <span className="font-medium text-foreground">Recojo en Local</span>
-                </div>
+
+              {Object.values(TYPE_DELIVERY).find(
+                (t) => t.id === formData.idTypeDelivery
+              )?.isScheduled ? (
                 <p className="text-foreground text-sm">
-                  <strong>Dirección:</strong> <span className="text-primary">[Dirección del local]</span>
+                  <strong>Programado para:</strong>{" "}
+                  <span className="text-primary">
+                    {new Date(formData.scheduledDate).toLocaleDateString()} a
+                    las {formData.scheduledTime}
+                  </span>
                 </p>
-                {formData.orderType === "scheduled" && formData.scheduledDate && formData.scheduledTime && (
-                  <p className="text-foreground text-sm">
-                    <strong>Recojo programado:</strong>{" "}
-                    <span className="text-primary">
-                      {new Date(formData.scheduledDate).toLocaleDateString()} a las {formData.scheduledTime}
-                    </span>
-                  </p>
-                )}
-              </div>
-            )}
+              ) : (
+                <p className="text-foreground text-sm">
+                  <strong>Tiempo estimado:</strong>{" "}
+                  <span className="text-primary">
+                    {
+                      Object.values(TYPE_DELIVERY).find(
+                        (t) => t.id === formData.idTypeDelivery
+                      )?.description
+                    }
+                  </span>
+                </p>
+              )}
+
+              {(formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
+                formData.idTypeDelivery ===
+                  TYPE_DELIVERY.DELIVERY_SCHEDULED.id) && (
+                <p className="text-foreground text-sm mt-1">
+                  <strong>Dirección:</strong>{" "}
+                  <span className="text-primary">{formData.address}</span>
+                </p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
