@@ -14,17 +14,27 @@ import {
   X,
   Maximize2,
   ChevronRight as ChevronRightBreadcrumb,
-  ArrowRight
+  ArrowRight,
+  Minus,
+  Plus,
+  ShoppingCart,
+  Heart,
+  Share2
 } from "lucide-react"
 import { useCart } from "@/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/context/AuthContext"
-// import { useWishlist } from "@/context/wishlist-context"
 import Welcome from "@/components/Welcome"
 import { NavSecondary } from "@/components/Nav"
 import { Branch, Company, Product } from "@/types/api-type"
-import { cn } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 import { MenuCard } from "./MenuCard"
+import { Label } from "./ui/label"
+import { Textarea } from "./ui/textarea"
+import { useWishlist } from "@/context/WishlistContext"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { TYPE_PRODUCT } from "@/constants/type-product"
+import { useCurrency } from "@/context/CurrencyContext"
 
 interface ProductImage {
   id: string
@@ -39,7 +49,7 @@ interface PropsProductComponent {
   branch: Branch
   product: Product
   relatedProducts: Product[]
-  authEnabled?: boolean
+  authEnabled: boolean
 }
 
 interface PropsProductImageGallery {
@@ -288,14 +298,15 @@ function ProductImageGallery({
 export default function ProductComponent({ company, branch, product, relatedProducts, authEnabled }: PropsProductComponent) {
   const params = useParams()
   const router = useRouter()
+  const { currency } = useCurrency()
   const { addToCart } = useCart()
   const { isAuthenticated } = useAuth()
-  //   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { toast } = useToast()
 
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState("")
-  //   const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.id) || false)
+  const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.id) || false)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -323,51 +334,51 @@ export default function ProductComponent({ company, branch, product, relatedProd
   }]
 
   // Determinar el estado de stock
-  const isOutOfStock = !product.isService && product.stock === 0
-  const isLowStock = !product.isService && product.stock > 0 && product.stock <= 5
+  const isOutOfStock = (product.typeProduct?.id !== TYPE_PRODUCT.SERVICE.id) && product.stock === 0
+  const isLowStock = product.typeProduct?.id !== TYPE_PRODUCT.SERVICE.id && product.stock > 0 && product.stock <= 5
 
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change
-    if (newQuantity >= 1 && (product.isService || newQuantity <= product.stock)) {
+    if (newQuantity >= 1 && (product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id || newQuantity <= product.stock)) {
       setQuantity(newQuantity)
     }
   }
 
   const handleAddToCart = () => {
-    // if (addToCart) {
-    //   addToCart(product, quantity, notes)
-    //   toast({
-    //     title: "Plato agregado al carrito",
-    //     description: `${quantity} x ${product.name} añadido a tu carrito${notes ? ` con notas: ${notes}` : ''}`,
-    //   })
-    // }
+    if (addToCart) {
+      addToCart(product, quantity, notes)
+      toast({
+        title: "Agregado al carrito",
+        description: `${quantity} x ${product.name} añadido a tu carrito${notes ? ` con notas: ${notes}` : ''}`,
+      })
+    }
   }
 
   const handleBuyNow = () => {
-    // if (addToCart) {
-    //   addToCart(product, quantity, notes)
-    //   router.push("/checkout")
-    // }
+    if (addToCart) {
+      addToCart(product, quantity, notes)
+      router.push("/checkout")
+    }
   }
 
   const handleWishlistToggle = () => {
-    // if (!addToWishlist || !removeFromWishlist) return
+    if (!addToWishlist || !removeFromWishlist) return
 
-    // if (isWishlisted) {
-    //   removeFromWishlist(product.id)
-    //   setIsWishlisted(false)
-    //   toast({
-    //     title: "Eliminado de favoritos",
-    //     description: `${product.name} ha sido eliminado de tus favoritos`,
-    //   })
-    // } else {
-    //   addToWishlist(product)
-    //   setIsWishlisted(true)
-    //   toast({
-    //     title: "Añadido a favoritos",
-    //     description: `${product.name} ha sido añadido a tus favoritos`,
-    //   })
-    // }
+    if (isWishlisted) {
+      removeFromWishlist(product.id)
+      setIsWishlisted(false)
+      toast({
+        title: "Eliminado de favoritos",
+        description: `${product.name} ha sido eliminado de tus favoritos`,
+      })
+    } else {
+      addToWishlist(product)
+      setIsWishlisted(true)
+      toast({
+        title: "Añadido a favoritos",
+        description: `${product.name} ha sido añadido a tus favoritos`,
+      })
+    }
   }
 
   const handleShare = async (platform: string) => {
@@ -393,15 +404,15 @@ export default function ProductComponent({ company, branch, product, relatedProd
       case "whatsapp":
         window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, "_blank")
         break
-      case "facebook":
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank")
-        break
-      case "twitter":
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank")
-        break
-      case "email":
-        window.open(`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`, "_blank")
-        break
+      // case "facebook":
+      //   window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank")
+      //   break
+      // case "twitter":
+      //   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank")
+      //   break
+      // case "email":
+      //   window.open(`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`, "_blank")
+      //   break
     }
   }
 
@@ -412,7 +423,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <NavSecondary title="Detalle de producto" />
+      <NavSecondary title="Detalle de producto" authEnabled={authEnabled} />
 
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
@@ -453,7 +464,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
             {/* Precio */}
             <div className="flex items-center gap-3 py-2">
               <span className="text-blue-600 font-bold text-xl">
-                S/. {product.price.toFixed(2)} x {product.measurement?.name}
+                {formatCurrency(product.price, currency!.code)} x {product.measurement?.name}
               </span>
             </div>
 
@@ -481,7 +492,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground w-32">Disponibilidad:</span>
-                {product.isService ? (
+                {product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
                   <span className="text-blue-600 font-medium flex items-center">
                     <AlertCircle className="h-4 w-4 mr-1" />
                     Siempre disponible
@@ -503,100 +514,128 @@ export default function ProductComponent({ company, branch, product, relatedProd
                   </span>
                 )}
               </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground w-32">Marca:</span>
+                <span>{product.brand?.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground w-32">Código:</span>
+                <span>{product.code}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground w-32">Sku:</span>
+                <span>{product.sku}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground w-32">Código de Barras:</span>
+                <span>{product.codeBar}</span>
+              </div>
             </div>
 
             {/* Selector de cantidad y notas */}
             <div className="space-y-6 pt-2">
               {/* Cantidad */}
               <div className="flex flex-col gap-3">
-                {/* <div className="flex items-center justify-between">
-                  <span className="font-medium">Cantidad:</span>
-                  <div className="flex items-center space-x-3">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleQuantityChange(-1)}
-                      disabled={quantity <= 1}
-                      className="h-10 w-10 p-0"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </Button>
-                    <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleQuantityChange(1)}
-                      disabled={!product.isService && quantity >= product.stock}
-                      className="h-10 w-10 p-0"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div> */}
+                {
+                  authEnabled && (
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Cantidad:</span>
+                      <div className="flex items-center space-x-3">
+                        {
+                          product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
+                            <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                          )
+                            : (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleQuantityChange(-1)}
+                                  disabled={quantity <= 1}
+                                  className="h-10 w-10 p-0"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </Button>
+                                <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleQuantityChange(1)}
+                                  className="h-10 w-10 p-0"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )
+                        }
+                      </div>
+                    </div>
+                  )
+                }
 
                 {/* Notas especiales */}
-                {/* <div>
+                <div>
                   <Label htmlFor="notes" className="font-medium mb-2 block">
                     Notas especiales (opcional)
                   </Label>
                   <Textarea
                     id="notes"
-                    placeholder="Ej: Sin cebolla, término medio, extra salsa..."
+                    placeholder=""
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="bg-muted border-border"
                     rows={3}
                   />
-                </div> */}
+                </div>
 
                 {/* Botones de acción */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  {/* <Button 
-                    size="lg" 
-                    className="w-full" 
-                    disabled={isOutOfStock} 
-                    onClick={handleAddToCart}
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Añadir al carrito
-                  </Button>
-                  {authEnabled && (
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      className="w-full" 
-                      disabled={isOutOfStock} 
-                      onClick={handleBuyNow}
-                    >
-                      Pedir ahora
-                    </Button>
-                  )} */}
+                {
+                  authEnabled && (
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                      <Button
+                        size="lg"
+                        className="w-full"
+                        disabled={isOutOfStock}
+                        onClick={handleAddToCart}
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Añadir al carrito
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full"
+                        disabled={isOutOfStock}
+                        onClick={handleBuyNow}
+                      >
+                        Pedir ahora
+                      </Button>
 
-                  <div className="flex gap-2 mt-2 sm:mt-0">
-                    {/* <Button
-                      variant={isWishlisted ? "default" : "outline"}
-                      size="icon"
-                      className={`flex-shrink-0 ${isWishlisted ? "bg-red-500 hover:bg-red-600" : ""}`}
-                      onClick={handleWishlistToggle}
-                      aria-label={isWishlisted ? "Eliminar de favoritos" : "Añadir a favoritos"}
-                    >
-                      <Heart className={`h-5 w-5 ${isWishlisted ? "fill-white text-white" : ""}`} />
-                    </Button> */}
-
-                    {/* <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon" className="flex-shrink-0">
-                          <Share2 className="h-5 w-5" />
+                      <div className="flex gap-2 mt-2 sm:mt-0">
+                        <Button
+                          variant={isWishlisted ? "default" : "outline"}
+                          size="icon"
+                          className={`flex-shrink-0 ${isWishlisted ? "bg-red-500 hover:bg-red-600" : ""}`}
+                          onClick={handleWishlistToggle}
+                          aria-label={isWishlisted ? "Eliminar de favoritos" : "Añadir a favoritos"}
+                        >
+                          <Heart className={`h-5 w-5 ${isWishlisted ? "fill-white text-white" : ""}`} />
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleShare("clipboard")}>
-                          Copiar enlace
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleShare("whatsapp")}>
-                          Compartir en WhatsApp
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleShare("facebook")}>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" className="flex-shrink-0">
+                              <Share2 className="h-5 w-5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleShare("clipboard")}>
+                              Copiar enlace
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleShare("whatsapp")}>
+                              Compartir en WhatsApp
+                            </DropdownMenuItem>
+                            {/* <DropdownMenuItem onClick={() => handleShare("facebook")}>
                           Compartir en Facebook
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleShare("twitter")}>
@@ -604,22 +643,24 @@ export default function ProductComponent({ company, branch, product, relatedProd
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleShare("email")}>
                           Compartir por email
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu> */}
-                  </div>
-                </div>
+                        </DropdownMenuItem> */}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  )
+                }
               </div>
 
               {/* Total */}
-              {/* <div className="flex flex-col md:flex-row md:justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
+              <div className="flex flex-col md:flex-row md:justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
                 <div className="w-full md:w-auto flex flex-row md:flex-col justify-between items-center md:items-start">
                   <div className="text-sm text-muted-foreground">Total</div>
                   <div className="text-2xl font-bold text-primary font-display">
-                    S/. {(product.price * quantity).toFixed(2)}
+                    {formatCurrency(product.price * quantity, currency!.code)}
                   </div>
                 </div>
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
@@ -642,15 +683,15 @@ export default function ProductComponent({ company, branch, product, relatedProd
             </TabsContent>
 
             <TabsContent value="details" className="mt-6">
-              <div className="max-w-none">
+              <div className="max-w-none w-full">
                 {product.details ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                     {product.details.map((detail, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-primary rounded-full" />
-                        <span className="text-base">
+                      <div key={index} className="flex items-start space-x-2">
+                        <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1" />
+                        <div className="text-base break-words">
                           <span className="font-semibold">{detail.name}:</span> {detail.value}
-                        </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -658,6 +699,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
                   <p className="text-muted-foreground">Información de ingredientes no disponible.</p>
                 )}
               </div>
+
             </TabsContent>
 
             {/* <TabsContent value="nutrition" className="mt-6">
@@ -703,35 +745,10 @@ export default function ProductComponent({ company, branch, product, relatedProd
                 <MenuCard
                   key={index}
                   item={item}
+                  onAddToCart={addToCart}
+                  currency={currency}
+                  authEnabled={authEnabled}
                 />
-                // <Card
-                //   key={item.id}
-                //   className="group bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer"
-                //   onClick={() => router.push(`/plato/${item.id}`)}
-                // >
-                //   <CardContent className="p-0">
-                //     <div className="relative overflow-hidden">
-                //       <Image
-                //         src={item.image || "/placeholder.svg"}
-                //         alt={item.name}
-                //         width={300}
-                //         height={200}
-                //         className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                //       />
-                //       <div className="absolute top-3 right-3">
-                //         <Badge className="bg-primary text-primary-foreground">
-                //           <Star className="w-3 h-3 mr-1 fill-current" />
-                //           4.8
-                //         </Badge>
-                //       </div>
-                //     </div>
-                //     <div className="p-4">
-                //       <h3 className="font-semibold text-lg text-foreground mb-2 font-display">{item.name}</h3>
-                //       <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{item.description}</p>
-                //       <div className="text-primary font-bold text-xl font-display">S/. {item.price.toFixed(2)}</div>
-                //     </div>
-                //   </CardContent>
-                // </Card>
               ))}
             </div>
           </div>

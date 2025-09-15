@@ -3,17 +3,21 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Trash2, Plus, Minus, ShoppingCart } from "lucide-react"
-import type { CartItem } from "@/types"
 import Image from "next/image"
+import { Cart } from "@/types/api-type"
+import { TYPE_PRODUCT } from "@/constants/type-product"
+import { useCurrency } from "@/context/CurrencyContext"
+import { formatCurrency } from "@/lib/utils"
 
 interface CartProps {
-  cart: CartItem[]
-  onUpdateQuantity: (itemId: string, quantity: number) => void
-  onRemoveItem: (itemId: string) => void
+  cart: Cart[]
+  onUpdateQuantity: (id: string, quantity: number) => void
+  onRemoveItem: (id: string) => void
   onCheckout: () => void
 }
 
-export function Cart({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartProps) {
+export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartProps) {
+  const { currency } = useCurrency();
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   if (cart.length === 0) {
@@ -29,7 +33,7 @@ export function Cart({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartP
   }
 
   return (
-    <Card className="bg-card border-border">
+    <Card>
       <CardHeader className="pb-4">
         <CardTitle className="text-foreground flex items-center justify-between font-display">
           <div className="flex items-center">
@@ -44,7 +48,7 @@ export function Cart({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartP
             <div key={item.id} className="flex flex-col space-y-3 p-3 bg-muted/50 rounded-lg border border-border/50">
               <div className="flex items-center space-x-3">
                 <Image
-                  src={item.images[0].url || "/placeholder.svg"}
+                  src={item.image || "/placeholder.svg"}
                   alt={item.name}
                   width={60}
                   height={60}
@@ -52,29 +56,40 @@ export function Cart({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartP
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-foreground truncate">{item.name}</h4>
-                  <p className="text-sm text-primary font-semibold">S/. {item.price.toFixed(2)}</p>
+                  <p className="text-sm text-primary font-semibold">
+                    {formatCurrency(item.price, currency!.code)}
+                  </p>
                   {item.notes && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">Nota: {item.notes}</p>}
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Minus className="w-3 h-3" />
-                  </Button>
-                  <span className="w-8 text-center text-foreground font-medium">{item.quantity}</span>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </Button>
+                  {
+                    item.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
+                      <span className="w-8 text-center text-foreground font-medium">{item.quantity}</span>
+                    ) : (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </Button>
+                        <span className="w-8 text-center text-foreground font-medium">{item.quantity}</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </>
+                    )
+                  }
+
                 </div>
                 <Button
                   size="sm"
@@ -92,7 +107,7 @@ export function Cart({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: CartP
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold text-foreground font-display">Total:</span>
             <Badge className="bg-primary text-primary-foreground text-lg px-4 py-2 font-display font-semibold">
-              S/. {total.toFixed(2)}
+              {formatCurrency(total, currency!.code)}
             </Badge>
           </div>
           <Button

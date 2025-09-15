@@ -3,8 +3,10 @@ import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReactToPrint } from "react-to-print";
-import type { Order, RestaurantData } from "@/types";
-import customers from "@/data/customer.json";
+import type { RestaurantData } from "@/types";
+import { useCurrency } from "@/context/CurrencyContext";
+import { formatCurrency } from "@/lib/utils";
+import { Order } from "@/types/api-type";
 
 interface OrderCompletionProps {
   order: Order;
@@ -13,19 +15,22 @@ interface OrderCompletionProps {
 }
 
 export const OrderCompletion: React.FC<OrderCompletionProps> = ({ order, restaurant, onBackToMenu }) => {
+  const { currency } = useCurrency();
   const contentRef = useRef<HTMLDivElement>(null);
-  const customer = customers.list.find(item => item.id === order.customerId);
+
+  const total = order.orderDetails.reduce((previousValue, currentValue) => previousValue + (currentValue.price * currentValue.quantity), 0);
 
   const handlePrint = useReactToPrint({ contentRef });
 
   const handleWhatsApp = () => {
-    const deliveryAddress = order.delivery?.address?.address || 'N/A';
+    // const deliveryAddress = order.delivery?.address?.address || 'N/A';
+    const deliveryAddress = order.person.address || 'N/A';
     const message = `Hola, me gustaría confirmar mi pedido:
     \n\n*Resumen del Pedido:*
-    \n${order.items.map(item => ` - ${item.name} x ${item.quantity}: S/. ${(item.price * item.quantity).toFixed(2)}`).join('\n')}
-    \n\n*Total:* S/. ${order.payment.total.toFixed(2)}
+    \n${order.orderDetails.map(item => ` - ${item.product.name} x ${item.quantity}: S/. ${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+    \n\n*Total:* S/. ${formatCurrency(total, currency.code)}
     \n\n*Dirección de entrega:* ${deliveryAddress}
-    \n*Método de pago:* ${order.payment.method}
+    \n*Método de pago:* completar
     \n\nGracias.`;
 
     const url = `https://wa.me/${restaurant.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
@@ -46,28 +51,28 @@ export const OrderCompletion: React.FC<OrderCompletionProps> = ({ order, restaur
               <div className="border-t border-border pt-4">
                 <h4 className="font-semibold text-foreground">Resumen del Pedido</h4>
                 <div className="space-y-2 mt-2">
-                  {order.items.map((item) => (
+                  {order.orderDetails.map((item) => (
                     <div key={item.id} className="flex justify-between">
-                      <span className="text-foreground">{item.name} x {item.quantity}</span>
-                      <span className="text-primary">S/. {(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-foreground">{item.product.name} x {item.quantity}</span>
+                      <span className="text-primary">{formatCurrency(item.price * item.quantity, currency.code)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="flex justify-between font-bold mt-4">
                   <span className="text-foreground">Total</span>
-                  <span className="text-primary">S/. {order.payment.total.toFixed(2)}</span>
+                  <span className="text-primary">{formatCurrency(total, currency.code)}</span>
                 </div>
               </div>
               <div className="border-t border-border pt-4">
                 <h4 className="font-semibold text-foreground">Información del Cliente</h4>
-                <p className="text-foreground"><strong>Nombre:</strong> {customer?.name || 'N/A'}</p>
-                <p className="text-foreground"><strong>Teléfono:</strong> {customer?.phone || 'N/A'}</p>
-                <p className="text-foreground"><strong>Dirección:</strong> {order.delivery?.address?.address || 'N/A'}</p>
+                <p className="text-foreground"><strong>Nombre:</strong> {order.person.information || 'N/A'}</p>
+                <p className="text-foreground"><strong>Teléfono:</strong> {order.person.cellular || 'N/A'}</p>
+                <p className="text-foreground"><strong>Dirección:</strong> {order.person.address || 'N/A'}</p>
               </div>
-              <div className="border-t border-border pt-4">
+              {/* <div className="border-t border-border pt-4">
                 <h4 className="font-semibold text-foreground">Método de Pago</h4>
                 <p className="text-foreground">{order.payment.method}</p>
-              </div>
+              </div> */}
               <div className="flex gap-4 pt-4">
                 <Button onClick={handleWhatsApp} className="flex-1 bg-green-500 hover:bg-green-500/90">
                   Enviar a WhatsApp

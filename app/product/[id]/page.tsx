@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getBranches, getCompanyInfo, getProductById, getProductsRelated } from "@/lib/api";
 import ProductComponent from "@/components/Product";
+import { Suspense } from "react";
+import Welcome from "@/components/Welcome";
 
 interface ProductDetalleProps {
   params: Promise<{ id: string }>;
@@ -33,15 +35,17 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   const branch = branches.find((branch) => branch.primary === true)!;
 
   // Procesar variable de entorno en el servidor
-  const authEnabled = process.env.APP_BACK_END === "true";
+  const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
-    <ProductComponent
-      company={company}
-      branch={branch}
-      product={product}
-      relatedProducts={relatedProducts}
-      authEnabled={authEnabled}
-    />
+    <Suspense fallback={<Welcome company={company} branch={branch} />}>
+      <ProductComponent
+        company={company}
+        branch={branch}
+        product={product}
+        relatedProducts={relatedProducts}
+        authEnabled={authEnabled}
+      />
+    </Suspense>
   );
 }

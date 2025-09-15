@@ -1,4 +1,4 @@
-export interface ProductImage { 
+export interface ProductImage {
   id: string
   name: string
   url: string
@@ -12,9 +12,42 @@ export interface ProductDetail {
   value: string,
 }
 
+export interface TypeProduct {
+  id: string
+  code?: string
+  name: string
+}
+
+export interface TypeDocument {
+  id: string
+  name: string
+  description?: string
+  lenght?: number
+  required?: boolean
+  code?: string
+  state: boolean
+}
+
+export interface TypePerson {
+  id: string
+  code?: string
+  name: string
+}
+
+export interface TypeDelivery {
+  id: string
+  code?: string
+  icon?: React.ReactNode
+  name: string
+  description?: string
+  isScheduled?: boolean
+}
+
 export interface Product {
   id: string
   code: string
+  sku: string
+  codeBar: string
   name: string
   description: string
   descriptionLong?: string
@@ -23,12 +56,12 @@ export interface Product {
   idBrand?: string
   idMeasurement?: string
   image: string
-  difficulty: "easy" | "medium" | "hard"
   isNew?: boolean
   discount: number
   stock: number
   oldPrice?: number
-  isService?: boolean 
+  idTypeProduct?: string
+  typeProduct?: TypeProduct
   brand?: Brand
   category?: Category
   measurement?: Measurement
@@ -112,11 +145,27 @@ export interface Branch {
   primary: boolean
 }
 
-export interface Currency{
+export interface Tax {
+  idTax?: string,
+  name: string,
+  percentage: number,
+  prefered: boolean,
+}
+
+export interface Currency {
   idCurrency?: string,
   name: string,
   symbol: string,
   code: string,
+  prefered: boolean,
+}
+
+export interface PaymentReceipt {
+  idPaymentReceipt: string,
+  name: string,
+  series: string
+  number?: string,
+  prefered: boolean,
 }
 
 export interface Whatsapp {
@@ -142,4 +191,69 @@ export type Consult = {
   subject: string
   message: string
   status: number
+}
+
+export interface Cart extends Product {
+  quantity: number
+  notes?: string
+}
+
+export interface Wishlist extends Product {
+  quantity: number
+  notes?: string
+}
+
+export interface Person {
+  idPerson: string
+  idTypeDocument?: string
+  document: string
+  information: string
+  cellular: string
+  phone: string
+  email: string
+  clave?: string
+  address: string
+
+  typePerson?: TypePerson
+  typeDocument?: TypeDocument
+}
+
+export interface Receipt { 
+  idReceipt: string;
+  name: string;
+  series: string;
+  number: number;
+  code: string;
+}
+
+export interface OrderDetail {
+  id: number
+  product: Product
+  measurement: Measurement
+  category: Category
+  price: number
+  quantity: number
+  idTax: string
+  tax: Tax
+}
+
+export interface Order {
+  id?: number
+  idOrder?: string
+  receipt?: Receipt
+  person: Person
+  date: string
+  time: string
+  series: string
+  numbering: string
+  status: "pending" | "preparing" | "ready" | "delivered" | "cancelled"
+  observations: string
+  notes: string
+  instructions: string
+  idTypeDelivery: string
+  typeDelivery: TypeDelivery
+  scheduledDate: string
+  scheduledTime: string
+  currency: Currency
+  orderDetails: OrderDetail[]
 }

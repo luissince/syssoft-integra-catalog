@@ -1,14 +1,16 @@
-"use client"
-import { Customer } from '@/types';
+"use client";
+
+import { loginCustomer } from '@/lib/api';
+import { Person } from '@/types/api-type';
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import customers from "@/data/customer.json";
 
 interface AuthContextType {
-  user: Customer | null;
+  user: Person | null;
   isAuthenticated: boolean;
   authLoading: boolean;
-  login: (username: string, password: string) => boolean;
-  register: (customer: Customer) => boolean;
+  login: (username: string, password: string) => Promise<Person | string>;
+  register: (person: Person) => boolean;
+  update: (person: Person) => void;
   logout: () => void;
 }
 
@@ -20,31 +22,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar si hay una sesión activa al cargar la aplicación
     const savedAuth = localStorage.getItem("isAuthenticated");
     const userAuth = localStorage.getItem("user");
     if (savedAuth && userAuth) {
       setUser(JSON.parse(userAuth));
       setIsAuthenticated(JSON.parse(savedAuth));
-      setAuthLoading(false);
     }
+
+    setAuthLoading(false);
   }, []);
 
-  const login = (email: string, password: string) => {
-    const customer = customers.list.find(customer => customer.email === email && customer.password === password);
-    if (!customer) {
-      return false;
+  const login = async (email: string, password: string): Promise<Person | string> => {
+    const customer = await loginCustomer({ email, password });
+
+    if (typeof customer === "string") {
+      return customer;
     }
 
-    setIsAuthenticated(true);
     localStorage.setItem("isAuthenticated", JSON.stringify(true));
-
     localStorage.setItem("user", JSON.stringify(customer));
-    setUser(user);
-    return true;
+
+    setIsAuthenticated(true);
+    setUser(customer);
+    return customer;
   };
 
-  const register = (customer: Customer) => {
+  const update = (person: Person) => {
+    setUser(person);
+    localStorage.setItem("user", JSON.stringify(person));
+  };
+
+  const register = (person: Person) => {
 
     return true;
   };
@@ -57,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, authLoading ,login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, authLoading, login, register, update, logout }}>
       {children}
     </AuthContext.Provider>
   );

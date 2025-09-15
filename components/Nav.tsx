@@ -11,18 +11,17 @@ import { useContact } from "@/lib/contact";
 import { Branch, Category, Company, Whatsapp } from "@/types/api-type";
 import Image from "next/image";
 
-const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === "true" ? true : false;
-
 interface NavPrimaryProps {
     company: Company;
     categories: Category[];
     whatsapp: Whatsapp;
     branch: Branch;
+    authEnabled: boolean;
     selectedCategory: string;
     setSelectedCategory: (category: string) => void;
 }
 
-export function NavPrimary({ company, categories, whatsapp, branch, selectedCategory, setSelectedCategory }: NavPrimaryProps) {
+export function NavPrimary({ company, categories, whatsapp, branch, authEnabled, selectedCategory, setSelectedCategory }: NavPrimaryProps) {
     const router = useRouter();
     const { isAuthenticated, logout } = useAuth();
     const { handleCall, handleWhatsapp, getDefaultMessage, isMobile } = useContact();
@@ -192,7 +191,7 @@ export function NavPrimary({ company, categories, whatsapp, branch, selectedCate
                             isAuthenticated ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="flex items-center">
+                                        <Button variant="outline" className="flex items-center">
                                             <Settings className="w-4 h-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -246,9 +245,10 @@ export function NavPrimary({ company, categories, whatsapp, branch, selectedCate
 
 interface NavSecondaryProps {
     title?: string;
+    authEnabled: boolean;
 }
 
-export function NavSecondary({ title = "Finalizar Pedido" }: NavSecondaryProps) {
+export function NavSecondary({ title = "Finalizar Pedido", authEnabled }: NavSecondaryProps) {
     const router = useRouter();
     const { isAuthenticated, logout } = useAuth();
 
