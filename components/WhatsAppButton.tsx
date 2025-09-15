@@ -22,7 +22,7 @@ export default function WhatsAppButton({whatsapp}:WhatsAppButtonProps) {
   return (
     <Button
       asChild
-      className="fixed bottom-32 right-28 z-50 rounded-full h-14 w-14 shadow-lg bg-[#25D366] hover:bg-[#128C7E] p-0 flex items-center justify-center"
+      className="fixed bottom-32 right-[8%] z-50 rounded-full h-14 w-14 shadow-lg bg-[#25D366] hover:bg-[#128C7E] p-0 flex items-center justify-center"
     >
       <Link href={whatsappUrl} target="_blank" rel="noopener noreferrer">
         <FaWhatsapp className="h-6 w-6" />
