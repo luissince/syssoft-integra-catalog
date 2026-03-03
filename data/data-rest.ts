@@ -15,11 +15,11 @@ export const fetchProductsAll = async (): Promise<Product[]> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching filtered products');
   }
-
-  const result = await response.json();
 
   const products = result.map((item: {
     idProducto: string,
@@ -75,11 +75,11 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching product');
   }
-
-  const result = await response.json();
 
   return {
     id: result.idProducto,
@@ -129,11 +129,11 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching product');
   }
-
-  const result = await response.json();
 
   return result.map((item: {
     idProducto: string,
@@ -188,11 +188,11 @@ export const fetchCategories = async (): Promise<Category[]> => {
     next: { revalidate: 0 }
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching filtered products');
   }
-
-  const data = await response.json();
 
   return data.map((item: {
     idCategoria: string,
@@ -215,11 +215,13 @@ export const fetchCompanyInfo = async (): Promise<Company> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching company info');
   }
 
-  const data = await response.json() as {
+  const data = result as {
     acercaNosotros: string,
     email: string,
     informacion: string,
@@ -268,11 +270,11 @@ export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
     next: { revalidate: 0 }
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching company info');
   }
-
-  const data = await response.json();
 
   const banners: CompanyBanner[] = data.map((banner: {
     id: string,
@@ -301,13 +303,11 @@ export const fetchBranches = async (): Promise<Branch[]> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching branches');
   }
-
-  console.log(response.ok);
-
-  const result = await response.json();
 
   const branches: Branch[] = result.map((branch: {
     idSucursal: string,
@@ -348,11 +348,11 @@ export const fetchTaxes = async (): Promise<Tax[]> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching taxes');
   }
-
-  const result = await response.json();
 
   const taxes: Tax[] = result.map((branch: {
     idImpuesto: string
@@ -379,11 +379,11 @@ export const fetchCurrencies = async (): Promise<Currency[]> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching currencies');
   }
-
-  const result = await response.json();
 
   const currencies: Currency[] = result.map((branch: {
     idMoneda: string
@@ -412,11 +412,11 @@ export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
     next: { revalidate: 0 }
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching whatsapp info');
   }
-
-  const data = await response.json();
 
   const whatsapp: Whatsapp = {
     message: data.mensajeWhatsapp,
@@ -435,11 +435,11 @@ export const fetchCurrencyInfo = async (): Promise<Currency> => {
     next: { revalidate: 0 }
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching currency info');
   }
-
-  const data = await response.json();
 
   const currency: Currency = {
     idCurrency: data.idMoneda,
@@ -460,11 +460,11 @@ export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentRec
     next: { revalidate: 0 }
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
     throw new Error('Error fetching currency info');
   }
-
-  const data = await response.json();
 
   const paymentReceipts: PaymentReceipt[] = data.map((document: {
     idComprobante: string,
@@ -496,11 +496,11 @@ export const fetchCreateOrder = async (formOrder: FormOrder): Promise<{ idOrder:
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error(response.statusText || 'Error fetching order');
   }
-
-  const result = await response.json();
 
   const data = {
     idOrder: result.idPedido,
@@ -522,11 +522,11 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error(response.statusText || 'Error fetching order');
   }
-
-  const result = await response.json();
 
   return result.map((item: {
     id: number
@@ -640,7 +640,7 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
         code: item.codiso,
         prefered: false,
       } as Currency,
-      delivery : {
+      delivery: {
         email: item.envio.email,
         phone: item.envio.telefono,
         whatsapp: item.envio.celular,
@@ -691,11 +691,11 @@ export const fetchGetOrder = async (idOrder: string): Promise<Order> => {
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     throw new Error(response.statusText || 'Error fetching order');
   }
-
-  const result = await response.json();
 
   const currency = {
     code: result.cabecera.codiso,
@@ -780,12 +780,12 @@ export const fetchLogin = async (body: { email: string, password: string }): Pro
     next: { revalidate: 0 }
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     const text = await response.text();
     throw new Error(text || 'Error fetching filtered products');
   }
-
-  const result = await response.json();
 
   return {
     idPerson: result.idPersona,
