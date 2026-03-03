@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
 import {
   AlertCircle,
   ChevronLeft,
@@ -26,7 +26,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/context/AuthContext"
 import Welcome from "@/components/Welcome"
 import { NavSecondary } from "@/components/Nav"
-import { Branch, Company, Product } from "@/types/api-type"
+import { Branch, Category, Company, Product, Whatsapp } from "@/types/api-type"
 import { cn, formatCurrency } from "@/lib/utils"
 import { MenuCard } from "./MenuCard"
 import { Label } from "./ui/label"
@@ -35,6 +35,10 @@ import { useWishlist } from "@/context/WishlistContext"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { TYPE_PRODUCT } from "@/constants/type-product"
 import { useCurrency } from "@/context/CurrencyContext"
+import CartButton from "./CartButton"
+import { ShoppingCartSidebar } from "./ShoppingCart"
+import Footer from "./Footer"
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog"
 
 interface ProductImage {
   id: string
@@ -47,6 +51,7 @@ interface ProductImage {
 interface PropsProductComponent {
   company: Company
   branch: Branch
+  whatsapp: Whatsapp;
   product: Product
   relatedProducts: Product[]
   authEnabled: boolean
@@ -68,20 +73,12 @@ function ProductImageGallery({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [zoomLevel, setZoomLevel] = useState(1)
 
-  const safeImages = images.length > 0 ? images : [{
-    id: "1",
-    name: "Vista principal",
-    url: "/placeholder.svg",
-    width: 600,
-    height: 400
-  }]
-
   const handlePrevious = () => {
-    setCurrentImageIndex((prev) => (prev === 0 ? safeImages.length - 1 : prev - 1))
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
   }
 
   const handleNext = () => {
-    setCurrentImageIndex((prev) => (prev === safeImages.length - 1 ? 0 : prev + 1))
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
   }
 
   const handleThumbnailClick = (index: number) => {
@@ -105,13 +102,19 @@ function ProductImageGallery({
     <>
       {/* Imagen principal */}
       <div className="relative aspect-square rounded-xl overflow-hidden shadow-lg mb-4 group">
-        <Image
-          src={safeImages[currentImageIndex].url || "/placeholder.svg"}
-          alt={productName}
-          fill
-          className={cn("object-cover", outOfStock ? "opacity-70" : "")}
-          priority
-        />
+        <div className="h-full flex items-center justify-center">
+          <Image
+            src={images[currentImageIndex].url || "/placeholder.svg"}
+            alt={images[currentImageIndex].name}
+            fill
+            sizes="(max-width: 768px) 100vw, 600px"
+            className={cn(
+              "object-contain",
+              outOfStock ? "opacity-70" : ""
+            )}
+            priority
+          />
+        </div>
 
         {/* Overlay para pantalla completa */}
         <button
@@ -126,7 +129,7 @@ function ProductImageGallery({
         </button>
 
         {/* Botones de navegación */}
-        {safeImages.length > 1 && (
+        {images.length > 1 && (
           <>
             <Button
               variant="ghost"
@@ -159,9 +162,9 @@ function ProductImageGallery({
       </div>
 
       {/* Miniaturas */}
-      {safeImages.length > 1 && (
+      {images.length > 1 && (
         <div className="flex space-x-2">
-          {safeImages.map((image, index) => (
+          {images.map((image, index) => (
             <button
               key={index}
               onClick={() => handleThumbnailClick(index)}
@@ -185,6 +188,9 @@ function ProductImageGallery({
 
       {/* Modal de pantalla completa */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogHeader>
+          <DialogTitle className="text-xl"></DialogTitle>
+        </DialogHeader>
         <DialogContent className="max-w-[95vw] w-[95vw] max-h-[95vh] h-[95vh] p-0 bg-black/95 border-none">
           <div className="relative w-full h-full flex flex-col">
             {/* Controles superiores */}
@@ -227,7 +233,7 @@ function ProductImageGallery({
             <div className="flex-1 flex items-center justify-center overflow-hidden">
               <div className="transition-transform duration-100 ease-out" style={{ transform: `scale(${zoomLevel})` }}>
                 <Image
-                  src={safeImages[currentImageIndex].url || "/placeholder.svg"}
+                  src={images[currentImageIndex].url || "/placeholder.svg"}
                   alt={`${productName} - imagen ${currentImageIndex + 1}`}
                   width={1200}
                   height={800}
@@ -237,7 +243,7 @@ function ProductImageGallery({
               </div>
 
               {/* Botones de navegación en modal */}
-              {safeImages.length > 1 && (
+              {images.length > 1 && (
                 <>
                   <Button
                     variant="ghost"
@@ -262,10 +268,10 @@ function ProductImageGallery({
             </div>
 
             {/* Miniaturas en modal */}
-            {safeImages.length > 1 && (
+            {images.length > 1 && (
               <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-black/50 overflow-x-auto">
                 <div className="flex gap-2 justify-center">
-                  {safeImages.map((image, index) => (
+                  {images.map((image, index) => (
                     <button
                       key={index}
                       className={cn(
@@ -295,7 +301,7 @@ function ProductImageGallery({
   )
 }
 
-export default function ProductComponent({ company, branch, product, relatedProducts, authEnabled }: PropsProductComponent) {
+export default function ProductComponent({ company, branch, whatsapp, product, relatedProducts, authEnabled }: PropsProductComponent) {
   const params = useParams()
   const router = useRouter()
   const { currency } = useCurrency()
@@ -308,6 +314,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
   const [notes, setNotes] = useState("")
   const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.id) || false)
   const [isMounted, setIsMounted] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
@@ -319,7 +326,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
   }
 
   // Preparar imágenes para la galería
-  const images: ProductImage[] = product.images?.map((img, index) => ({
+  const images: ProductImage[] = product.images && product.images.length > 0 && product.images?.map((img, index) => ({
     id: `${index + 1}`,
     name: `Vista ${index + 1}`,
     url: img.url || "/placeholder.svg",
@@ -447,8 +454,8 @@ export default function ProductComponent({ company, branch, product, relatedProd
               productName={product.name}
               outOfStock={isOutOfStock}
             />
-          </div>
 
+          </div>
           {/* Información del plato */}
           <div className="space-y-6">
             <div>
@@ -601,7 +608,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
                         <ShoppingCart className="w-4 h-4 mr-2" />
                         Añadir al carrito
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="outline"
                         size="lg"
                         className="w-full"
@@ -609,7 +616,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
                         onClick={handleBuyNow}
                       >
                         Pedir ahora
-                      </Button>
+                      </Button> */}
 
                       <div className="flex gap-2 mt-2 sm:mt-0">
                         <Button
@@ -656,7 +663,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
               <div className="flex flex-col md:flex-row md:justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
                 <div className="w-full md:w-auto flex flex-row md:flex-col justify-between items-center md:items-start">
                   <div className="text-sm text-muted-foreground">Total</div>
-                  <div className="text-2xl font-bold text-primary font-display">
+                  <div className="text-2xl font-bold text-primary">
                     {formatCurrency(product.price * quantity, currency!.code)}
                   </div>
                 </div>
@@ -731,7 +738,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
         {relatedProducts.length > 0 && (
           <div className="mt-20">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold font-display">También te puede gustar</h2>
+              <h2 className="text-3xl font-bold">También te puede gustar</h2>
               <button
                 onClick={() => router.push("/")}
                 className="flex items-center text-primary text-sm font-medium hover:underline"
@@ -754,6 +761,22 @@ export default function ProductComponent({ company, branch, product, relatedProd
           </div>
         )}
       </div>
+
+      <CartButton
+        isOpen={isCartOpen}
+        setIsOpen={setIsCartOpen}
+      />
+
+      <ShoppingCartSidebar
+        isOpen={isCartOpen}
+        setIsOpen={setIsCartOpen}
+      />
+
+      <Footer
+        company={company}
+        whatsapp={whatsapp}
+        branch={branch}
+      />
     </div>
   )
 }

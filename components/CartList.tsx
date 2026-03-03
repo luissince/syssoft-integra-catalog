@@ -1,7 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Trash2, Plus, Minus, ShoppingCart } from "lucide-react"
 import Image from "next/image"
 import { Cart } from "@/types/api-type"
@@ -26,7 +25,7 @@ export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: C
         <CardContent className="p-8 text-center">
           <ShoppingCart className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
           <p className="text-muted-foreground font-medium">Tu carrito está vacío</p>
-          <p className="text-sm text-muted-foreground mt-2">Agrega algunos platos deliciosos</p>
+          <p className="text-sm text-muted-foreground mt-2">Añade algunos de nuestros productos para continuar</p>
         </CardContent>
       </Card>
     )
@@ -35,10 +34,10 @@ export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: C
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-foreground flex items-center justify-between font-display">
+        <CardTitle className="text-foreground flex items-center justify-between">
           <div className="flex items-center">
             <ShoppingCart className="w-5 h-5 mr-2 text-primary" />
-            <span>Mi Pedido ({cart.length} items)</span>
+            <span className="text-lg">Mi Pedido ({cart.length} items)</span>
           </div>
         </CardTitle>
       </CardHeader>
@@ -105,10 +104,8 @@ export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: C
         </div>
         <div className="border-t border-border pt-4 space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-foreground font-display">Total:</span>
-            <Badge className="bg-primary text-primary-foreground text-lg px-4 py-2 font-display font-semibold">
-              {formatCurrency(total, currency!.code)}
-            </Badge>
+            <span className="text-lg text-foreground">Total:</span>
+            <span className="text-lg font-semibold text-foreground">{formatCurrency(total, currency!.code)}</span>
           </div>
           <Button
             onClick={onCheckout}

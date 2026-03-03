@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
-import { LogOut, Menu, Phone, Settings, MessageCircle, MapPin } from "lucide-react";
+import { LogOut, Menu, Phone, Settings, MessageCircle, MapPin, MenuIcon } from "lucide-react";
 import { LoginCard } from "./LoginCard";
 // import restaurantData from "@/data/restaurant-data.json";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
@@ -43,7 +43,7 @@ export function NavPrimary({ company, categories, whatsapp, branch, authEnabled,
             <div className="container mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-8">
-                        <div className="text-2xl font-bold font-display">
+                        <div className="text-2xl font-bold">
                             {/* <span className="text-primary">{company.name}</span> */}
                             <Image
                                 src={company.logo || "/placeholder.svg"}
@@ -122,7 +122,7 @@ export function NavPrimary({ company, categories, whatsapp, branch, authEnabled,
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline">
-                                        <Phone className="w-4 h-4" />
+                                        <MenuIcon className="w-4 h-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56">
@@ -142,9 +142,6 @@ export function NavPrimary({ company, categories, whatsapp, branch, authEnabled,
                                         <MessageCircle className="w-4 h-4 mr-2 text-green-600" />
                                         <div className="flex flex-col">
                                             <span>WhatsApp</span>
-                                            {/* <span className="text-xs text-muted-foreground">
-                                                {restaurantData.restaurant.whatsapp}
-                                            </span> */}
                                             <span className="text-xs text-muted-foreground">
                                                 {whatsapp.number}
                                             </span>
@@ -258,7 +255,7 @@ export function NavSecondary({ title = "Finalizar Pedido", authEnabled }: NavSec
                 <Button className="hidden md:flex" onClick={() => router.push("/")} variant="outline">
                     ← Volver al Menú
                 </Button>
-                <h1 className="text-2xl font-bold font-display text-primary">{title}</h1>
+                <h1 className="text-2xl font-bold text-primary">{title}</h1>
                 <div className="flex items-center space-x-4">
                     <ThemeToggle />
                     {authEnabled && (

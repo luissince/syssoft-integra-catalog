@@ -38,7 +38,7 @@ const Welcome = ({ company, branch }: WelcomeProps) => {
         
         {/* Texto de bienvenida */}
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold font-display text-black">
+          <h1 className="text-2xl font-bold text-black">
             {/* {restaurantData.restaurant.owner} */}
             {company.name}
           </h1>

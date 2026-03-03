@@ -67,9 +67,6 @@ export interface Product {
   measurement?: Measurement
   images?: ProductImage[],
   details?: ProductDetail[],
-  colors?: Attribute[],
-  sizes?: Attribute[],
-  flavors?: Attribute[],
 }
 
 export interface Measurement {
@@ -208,8 +205,8 @@ export interface Person {
   idTypeDocument?: string
   document: string
   information: string
-  cellular: string
   phone: string
+  whatsapp: string
   email: string
   clave?: string
   address: string
@@ -218,7 +215,7 @@ export interface Person {
   typeDocument?: TypeDocument
 }
 
-export interface Receipt { 
+export interface Receipt {
   idReceipt: string;
   name: string;
   series: string;
@@ -235,6 +232,14 @@ export interface OrderDetail {
   quantity: number
   idTax: string
   tax: Tax
+}
+
+export interface OrderDelivery {
+  email: string
+  phone: string
+  whatsapp: string
+  address: string
+  landmark: string
 }
 
 export interface Order {
@@ -255,5 +260,16 @@ export interface Order {
   scheduledDate: string
   scheduledTime: string
   currency: Currency
+  delivery: OrderDelivery | null
   orderDetails: OrderDetail[]
+}
+
+export interface PaymentMethod {
+  id: string
+  code?: string
+  type: string
+  name: string
+  icon: string
+  available: boolean
+  prefered: boolean
 }

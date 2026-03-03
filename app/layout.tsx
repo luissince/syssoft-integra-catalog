@@ -1,8 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
-import { Inter, Playfair_Display } from "next/font/google"
+import { Inter, Playfair_Display, Great_Vibes } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
@@ -24,6 +22,13 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
   display: "swap",
+})
+
+const greatVibes = Great_Vibes({
+  subsets: ["latin"],
+  variable: "--font-greatvibes",
+  display: "swap",
+  weight: "400"
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -57,18 +62,7 @@ export default async function RootLayout({
 
   return (
     <html lang="es" suppressHydrationWarning>
-      <head>
-        <style>{`
-          html {
-            font-family: ${GeistSans.style.fontFamily};
-            --font-sans: ${GeistSans.variable};
-            --font-mono: ${GeistMono.variable};
-            --font-inter: ${inter.style.fontFamily};
-            --font-playfair: ${playfair.style.fontFamily};
-          }
-        `}</style>
-      </head>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} ${greatVibes.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
           <AuthProvider>
             <CurrencyProvider initialCurrency={currency}>
@@ -76,8 +70,8 @@ export default async function RootLayout({
                 <WishlistProvider>
                   {children}
                   <Toaster />
-                  <WhatsAppButton whatsapp={whatsapp} />
-                  <ContactButton />
+                  {/* <WhatsAppButton whatsapp={whatsapp} />
+                  <ContactButton /> */}
                 </WishlistProvider>
               </CartProvider>
             </CurrencyProvider>

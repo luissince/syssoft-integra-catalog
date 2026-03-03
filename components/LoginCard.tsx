@@ -81,7 +81,7 @@ export function LoginCard() {
       </DialogTrigger>
       <DialogContent className="bg-card text-card-foreground border-border max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Iniciar Sesión</DialogTitle>
+          <DialogTitle className="text-xl">Iniciar Sesión</DialogTitle>
           <DialogDescription>
           </DialogDescription>
         </DialogHeader>

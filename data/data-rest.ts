@@ -1,6 +1,6 @@
-import { TYPE_DELIVERY } from "@/constants/type-delivery";
+import { TYPE_DELIVERY_LIST } from "@/constants/type-delivery";
 import { TYPE_PRODUCT_LIST } from "@/constants/type-product";
-import { Branch, Category, Company, CompanyBanner, Consult, Currency, FilterOptions, Measurement, Order, OrderDetail, PaymentReceipt, Person, Product, Receipt, Tax, TypeDelivery, TypeDocument, Whatsapp } from "@/types/api-type";
+import { Branch, Category, Company, CompanyBanner, Consult, Currency, FilterOptions, Measurement, Order, OrderDelivery, OrderDetail, PaymentReceipt, Person, Product, Receipt, Tax, TypeDelivery, TypeDocument, Whatsapp } from "@/types/api-type";
 import { FormCustomer, FormOrder } from "@/types/form";
 
 // Función para obtener todos los productos
@@ -62,74 +62,6 @@ export const fetchProductsAll = async (): Promise<Product[]> => {
   return products;
 }
 
-// Función para obtener todo los productos por filtro
-export const fetchProducts = async (search: string, currentPage: number, totalPage: number, filters: FilterOptions | null = null): Promise<{ products: Product[], count: number }> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
-
-  const response = await fetch(`${url}/api/producto/filter/web`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      buscar: search,
-      filtros: filters,
-      posicionPagina: currentPage.toString(),
-      filasPorPagina: totalPage.toString()
-    }),
-    next: { revalidate: 0 }
-  });
-
-  if (!response.ok) {
-    throw new Error('Error fetching filtered products');
-  }
-
-  const result = await response.json();
-
-  const products = result.data.map((item: {
-    idProducto: string,
-    codigo: string,
-    descripcionCorta: string,
-    sku: string,
-    codigoBarras: string,
-    nombre: string,
-    precio: number,
-    imagen: string,
-    idTipoProducto: string,
-    idCategoria: string,
-    nombreCategoria: string,
-    idMedida: string,
-    nombreMedida: string,
-    cantidad: number;
-    id: number
-  }) => {
-    const product: Product = {
-      id: item.id.toString(),
-      code: item.codigo,
-      sku: item.sku,
-      codeBar: item.codigoBarras,
-      name: item.nombre,
-      description: item.descripcionCorta,
-      price: item.precio,
-      idCategory: item.idCategoria,
-      category: { id: item.idCategoria, name: item.nombreCategoria },
-      idMeasurement: item.idMedida,
-      measurement: { id: item.idMedida, name: item.nombreMedida },
-      image: item.imagen,
-      discount: 0,
-      stock: item.cantidad,
-      typeProduct: TYPE_PRODUCT_LIST.find(type => type.id === item.idTipoProducto),
-    }
-
-    return product;
-  });
-
-  return {
-    "products": products,
-    "count": result.count
-  };
-}
-
 // Función para obtener en detalle de un producto
 export const fetchProductById = async (id: string): Promise<Product> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
@@ -180,9 +112,6 @@ export const fetchProductById = async (id: string): Promise<Product> => {
         height: image.alto
       }
     }),
-    colors: result.colores.map((item: { id: string, idAtributo: string, nombre: string, hexadecimal: string }) => ({ id: item.idAtributo, name: item.nombre, hexadecimal: item.hexadecimal })),
-    sizes: result.tallas.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
-    flavors: result.sabores.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
   } as Product;
 }
 
@@ -375,6 +304,8 @@ export const fetchBranches = async (): Promise<Branch[]> => {
   if (!response.ok) {
     throw new Error('Error fetching branches');
   }
+
+  console.log(response.ok);
 
   const result = await response.json();
 
@@ -622,6 +553,13 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
     fechaPedido: string
     horaPedido: string
     codiso: string
+    envio: {
+      email: string
+      telefono: string
+      celular: string
+      direccion: string
+      referencia: string
+    },
     detalles: {
       id: number
 
@@ -653,18 +591,18 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
       id: item.id,
       idOrder: item.idPedido,
       receipt: {
-          idReceipt: "",
-          name: item.comprobante,
-          series: "",
-          number: 0,
-          code: "",
+        idReceipt: "",
+        name: item.comprobante,
+        series: "",
+        number: 0,
+        code: "",
       } as Receipt,
       person: {
         idPerson: "",
         document: item.documento,
         information: item.informacion,
-        cellular: item.telefono,
-        phone: item.celular,
+        phone: item.telefono,
+        whatsapp: item.celular,
         email: item.email,
         address: item.direccion,
 
@@ -687,21 +625,28 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
       notes: item.nota,
       instructions: item.instruccion,
       idTypeDelivery: item.idTipoEntrega,
-      typeDelivery: Object.values(TYPE_DELIVERY).find(type => type.id === item.idTipoEntrega) || {
-          id: item.idTipoEntrega,
-          name: item.tipoEntrega,
-          icon: undefined,
-          code: "",
+      typeDelivery: TYPE_DELIVERY_LIST.find(type => type.id === item.idTipoEntrega) || {
+        id: item.idTipoEntrega,
+        name: item.tipoEntrega,
+        icon: undefined,
+        code: "",
       } as TypeDelivery,
       scheduledDate: item.fechaPedido,
       scheduledTime: item.horaPedido,
       currency: {
-          idCurrency: "",
-          name: "",
-          symbol: "",
-          code: item.codiso,
-          prefered: false,
+        idCurrency: "",
+        name: "",
+        symbol: "",
+        code: item.codiso,
+        prefered: false,
       } as Currency,
+      delivery : {
+        email: item.envio.email,
+        phone: item.envio.telefono,
+        whatsapp: item.envio.celular,
+        address: item.envio.direccion,
+        landmark: item.envio.referencia,
+      } as OrderDelivery,
       orderDetails: item.detalles.map((detalle) => {
         return {
           id: detalle.id,
@@ -752,13 +697,55 @@ export const fetchGetOrder = async (idOrder: string): Promise<Order> => {
 
   const result = await response.json();
 
+  const currency = {
+    code: result.cabecera.codiso,
+  } as Currency
+
+  const delivery = result.envio ?? null;
+
+  const orderDetails = result.detalles.map((item: {
+    id: number
+    imagen: string
+    codigo: string
+    producto: string
+    medida: string
+    categoria: string
+    precio: number
+    cantidad: number
+    idImpuesto: string
+    impuesto: string
+    porcentaje: number
+  }) => {
+    return {
+      id: item.id,
+      product: {
+        image: item.imagen,
+        code: item.codigo,
+        name: item.producto,
+      } as Product,
+      measurement: {
+        name: item.medida,
+      } as Measurement,
+      category: {
+        name: item.categoria,
+      } as Category,
+      price: item.precio,
+      quantity: item.cantidad,
+      tax: {
+        idTax: item.idImpuesto,
+        name: item.impuesto,
+        percentage: item.porcentaje,
+      } as Tax,
+    }
+  })
+
   return {
     person: {
       idPerson: result.cabecera.idPersona,
       document: result.cabecera.documento,
       information: result.cabecera.informacion,
-      cellular: result.cabecera.telefono,
-      phone: result.cabecera.celular,
+      phone: result.cabecera.telefono,
+      whatsapp: result.cabecera.celular,
       email: result.cabecera.email,
       address: result.cabecera.direccion,
     },
@@ -771,47 +758,12 @@ export const fetchGetOrder = async (idOrder: string): Promise<Order> => {
     notes: result.cabecera.nota,
     instructions: result.cabecera.instruccion,
     idTypeDelivery: result.cabecera.idTipoEntrega,
-    typeDelivery: Object.values(TYPE_DELIVERY).find(type => type.id === result.cabecera.idTipoEntrega)!,
+    typeDelivery: TYPE_DELIVERY_LIST.find(type => type.id === result.cabecera.idTipoEntrega)!,
     scheduledDate: result.cabecera.fechaPedido,
     scheduledTime: result.cabecera.horaPedido,
-    currency: {
-      code: result.cabecera.codiso,
-    } as Currency,
-    orderDetails: result.detalles.map((item: {
-      id: number
-      imagen: string
-      codigo: string
-      producto: string
-      medida: string
-      categoria: string
-      precio: number
-      cantidad: number
-      idImpuesto: string
-      impuesto: string
-      porcentaje: number
-    }) => {
-      return {
-        id: item.id,
-        product: {
-          image: item.imagen,
-          code: item.codigo,
-          name: item.producto,
-        } as Product,
-        measurement: {
-          name: item.medida,
-        } as Measurement,
-        category: {
-          name: item.categoria,
-        } as Category,
-        price: item.precio,
-        quantity: item.cantidad,
-        tax: {
-          idTax: item.idImpuesto,
-          name: item.impuesto,
-          percentage: item.porcentaje,
-        } as Tax,
-      }
-    }),
+    currency: currency,
+    delivery: delivery,
+    orderDetails: orderDetails,
   }
 }
 
@@ -840,8 +792,8 @@ export const fetchLogin = async (body: { email: string, password: string }): Pro
     idTypeDocument: result.idTipoDocumento,
     document: result.documento,
     information: result.informacion,
-    cellular: result.telefono,
-    phone: result.celular,
+    phone: result.telefono,
+    whatsapp: result.celular,
     email: result.email,
     address: result.direccion,
   } as Person;
@@ -872,8 +824,8 @@ export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
     idTypeDocument: result.idTipoDocumento,
     document: result.documento,
     information: result.informacion,
-    cellular: result.telefono,
-    phone: result.celular,
+    phone: result.telefono,
+    whatsapp: result.celular,
     email: result.email,
     address: result.direccion,
   } as Person;

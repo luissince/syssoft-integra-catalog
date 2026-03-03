@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Company, Branch, Consult } from "@/types/api-type"
 import { createConsult } from "@/lib/api"
 import { NavSecondary } from "./Nav"
+import { alertKit } from "alert-kit"
+import { useAlert } from "@/hooks/use-alert"
 
 type FormValues = {
   name: string
@@ -40,11 +42,13 @@ export default function Contact({ company, branches, authEnabled }: Props) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState(branches[0].id)
+  const alert = useAlert()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormValues>({
     defaultValues: process.env.NEXT_PUBLIC_ENV === "development" ? consultDefault : undefined
   })
@@ -61,23 +65,29 @@ export default function Contact({ company, branches, authEnabled }: Props) {
       status: 1,
     }
 
+    alert.loading({
+      title: "Enviando...",
+    });
+
     const { status, message } = await createConsult(payload);
 
     if (!status) {
-      toast({
-        title: "Error",
-        description: message,
-      })
+      alert.warning({
+        title: "Contacto",
+        message: message,
+      }, () => {
+        setIsSubmitting(false)
+      });
       return;
     }
 
-    toast({
-      title: "Formulario enviado",
-      description: message,
-    })
-
-    // Redirigir a la página de mensaje enviado
-    router.push("/contacto/mensaje-enviado")
+    alert.success({
+      title: "Contacto",
+      message: message,
+    }, () => {
+      setIsSubmitting(false)
+      reset()
+    });
   }
 
   return (

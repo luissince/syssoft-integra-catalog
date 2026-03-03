@@ -1,9 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-type SupportedCurrency = 'PEN' | 'USD' | 'EUR';
-type SupportedLocale = 'es-PE' | 'en-US' | 'de-DE';
-
 /**
  * Combina clases de Tailwind usando clsx y twMerge, 
  * evitando duplicados o conflictos de utilidades.
@@ -24,7 +21,6 @@ export function cn(...inputs: ClassValue[]): string {
 export function isValidEmail(email: string): boolean {
   return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 }
-
 
 /**
  * Restringe la entrada de un input a solo números enteros.
@@ -239,38 +235,56 @@ export function isNumeric(valor: any): boolean {
  * @param {string} [currency="PEN"] - Moneda (PEN, USD, EUR).
  * @returns {string} Cadena formateada como dinero.
  */
-export const formatCurrency = (value: number, currency: string = "PEN"): string => {
-  if (!isNumeric(value)) {
-    return "MN " + formatDecimal(value.toString());
-  }
+export const formatCurrency = (value: number, currency = 'PEN') => {
+  // Definir formatos para diferentes monedas
+  const formats = [
+    {
+      locales: 'es-PE',
+      options: {
+        style: 'currency',
+        currency: 'PEN',
+        minimumFractionDigits: 2,
+      },
+    },
+    {
+      locales: 'en-US',
+      options: {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+      },
+    },
+    {
+      locales: 'de-DE',
+      options: {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+      },
+    },
+  ];
 
-  const formats: {
-    locales: SupportedLocale;
-    options: Intl.NumberFormatOptions & { currency: SupportedCurrency };
-  }[] = [
-      {
-        locales: 'es-PE',
-        options: { style: 'currency', currency: 'PEN', minimumFractionDigits: 2 },
-      },
-      {
-        locales: 'en-US',
-        options: { style: 'currency', currency: 'USD', minimumFractionDigits: 2 },
-      },
-      {
-        locales: 'de-DE',
-        options: { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 },
-      },
-    ];
-
+  // Buscar el formato correspondiente a la moneda especificada
   const newFormat = formats.find((item) => currency === item.options.currency);
 
   if (newFormat) {
-    const formatter = new Intl.NumberFormat(newFormat.locales, newFormat.options);
-    return formatter.format(value).replace(/\s/g, '');
+    // Crear un formateador de números con el formato encontrado
+    const formatter = new Intl.NumberFormat(newFormat.locales, {
+      style: newFormat.options.style,
+      currency: newFormat.options.currency,
+    });
+
+    // Formatear el valor y devolverlo
+    const formattedValue = formatter.format(value);
+
+    // Elimina todos los espacios en blanco
+    return formattedValue.replace(/\s/g, '');
   } else {
-    return 'MN ' + formatDecimal(value.toString());
+    // Si no se encuentra un formato válido, devolver "0"
+    return 'MN ' + formatDecimal(value);
   }
-}
+};
+
 
 /**
  * Formatea un número en string con separadores de miles y decimales personalizados.

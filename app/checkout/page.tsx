@@ -1,5 +1,5 @@
 import { getBranches, getCompanyInfo, getListTypeDocument, getTaxes } from "@/lib/api";
-import CheckoutComponent from "@/components/Checkout";
+import CheckoutComponent from "@/components/checkout/Checkout";
 import { Suspense } from "react";
 import Welcome from "@/components/Welcome";
 

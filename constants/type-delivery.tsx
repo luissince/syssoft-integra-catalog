@@ -1,5 +1,5 @@
 import { TypeDelivery } from "@/types/api-type";
-import { Home, Truck, AlarmClock, CalendarDays } from "lucide-react";
+import { Home, Truck, CalendarDays } from "lucide-react";
 
 export const TYPE_DELIVERY = {
   DELIVERY_NOW: {
@@ -38,15 +38,3 @@ export const TYPE_DELIVERY = {
 
 // Lista para iterar fácilmente
 export const TYPE_DELIVERY_LIST: TypeDelivery[] = Object.values(TYPE_DELIVERY);
-
-// Agrupados por categoría para mejor UX
-export const TYPE_DELIVERY_GROUPED = {
-  IMMEDIATE: [
-    TYPE_DELIVERY.DELIVERY_NOW,
-    TYPE_DELIVERY.PICKUP_NOW,
-  ],
-  SCHEDULED: [
-    TYPE_DELIVERY.DELIVERY_SCHEDULED,
-    TYPE_DELIVERY.PICKUP_SCHEDULED,
-  ],
-};

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getBranches, getCompanyInfo, getProductById, getProductsRelated } from "@/lib/api";
+import { getBranches, getCompanyInfo, getProductById, getProductsRelated, getWhatsappInfo } from "@/lib/api";
 import ProductComponent from "@/components/Product";
 import { Suspense } from "react";
 import Welcome from "@/components/Welcome";
@@ -18,9 +18,10 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   }
 
   // Cargar datos en paralelo para mejor performance
-  const [company, branches, product] = await Promise.all([
+  const [company, branches, whatsapp, product] = await Promise.all([
     getCompanyInfo(),
     getBranches(),
+    getWhatsappInfo(),
     getProductById(id)
   ]);
 
@@ -42,6 +43,7 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
       <ProductComponent
         company={company}
         branch={branch}
+        whatsapp={whatsapp}
         product={product}
         relatedProducts={relatedProducts}
         authEnabled={authEnabled}

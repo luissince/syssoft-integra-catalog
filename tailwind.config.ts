@@ -12,7 +12,23 @@ const config: Config = {
 		"*.{js,ts,jsx,tsx,mdx}",
 	],
 	theme: {
+		screens: {
+			'xs': '480px',   // Breakpoint personalizado (opcional)
+			'sm': '640px',   // Sobrescribe el valor predeterminado de sm
+			'md': '768px',   // Sobrescribe el valor predeterminado de md
+			'lg': '1024px',  // Sobrescribe el valor predeterminado de lg
+			'xl': '1280px',  // Sobrescribe el valor predeterminado de xl
+			'2xl': '1536px', // Sobrescribe el valor predeterminado de 2xl
+		},
 		extend: {
+			cursor: {
+				move: 'move',
+			},
+			fontFamily: {
+				sans: ["var(--font-inter)", "sans-serif"],
+				playfair: ["var(--font-playfair)", "serif"],
+				greatvibes: ["var(--font-greatvibes)", "serif"],
+			},
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
@@ -86,7 +102,11 @@ const config: Config = {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				progress: {
+					"0%": { width: "0%" },
+					"100%": { width: "100%" },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -94,6 +114,9 @@ const config: Config = {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		require('tailwind-scrollbar'),
+	],
 };
 export default config;

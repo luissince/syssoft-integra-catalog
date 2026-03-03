@@ -78,7 +78,7 @@ const NotFound = ({ company, branch }: NotFoundProps) => {
         {/* Mensaje de error */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <h1 className="text-6xl font-bold font-display text-red-500 dark:text-red-400">
+            <h1 className="text-6xl font-bold text-red-500 dark:text-red-400">
               404
             </h1>
             <h2 className="text-3xl font-bold text-foreground">

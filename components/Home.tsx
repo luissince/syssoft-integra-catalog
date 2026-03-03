@@ -20,6 +20,9 @@ import { CartList } from "./CartList";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { useCurrency } from "@/context/CurrencyContext";
+import { ShoppingCartSidebar } from "./ShoppingCart";
+import CartButton from "./CartButton";
+import { cn } from "@/lib/utils";
 
 interface HomeComponentProps {
     company: Company;
@@ -28,7 +31,7 @@ interface HomeComponentProps {
     whatsapp: Whatsapp;
     branch: Branch;
     initialProducts: Product[];
-    authEnabled?: boolean; // Pasar como prop desde el servidor
+    authEnabled?: boolean;
 }
 
 export default function HomeComponent({
@@ -40,7 +43,6 @@ export default function HomeComponent({
     initialProducts,
     authEnabled = false
 }: HomeComponentProps) {
-
     const router = useRouter();
 
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -50,6 +52,8 @@ export default function HomeComponent({
     const [visibleItems, setVisibleItems] = useState(6);
 
     const { cart, updateQuantity, removeFromCart, addToCart } = useCart();
+
+    const [isCartOpen, setIsCartOpen] = useState(false)
 
     // Estado para controlar si el componente está montado (evita hidratación)
     const [isMounted, setIsMounted] = useState(false);
@@ -113,8 +117,10 @@ export default function HomeComponent({
                         {banners.map((banner, index) => (
                             <div
                                 key={banner.id}
-                                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentBannerIndex ? 'opacity-70' : 'opacity-0'
-                                    }`}
+                                className={cn(
+                                    'absolute inset-0 transition-opacity duration-1000',
+                                    index === currentBannerIndex ? 'opacity-70' : 'opacity-0'
+                                )}
                                 style={{
                                     backgroundImage: `url(${banner.url})`,
                                     backgroundSize: 'cover',
@@ -130,7 +136,7 @@ export default function HomeComponent({
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div className="flex flex-col gap-4">
-                            <h1 className="text-2xl md:text-4xl font-bold font-display">
+                            <h1 className="text-2xl md:text-4xl font-bold">
                                 <span className="text-primary drop-shadow-sm">{company.name}</span>
                             </h1>
                             <p className="text-muted-foreground text-lg leading-relaxed drop-shadow-sm">
@@ -146,10 +152,12 @@ export default function HomeComponent({
                             <button
                                 key={index}
                                 onClick={() => setCurrentBannerIndex(index)}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentBannerIndex
-                                    ? 'bg-primary scale-125'
-                                    : 'bg-white/50 hover:bg-white/70'
-                                    }`}
+                                className={cn(
+                                    'w-2 h-2 rounded-full transition-all duration-300',
+                                    index === currentBannerIndex
+                                        ? 'bg-primary scale-125'
+                                        : 'bg-white/50 hover:bg-white/70'
+                                )}
                             />
                         ))}
                     </div>
@@ -161,7 +169,7 @@ export default function HomeComponent({
                     <div className="flex-1">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-4">
                             <div>
-                                <h2 className="text-3xl font-bold text-foreground font-display">
+                                <h2 className="text-3xl font-bold text-foreground">
                                     {categories.find((cat) => cat.id === selectedCategory)?.name || "Todos los productos"}
                                 </h2>
                                 <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 mt-2">
@@ -280,7 +288,7 @@ export default function HomeComponent({
                         )}
                     </div>
 
-                    {authEnabled && (
+                    {/* {authEnabled && (
                         <div className="w-auto hidden lg:block">
                             <div className="sticky">
                                 <CartList
@@ -291,16 +299,30 @@ export default function HomeComponent({
                                 />
                             </div>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
 
+            {
+                authEnabled && (
+                    <>
+                        <CartButton
+                            isOpen={isCartOpen}
+                            setIsOpen={setIsCartOpen}
+                        />
+
+                        <ShoppingCartSidebar
+                            isOpen={isCartOpen}
+                            setIsOpen={setIsCartOpen}
+                        />
+                    </>
+                )
+            }
+
             <Footer
                 company={company}
-                categories={categories}
                 whatsapp={whatsapp}
                 branch={branch}
-                setSelectedCategory={setSelectedCategory}
             />
         </div>
     );

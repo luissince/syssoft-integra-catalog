@@ -11,7 +11,7 @@ export default function ContactButton() {
   return (
     <Button
       asChild
-      className="fixed bottom-12 right-[8%] z-50 rounded-full h-14 w-14 shadow-lg bg-gray-400 hover:bg-gray-500 p-0 flex items-center justify-center cursor-pointer"
+      className="fixed bottom-4 left-[8%] z-50 rounded-full h-14 w-14 shadow-lg bg-gray-400 hover:bg-gray-500 p-0 flex items-center justify-center cursor-pointer"
       onClick={() => router.push("/contact")}
     >
       <div>

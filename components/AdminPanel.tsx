@@ -12,7 +12,7 @@ import type { MenuItem } from "@/types";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useAuth } from "@/context/AuthContext";
 import { FaWhatsapp } from "react-icons/fa";
-import { MdDeliveryDining } from "react-icons/md";
+import { MdDeliveryDining, MdEmail } from "react-icons/md";
 import { CgOptions } from "react-icons/cg";
 import { FaAmazonPay } from "react-icons/fa6";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -25,7 +25,7 @@ import { getCustomerById, updateCustomer } from "@/lib/api";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FormCustomer } from "@/types/form";
 import { useAlert } from "@/hooks/use-alert";
-import { TYPE_DELIVERY } from "@/constants/type-delivery";
+import { TYPE_DELIVERY_LIST } from "@/constants/type-delivery";
 
 interface AdminPanelProps {
   orders: Order[];
@@ -51,8 +51,8 @@ export function AdminPanel({
     idTypeDocument: string,
     document: string,
     information: string,
-    cellular: string,
     phone: string,
+    whatsapp: string,
     email: string,
     password: string,
     address: string,
@@ -61,8 +61,8 @@ export function AdminPanel({
     idTypeDocument: user?.idTypeDocument || "",
     document: user?.document || "",
     information: user?.information || "",
-    cellular: user?.cellular || "",
     phone: user?.phone || "",
+    whatsapp: user?.whatsapp || "",
     email: user?.email || "",
     password: user?.clave || "",
     address: user?.address || "",
@@ -117,8 +117,8 @@ export function AdminPanel({
         idTipoDocumento: formCustumer.idTypeDocument,
         documento: formCustumer.document,
         informacion: formCustumer.information,
-        celular: formCustumer.cellular,
         telefono: formCustumer.phone,
+        celular: formCustumer.whatsapp,
         email: formCustumer.email,
         clave: formCustumer.password,
         direccion: formCustumer.address
@@ -137,8 +137,8 @@ export function AdminPanel({
         idTypeDocument: responseGetCustomer.idTypeDocument,
         document: responseGetCustomer.document,
         information: responseGetCustomer.information,
-        cellular: responseGetCustomer.cellular,
         phone: responseGetCustomer.phone,
+        whatsapp: responseGetCustomer.whatsapp,
         email: responseGetCustomer.email,
         address: responseGetCustomer.address,
       }
@@ -175,7 +175,7 @@ export function AdminPanel({
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto p-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold font-display text-primary mb-2">
+          <h1 className="text-4xl font-bold text-primary mb-2">
             Panel de Cliente
           </h1>
           <p className="text-muted-foreground">
@@ -349,13 +349,17 @@ export function AdminPanel({
                               <User className="w-4 h-4 mr-2" />
                               {order.person.information}
                             </p>
+                             <p className="text-muted-foreground flex items-center">
+                              <MdEmail className="w-4 h-4 mr-2" />
+                              {order.delivery?.email ?? ""}
+                            </p>
                             <p className="text-muted-foreground flex items-center">
                               <Phone className="w-4 h-4 mr-2" />
-                              {order.person.cellular}
+                              {order.delivery?.phone ?? ""}
                             </p>
                             <p className="text-muted-foreground flex items-center">
                               <FaWhatsapp className="w-4 h-4 mr-2" />
-                              {order.person.phone}
+                              {order.delivery?.whatsapp ?? ""}
                             </p>
                           </div>
                         </div>
@@ -364,22 +368,22 @@ export function AdminPanel({
                           <div className="space-y-2 text-sm">
                             <p className="text-muted-foreground flex items-center">
                               {
-                                Object.values(TYPE_DELIVERY).find(type => type.id === order.idTypeDelivery)?.icon
+                                TYPE_DELIVERY_LIST.find(type => type.id === order.idTypeDelivery)?.icon
                               }
                               {
-                                Object.values(TYPE_DELIVERY).find(type => type.id === order.idTypeDelivery)?.name
+                                TYPE_DELIVERY_LIST.find(type => type.id === order.idTypeDelivery)?.name
                               }
                               {
-                                Object.values(TYPE_DELIVERY).find(type => type.id === order.idTypeDelivery)?.description && (
+                                TYPE_DELIVERY_LIST.find(type => type.id === order.idTypeDelivery)?.description && (
                                   <span className="ml-2 text-xs text-muted-foreground">
-                                    ({Object.values(TYPE_DELIVERY).find(type => type.id === order.idTypeDelivery)?.description})
+                                    ({TYPE_DELIVERY_LIST.find(type => type.id === order.idTypeDelivery)?.description})
                                   </span>
                                 )
                               }
                             </p>
 
                             {
-                              Object.values(TYPE_DELIVERY).find(type => type.id === order.idTypeDelivery)?.isScheduled && (
+                              TYPE_DELIVERY_LIST.find(type => type.id === order.idTypeDelivery)?.isScheduled && (
                                 <p className="text-muted-foreground flex items-center">
                                   <Blinds className="w-4 h-4 mr-2" />
                                   <span>
@@ -400,7 +404,7 @@ export function AdminPanel({
                               <FaAmazonPay className="w-4 h-4 mr-2" /> Pago:
                             </p>
 
-                            <p className="text-primary font-bold text-lg font-display">
+                            <p className="text-primary font-bold text-lg  ">
                               {formatCurrency(total, order.currency.code)}
                             </p>
                           </div>
@@ -412,12 +416,14 @@ export function AdminPanel({
                             <p className="text-muted-foreground flex items-center">
                               <House className="w-4 h-4 mr-2" />
                               {
-                                order.person.address
+                                order.delivery?.address ?? ""
                               }
                             </p>
                             <p className="text-muted-foreground flex items-center">
                               <MapPinHouse className="w-4 h-4 mr-2" />
-                              zona
+                              {
+                                order.delivery?.landmark ?? ""
+                              }
                             </p>
                           </div>
                         </div>
@@ -477,7 +483,7 @@ export function AdminPanel({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-bold text-lg text-foreground font-display">
+                    <h3 className="font-bold text-lg text-foreground  ">
                       Pedido #
                     </h3>
                     <p className="text-sm text-muted-foreground">
@@ -531,7 +537,7 @@ export function AdminPanel({
 
                       </p>
                       <p className="text-muted-foreground flex items-center"><FaAmazonPay className="w-4 h-4 mr-2" /> Pago: </p>
-                      <p className="text-primary font-bold text-lg font-display">
+                      <p className="text-primary font-bold text-lg  ">
                         {formatCurrency(0, currency!.code)}
                       </p>
                     </div>
@@ -594,7 +600,7 @@ export function AdminPanel({
           <TabsContent value="information" className="space-y-6">
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="font-display text-xl text-foreground">Editar Datos de Cliente</CardTitle>
+                <CardTitle className="  text-xl text-foreground">Editar Datos de Cliente</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -639,8 +645,8 @@ export function AdminPanel({
                     <Label className="text-foreground font-medium">N° de Celular *</Label>
                     <Input
                       type={isMobile ? "tel" : "text"}
-                      value={formCustumer.cellular}
-                      onChange={(e) => setFormCustumer({ ...formCustumer, cellular: e.target.value })}
+                      value={formCustumer.phone}
+                      onChange={(e) => setFormCustumer({ ...formCustumer, phone: e.target.value })}
                       className="bg-muted border-border text-foreground mt-2"
                       onKeyDown={!isMobile ? keyNumberPhone : undefined} />
                   </div>
@@ -648,8 +654,8 @@ export function AdminPanel({
                     <Label className="text-foreground font-medium">WhatsApp * </Label>
                     <Input
                       type={isMobile ? "tel" : "text"}
-                      value={formCustumer.phone}
-                      onChange={(e) => setFormCustumer({ ...formCustumer, phone: e.target.value })}
+                      value={formCustumer.whatsapp}
+                      onChange={(e) => setFormCustumer({ ...formCustumer, whatsapp: e.target.value })}
                       className="bg-muted border-border text-foreground mt-2"
                       onKeyDown={!isMobile ? keyNumberPhone : undefined} />
                   </div>
@@ -704,9 +710,9 @@ export function AdminPanel({
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-bold text-lg text-foreground font-display">{item.name}</h3>
+                        <h3 className="font-bold text-lg text-foreground  ">{item.name}</h3>
                         <p className="text-sm text-muted-foreground">{item.description}</p>
-                        <p className="text-primary font-bold text-lg font-display">
+                        <p className="text-primary font-bold text-lg  ">
                           {formatCurrency(item.price, currency!.code)}
                         </p>
                       </div>
@@ -743,7 +749,7 @@ export function AdminPanel({
                         <CardContent className="p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div>
-                              <h3 className="font-bold text-lg text-foreground font-display">Pedido #{order.id}</h3>
+                              <h3 className="font-bold text-lg text-foreground  ">Pedido #{order.id}</h3>
                               <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
                             </div>
                             <Badge className={`${getStatusColor(order.status)} text-white border-0`}>
@@ -818,7 +824,7 @@ export function AdminPanel({
                                     <span>Delivery +{order.payment.deliveryFee}:</span>
                                   </div>
                                 )}
-                                <p className="text-primary font-bold text-lg font-display">
+                                <p className="text-primary font-bold text-lg  ">
                                   Total: {formatCurrency(order.payment.total, currency!.code)}
                                 </p>
                               </div>
@@ -884,7 +890,7 @@ export function AdminPanel({
                         <CardContent className="p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div>
-                              <h3 className="font-bold text-lg text-foreground font-display">Pedido #{order.id}</h3>
+                              <h3 className="font-bold text-lg text-foreground  ">Pedido #{order.id}</h3>
                               <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
                             </div>
                             <Badge className={`${getStatusColor(order.status)} text-white border-0`}>
@@ -959,7 +965,7 @@ export function AdminPanel({
                                     <span>Delivery +{order.payment.deliveryFee}:</span>
                                   </div>
                                 )}
-                                <p className="text-primary font-bold text-lg font-display">
+                                <p className="text-primary font-bold text-lg  ">
                                   Total: {formatCurrency(order.payment.total, currency!.code)}
                                 </p>
                               </div>
@@ -1018,7 +1024,7 @@ export function AdminPanel({
               {editingItem ? (
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="font-display text-xl text-foreground">Editar Plato</CardTitle>
+                    <CardTitle className="  text-xl text-foreground">Editar Plato</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -1080,7 +1086,7 @@ export function AdminPanel({
               ) : (
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="font-display text-xl text-foreground">Agregar Nuevo Plato</CardTitle>
+                    <CardTitle className="  text-xl text-foreground">Agregar Nuevo Plato</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -1152,9 +1158,9 @@ export function AdminPanel({
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-bold text-lg text-foreground font-display">{item.name}</h3>
+                          <h3 className="font-bold text-lg text-foreground  ">{item.name}</h3>
                           <p className="text-sm text-muted-foreground">{item.description}</p>
-                          <p className="text-primary font-bold text-lg font-display">
+                          <p className="text-primary font-bold text-lg  ">
                             {formatCurrency(item.price, currency!.code)}
                           </p>
                         </div>

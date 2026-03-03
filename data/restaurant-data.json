@@ -1950,25 +1950,29 @@
   ],
   "paymentMethods": [
     {
-      "id": "cash",
+      "id": "PM0001",
+      "type": "cash",
       "name": "Efectivo",
       "icon": "💵",
       "available": true
     },
     {
-      "id": "card",
-      "name": "Tarjeta",
+      "id": "PM002",
+      "type": "card",
+      "name": "Tranferencia Bancaria",
       "icon": "💳",
       "available": true
     },
     {
-      "id": "yape",
+      "id": "PM003",
+      "type": "wallet",
       "name": "Yape",
       "icon": "📱",
       "available": true
     },
     {
-      "id": "plin",
+      "id": "PM004",
+      "type": "wallet",
       "name": "Plin",
       "icon": "📲",
       "available": true

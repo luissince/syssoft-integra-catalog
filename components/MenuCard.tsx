@@ -51,6 +51,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
     router.push(`/product/${item.id}`)
   }
 
+
   return (
     <Card className="group bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full flex flex-col">
       <CardContent className="p-0 flex flex-col h-full" onClick={handleCardClick}>
@@ -59,9 +60,9 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
           <Image
             src={item.image || "/placeholder.svg"}
             alt={item.name}
-            width={300}
-            height={200}
-            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="(max-width: 768px) 100vw, 300px"
+            className="object-contain transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute top-3 right-3">
             <Badge className="bg-primary text-primary-foreground shadow-lg">

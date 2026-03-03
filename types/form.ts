@@ -39,14 +39,13 @@ export interface FormOrder {
     idMoneda: string
     idSucursal: string
     idUsuario: string
-    nota: string
     observacion: string
+    nota: string
     instruccion: string
 
     idTipoEntrega: string
-    idTipoPedido: string
-    fechaPedido: string
-    horaPedido: string
+    fechaEntrega: string
+    horaEntrega: string
 
     entrega: FormOrderDelivery | null
 
