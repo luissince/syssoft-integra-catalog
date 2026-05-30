@@ -1,5 +1,6 @@
 import { TYPE_DELIVERY } from "@/constants/type-delivery";
 import { TYPE_PRODUCT_LIST } from "@/constants/type-product";
+import { apiFetch } from "@/lib/utils";
 import { Branch, Category, Company, CompanyBanner, Consult, Currency, FilterOptions, Measurement, Order, OrderDetail, PaymentReceipt, Person, Product, Receipt, Tax, TypeDelivery, TypeDocument, Whatsapp } from "@/types/api-type";
 import { FormCustomer, FormOrder } from "@/types/form";
 
@@ -368,17 +369,10 @@ export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
 export const fetchBranches = async (): Promise<Branch[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/sucursal/list/web`, {
-    next: { revalidate: 0 }
-  });
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/sucursal/list/web`);
 
-  if (!response.ok) {
-    throw new Error('Error fetching branches');
-  }
-
-  const result = await response.json();
-
-  const branches: Branch[] = result.map((branch: {
+  const branches: Branch[] = data.map((branch: {
     idSucursal: string,
     nombre: string,
     email: string,
@@ -653,11 +647,11 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
       id: item.id,
       idOrder: item.idPedido,
       receipt: {
-          idReceipt: "",
-          name: item.comprobante,
-          series: "",
-          number: 0,
-          code: "",
+        idReceipt: "",
+        name: item.comprobante,
+        series: "",
+        number: 0,
+        code: "",
       } as Receipt,
       person: {
         idPerson: "",
@@ -688,19 +682,19 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
       instructions: item.instruccion,
       idTypeDelivery: item.idTipoEntrega,
       typeDelivery: Object.values(TYPE_DELIVERY).find(type => type.id === item.idTipoEntrega) || {
-          id: item.idTipoEntrega,
-          name: item.tipoEntrega,
-          icon: undefined,
-          code: "",
+        id: item.idTipoEntrega,
+        name: item.tipoEntrega,
+        icon: undefined,
+        code: "",
       } as TypeDelivery,
       scheduledDate: item.fechaPedido,
       scheduledTime: item.horaPedido,
       currency: {
-          idCurrency: "",
-          name: "",
-          symbol: "",
-          code: item.codiso,
-          prefered: false,
+        idCurrency: "",
+        name: "",
+        symbol: "",
+        code: item.codiso,
+        prefered: false,
       } as Currency,
       orderDetails: item.detalles.map((detalle) => {
         return {
