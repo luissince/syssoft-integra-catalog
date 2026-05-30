@@ -31,7 +31,6 @@ jobs:
           NEXT_PUBLIC_APP_BACK_END="${{secrets.NEXT_PUBLIC_APP_BACK_END}}"
           AUTH_ENABLED="${{secrets.AUTH_ENABLED}}"
           NEXT_PUBLIC_ENV="${{secrets.NEXT_PUBLIC_ENV}}"
-          ENV="${{secrets.ENV}}"
           EOL
 
       - name: Build Docker image
