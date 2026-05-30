@@ -55,7 +55,7 @@ jobs:
 
   deploy-to-runs-on:
     name: Deploy to Production Server
-    runs-on: webs
+    runs-on: self-hosted
     needs: build-and-push
 
     strategy:
