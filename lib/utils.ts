@@ -385,7 +385,8 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+    const text = await response.text();
+    throw new Error(text || 'Error fetching internal data');
   }
 
   const contentType = response.headers.get('content-type');

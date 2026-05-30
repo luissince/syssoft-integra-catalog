@@ -1,0 +1,20 @@
+x-service-template: &catalog-service
+  networks:
+    - luis
+  restart: always
+
+services:
+  sysintegra-services:
+    <<: *catalog-service
+    image: ${IMAGE_NAME}
+    container_name: ${CONTAINER_NAME}
+
+  leatsac-services:
+    <<: *catalog-service
+    image: ${IMAGE_NAME}
+    container_name: ${CONTAINER_NAME}
+
+  importmuneli-services:
+    <<: *catalog-service
+    image: ${IMAGE_NAME}
+    container_name: ${CONTAINER_NAME}

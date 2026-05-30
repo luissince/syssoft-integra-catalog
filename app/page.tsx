@@ -11,8 +11,6 @@ export default async function Home() {
   const branches = await getBranches();
   const products = await getProductsAll();
 
-  console.log(branches);
-
   const branch = branches.find((branch) => branch.primary === true)!;
 
   const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
