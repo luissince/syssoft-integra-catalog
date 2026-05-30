@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getBranches, getCategories, getCompanyBanners, getCompanyInfo, getProductsAll, getWhatsappInfo } from "@/lib/api";
 import HomeComponent from "@/components/Home";
 import { Suspense } from "react";
@@ -14,6 +15,11 @@ export default async function Home() {
   const branch = branches.find((branch) => branch.primary === true)!;
 
   const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
+
+
+  if (!branches || branches.length === 0) {
+    notFound();
+  }
 
   return (
     <Suspense fallback={<Welcome company={company} branch={branch} />}>

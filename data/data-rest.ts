@@ -315,6 +315,10 @@ export const fetchBranches = async (): Promise<Branch[]> => {
 
   // Obtener los datos de la respuesta
   const data = await apiFetch<[]>(`${url}/api/sucursal/list/web`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
     next: { revalidate: 0 }
   });
 
