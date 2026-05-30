@@ -395,5 +395,7 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
     throw new Error('The response is not JSON');
   }
 
-  return response.json() as Promise<T>;
+  const data = await response.json();
+  
+  return data as T;
 }
