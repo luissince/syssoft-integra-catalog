@@ -6,22 +6,25 @@ on:
       - "test"
 
 jobs:
-  build-nextjs-development:
-    name: Build Catalog (Next Js)
+  build-and-push:
+    name: Build and Push Docker Image to ECR
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - environment: test
-            service: test-services
+          - environment: sysintegra
+            service: sysintegra-services
   
     environment: ${{ matrix.environment }}
 
+    env:
+      ECR_IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog-development:${{ matrix.environment }}-latest
+    
     steps:
-      - name: Checkout código
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Crear archivo .env
+      - name: Create .env file
         run: |
           cat > .env <<EOL
           APP_BACK_END="${{secrets.APP_BACK_END}}"
@@ -31,7 +34,7 @@ jobs:
           ENV="${{secrets.ENV}}"
           EOL
 
-      - name: Construyendo contenedor NextJs
+      - name: Build Docker image
         run: docker compose -f docker-compose.build.yml build ${{ matrix.service }}
 
       - name: Configure AWS credentials
@@ -45,26 +48,27 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1 
       
       - name: Tag catalog image
-        run: docker tag ${{ matrix.environment }}-catalog ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog-development:${{ matrix.environment }}-latest
+        run: docker tag ${{ matrix.environment }}-catalog $ECR_IMAGE_URI
 
       - name: Push catalog image to ECR
-        run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog-development:${{ matrix.environment }}-latest
+        run: docker push $ECR_IMAGE_URI
 
-  deploy-nextjs-development:
-    name: Deploy Catalog (Next Js)
+  deploy-to-runs-on:
+    name: Deploy to Production Server
     runs-on: webs
-    needs: build-nextjs-development
+    needs: build-and-push
 
     strategy:
       matrix:
         include:
-          - environment: test
-            service: test-services
+          - environment: sysintegra
+            service: sysintegra-services
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      NAME_SERVICE: ${{ matrix.environment }}
+      CONTAINER_NAME: ${{ matrix.environment }}-catalog
+      IMAGE_NAME: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog-development:${{ matrix.environment }}-latest
 
     steps:
       - name: Checkout código
@@ -80,49 +84,26 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Descargar imagen desde ECR
-        run: docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/syssoftintegra/catalog-development:${{ matrix.environment }}-latest
+      - name: Download image from Amazon ECR
+        run: docker pull $IMAGE_NAME
 
-      - name: Crear archivo Compose para ${{ matrix.environment }}
-        run: |
-          cat <<EOF > docker-compose-${{ matrix.environment }}.yml
-          services:
-            ${NAME_SERVICE}:
-              image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/syssoftintegra/catalog-development:${NAME_SERVICE}-latest
-              container_name: ${NAME_SERVICE}-catalog
-              restart: always
-              networks:
-                - luis
-          networks:
-            luis:
-              external: true
-          EOF
+      - name: Create and run container
+        run: docker compose -f docker-compose.prod.yml up ${{ matrix.service }} -d
 
-      - name: Crear y ejecutar contenedor en producción
-        run: docker compose -f docker-compose-${{ matrix.environment }}.yml up -d ${{ matrix.environment }}
-
-      - name: Eliminar Compose temporal
-        run: rm docker-compose-${{ matrix.environment }}.yml
-
-      - name: Eliminar imágenes locales y builder
-        run: docker builder prune --all || true
+      - name: Clean up local Docker images
+        run: docker image prune -af || true
   
-
-  clean-ecr-images-development:
-    name: Borrar imágenes antiguas de ECR
+  clean-ecr-images:
+    name: Clear up old images in ECR
     runs-on: ubuntu-latest
-    needs: deploy-nextjs-development
+    needs: deploy-to-runs-on
 
     strategy:
       matrix:
         include:
-          - environment: test
-            branch: test
-    
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-
+          - environment: sysintegra
+            service: sysintegra-services
+  
     steps:
       - name: Configurar credenciales AWS
         uses: aws-actions/configure-aws-credentials@v2
@@ -134,20 +115,25 @@ jobs:
       - name: Instalar jq
         run: sudo apt-get install -y jq
 
-      - name: Borrar imágenes sin tag '${{ matrix.environment }}-latest' - NextJs
+      - name: Delete old images from ECR
         run: |
           REPO="syssoftintegra/catalog-development"
           ENV="${{ matrix.environment }}"
           TAG="${ENV}-latest"
 
-          aws ecr list-images --repository-name "$REPO" \
-            --query "imageIds[?type(imageTag)==null || imageTag!='${TAG}']" \
-            --output json > images.json
+          aws ecr list-images \
+          --repository-name "$REPO" \
+          --query "imageIds[?type(imageTag)==null || imageTag!='${TAG}']" \
+          --output json > images.json
 
           COUNT=$(jq length images.json)
+
           if [ "$COUNT" -gt 0 ]; then
-            echo "🗑️ Borrando $COUNT imágenes antiguas..."
-            aws ecr batch-delete-image --repository-name "$REPO" --image-ids file://images.json
+            echo "🗑️ Cleaning up $COUNT old images from $REPO..."
+            
+            aws ecr batch-delete-image \
+              --repository-name "$REPO" \
+              --image-ids file://images.json
           else
-            echo "✅ No hay imágenes antiguas para borrar en $REPO"
+            echo "✅ There are no old images to delete from $REPO."
           fi
