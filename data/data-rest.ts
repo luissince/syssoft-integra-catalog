@@ -261,7 +261,7 @@ export const fetchCompanyInfo = async (): Promise<Company> => {
     next: { revalidate: 0 }
   });
 
-  const company: Company = {
+  return {
     aboutUs: data.acercaNosotros,
     email: data.email,
     information: data.informacion,
@@ -278,9 +278,7 @@ export const fetchCompanyInfo = async (): Promise<Company> => {
     cover: data.rutaPortada,
     banner: data.rutaBanner,
     termsAndConditions: data.terminosCondiciones,
-  }
-
-  return company;
+  } as Company;
 }
 
 // Función para obtener los banners de la empresa
