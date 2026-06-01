@@ -1,5 +1,6 @@
 import { TYPE_DELIVERY } from "@/constants/type-delivery";
 import { TYPE_PRODUCT_LIST } from "@/constants/type-product";
+import { apiFetch } from "@/lib/utils";
 import { Branch, Category, Company, CompanyBanner, Consult, Currency, FilterOptions, Measurement, Order, OrderDetail, PaymentReceipt, Person, Product, Receipt, Tax, TypeDelivery, TypeDocument, Whatsapp } from "@/types/api-type";
 import { FormCustomer, FormOrder } from "@/types/form";
 
@@ -7,7 +8,8 @@ import { FormCustomer, FormOrder } from "@/types/form";
 export const fetchProductsAll = async (): Promise<Product[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/producto/filter/web/all`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/producto/filter/web/all`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -15,13 +17,7 @@ export const fetchProductsAll = async (): Promise<Product[]> => {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching filtered products');
-  }
-
-  const result = await response.json();
-
-  const products = result.map((item: {
+  const products = data.map((item: {
     idProducto: string,
     codigo: string,
     descripcionCorta: string,
@@ -66,7 +62,8 @@ export const fetchProductsAll = async (): Promise<Product[]> => {
 export const fetchProducts = async (search: string, currentPage: number, totalPage: number, filters: FilterOptions | null = null): Promise<{ products: Product[], count: number }> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/producto/filter/web`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/producto/filter/web`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -80,13 +77,7 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching filtered products');
-  }
-
-  const result = await response.json();
-
-  const products = result.data.map((item: {
+  const products = data.data.map((item: {
     idProducto: string,
     codigo: string,
     descripcionCorta: string,
@@ -126,7 +117,7 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
 
   return {
     "products": products,
-    "count": result.count
+    "count": data.count
   };
 }
 
@@ -138,40 +129,34 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     "codigo": id,
   });
 
-  const response = await fetch(
-    `${process.env.APP_BACK_END || url}/api/producto/filter/web/id?${params}`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/producto/filter/web/id?${params}`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching product');
-  }
-
-  const result = await response.json();
-
   return {
-    id: result.idProducto,
-    code: result.codigo,
-    sku: result.sku,
-    codeBar: result.codigoBarras,
-    name: result.nombre,
-    description: result.descripcionCorta,
-    descriptionLong: result.descripcionLarga,
-    price: result.precio,
-    idCategory: result.idCategoria,
-    idBrand: result.idMarca,
-    image: result.imagen,
+    id: data.idProducto,
+    code: data.codigo,
+    sku: data.sku,
+    codeBar: data.codigoBarras,
+    name: data.nombre,
+    description: data.descripcionCorta,
+    descriptionLong: data.descripcionLarga,
+    price: data.precio,
+    idCategory: data.idCategoria,
+    idBrand: data.idMarca,
+    image: data.imagen,
     difficulty: "hard",
     isNew: true,
     discount: 0,
-    stock: result.cantidad,
+    stock: data.cantidad,
     oldPrice: 0,
-    typeProduct: TYPE_PRODUCT_LIST.find(type => type.id === result.idTipoProducto),
-    category: { id: result.categoria.idCategoria, name: result.categoria.nombre },
-    brand: { id: result.marca.idMarca, name: result.marca.nombre },
-    measurement: { id: result.medida.idMedida, name: result.medida.nombre },
-    details: result.detalles.map((item: { id: string, nombre: string, valor: string }) => ({ id: item.id, name: item.nombre, value: item.valor })),
-    images: result.imagenes.map((image: any) => {
+    typeProduct: TYPE_PRODUCT_LIST.find(type => type.id === data.idTipoProducto),
+    category: { id: data.categoria.idCategoria, name: data.categoria.nombre },
+    brand: { id: data.marca.idMarca, name: data.marca.nombre },
+    measurement: { id: data.medida.idMedida, name: data.medida.nombre },
+    details: data.detalles.map((item: { id: string, nombre: string, valor: string }) => ({ id: item.id, name: item.nombre, value: item.valor })),
+    images: data.imagenes.map((image: any) => {
       return {
         id: image.idImagen,
         name: image.nombre,
@@ -180,9 +165,9 @@ export const fetchProductById = async (id: string): Promise<Product> => {
         height: image.alto
       }
     }),
-    colors: result.colores.map((item: { id: string, idAtributo: string, nombre: string, hexadecimal: string }) => ({ id: item.idAtributo, name: item.nombre, hexadecimal: item.hexadecimal })),
-    sizes: result.tallas.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
-    flavors: result.sabores.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
+    colors: data.colores.map((item: { id: string, idAtributo: string, nombre: string, hexadecimal: string }) => ({ id: item.idAtributo, name: item.nombre, hexadecimal: item.hexadecimal })),
+    sizes: data.tallas.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
+    flavors: data.sabores.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
   } as Product;
 }
 
@@ -195,18 +180,12 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
     "idCategoria": idCategory,
   });
 
-  const response = await fetch(
-    `${process.env.APP_BACK_END || url}/api/producto/filter/web/related/id?${params}`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/producto/filter/web/related/id?${params}`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching product');
-  }
-
-  const result = await response.json();
-
-  return result.map((item: {
+  return data.map((item: {
     idProducto: string,
     nombre: string,
     codigo: string,
@@ -255,15 +234,10 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
 export const fetchCategories = async (): Promise<Category[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/categoria/combo`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/categoria/combo`, {
     next: { revalidate: 0 }
   });
-
-  if (!response.ok) {
-    throw new Error('Error fetching filtered products');
-  }
-
-  const data = await response.json();
 
   return data.map((item: {
     idCategoria: string,
@@ -282,34 +256,12 @@ export const fetchCategories = async (): Promise<Category[]> => {
 export const fetchCompanyInfo = async (): Promise<Company> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/empresa/web/info`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/empresa/web/info`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching company info');
-  }
-
-  const data = await response.json() as {
-    acercaNosotros: string,
-    email: string,
-    informacion: string,
-    nombreEmpresa: string,
-    paginaWeb: string,
-    youTubePagina: string,
-    facebookPagina: string,
-    twitterPagina: string,
-    instagramPagina: string,
-    tiktokPagina: string,
-    politicasPrivacidad: string,
-    rutaIcon: string,
-    rutaImage: string,
-    rutaBanner: string,
-    rutaPortada: string,
-    terminosCondiciones: string,
-  };
-
-  const company: Company = {
+  return {
     aboutUs: data.acercaNosotros,
     email: data.email,
     information: data.informacion,
@@ -326,24 +278,17 @@ export const fetchCompanyInfo = async (): Promise<Company> => {
     cover: data.rutaPortada,
     banner: data.rutaBanner,
     termsAndConditions: data.terminosCondiciones,
-  }
-
-  return company;
+  } as Company;
 }
 
 // Función para obtener los banners de la empresa
 export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/empresa/web/banners`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/empresa/web/banners`, {
     next: { revalidate: 0 }
   });
-
-  if (!response.ok) {
-    throw new Error('Error fetching company info');
-  }
-
-  const data = await response.json();
 
   const banners: CompanyBanner[] = data.map((banner: {
     id: string,
@@ -368,17 +313,16 @@ export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
 export const fetchBranches = async (): Promise<Branch[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/sucursal/list/web`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/sucursal/list/web`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching branches');
-  }
-
-  const result = await response.json();
-
-  const branches: Branch[] = result.map((branch: {
+  const branches: Branch[] = data.map((branch: {
     idSucursal: string,
     nombre: string,
     email: string,
@@ -413,17 +357,12 @@ export const fetchBranches = async (): Promise<Branch[]> => {
 export const fetchTaxes = async (): Promise<Tax[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/impuesto/combo`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/impuesto/combo`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching taxes');
-  }
-
-  const result = await response.json();
-
-  const taxes: Tax[] = result.map((branch: {
+  const taxes: Tax[] = data.map((branch: {
     idImpuesto: string
     nombre: string
     porcentaje: number
@@ -444,17 +383,12 @@ export const fetchTaxes = async (): Promise<Tax[]> => {
 export const fetchCurrencies = async (): Promise<Currency[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/moneda/combo`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/moneda/combo`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error('Error fetching currencies');
-  }
-
-  const result = await response.json();
-
-  const currencies: Currency[] = result.map((branch: {
+  const currencies: Currency[] = data.map((branch: {
     idMoneda: string
     nombre: string
     simbolo: string
@@ -477,15 +411,10 @@ export const fetchCurrencies = async (): Promise<Currency[]> => {
 export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/empresa//web/whatsapp`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/empresa//web/whatsapp`, {
     next: { revalidate: 0 }
   });
-
-  if (!response.ok) {
-    throw new Error('Error fetching whatsapp info');
-  }
-
-  const data = await response.json();
 
   const whatsapp: Whatsapp = {
     message: data.mensajeWhatsapp,
@@ -500,15 +429,10 @@ export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
 export const fetchCurrencyInfo = async (): Promise<Currency> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/moneda/nacional`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/moneda/nacional`, {
     next: { revalidate: 0 }
   });
-
-  if (!response.ok) {
-    throw new Error('Error fetching currency info');
-  }
-
-  const data = await response.json();
 
   const currency: Currency = {
     idCurrency: data.idMoneda,
@@ -525,15 +449,10 @@ export const fetchCurrencyInfo = async (): Promise<Currency> => {
 export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentReceipt[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
     next: { revalidate: 0 }
   });
-
-  if (!response.ok) {
-    throw new Error('Error fetching currency info');
-  }
-
-  const data = await response.json();
 
   const paymentReceipts: PaymentReceipt[] = data.map((document: {
     idComprobante: string,
@@ -556,7 +475,8 @@ export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentRec
 export const fetchCreateOrder = async (formOrder: FormOrder): Promise<{ idOrder: string, message: string }> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/pedido/create/web`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/pedido/create/web`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -565,25 +485,18 @@ export const fetchCreateOrder = async (formOrder: FormOrder): Promise<{ idOrder:
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error(response.statusText || 'Error fetching order');
-  }
-
-  const result = await response.json();
-
-  const data = {
-    idOrder: result.idPedido,
-    message: result.message,
+  return {
+    idOrder: data.idPedido,
+    message: data.message,
   };
-
-  return data;
 }
 
 // Función para obtener todos los pedidos
 export const fetchAllOrder = async (): Promise<Order[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/pedido/list/web`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/pedido/list/web`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -591,13 +504,8 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error(response.statusText || 'Error fetching order');
-  }
 
-  const result = await response.json();
-
-  return result.map((item: {
+  return data.map((item: {
     id: number
     idPedido: string
     comprobante: string
@@ -653,11 +561,11 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
       id: item.id,
       idOrder: item.idPedido,
       receipt: {
-          idReceipt: "",
-          name: item.comprobante,
-          series: "",
-          number: 0,
-          code: "",
+        idReceipt: "",
+        name: item.comprobante,
+        series: "",
+        number: 0,
+        code: "",
       } as Receipt,
       person: {
         idPerson: "",
@@ -688,19 +596,19 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
       instructions: item.instruccion,
       idTypeDelivery: item.idTipoEntrega,
       typeDelivery: Object.values(TYPE_DELIVERY).find(type => type.id === item.idTipoEntrega) || {
-          id: item.idTipoEntrega,
-          name: item.tipoEntrega,
-          icon: undefined,
-          code: "",
+        id: item.idTipoEntrega,
+        name: item.tipoEntrega,
+        icon: undefined,
+        code: "",
       } as TypeDelivery,
       scheduledDate: item.fechaPedido,
       scheduledTime: item.horaPedido,
       currency: {
-          idCurrency: "",
-          name: "",
-          symbol: "",
-          code: item.codiso,
-          prefered: false,
+        idCurrency: "",
+        name: "",
+        symbol: "",
+        code: item.codiso,
+        prefered: false,
       } as Currency,
       orderDetails: item.detalles.map((detalle) => {
         return {
@@ -738,46 +646,37 @@ export const fetchAllOrder = async (): Promise<Order[]> => {
 export const fetchGetOrder = async (idOrder: string): Promise<Order> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/pedido/detail/${idOrder}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/pedido/detail/${idOrder}`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    throw new Error(response.statusText || 'Error fetching order');
-  }
-
-  const result = await response.json();
-
   return {
     person: {
-      idPerson: result.cabecera.idPersona,
-      document: result.cabecera.documento,
-      information: result.cabecera.informacion,
-      cellular: result.cabecera.telefono,
-      phone: result.cabecera.celular,
-      email: result.cabecera.email,
-      address: result.cabecera.direccion,
+      idPerson: data.cabecera.idPersona,
+      document: data.cabecera.documento,
+      information: data.cabecera.informacion,
+      cellular: data.cabecera.telefono,
+      phone: data.cabecera.celular,
+      email: data.cabecera.email,
+      address: data.cabecera.direccion,
     },
-    date: result.cabecera.fecha,
-    time: result.cabecera.hora,
-    series: result.cabecera.serie,
-    numbering: result.cabecera.numeracion,
-    status: result.cabecera.estado,
-    observations: result.cabecera.observacion,
-    notes: result.cabecera.nota,
-    instructions: result.cabecera.instruccion,
-    idTypeDelivery: result.cabecera.idTipoEntrega,
-    typeDelivery: Object.values(TYPE_DELIVERY).find(type => type.id === result.cabecera.idTipoEntrega)!,
-    scheduledDate: result.cabecera.fechaPedido,
-    scheduledTime: result.cabecera.horaPedido,
+    date: data.cabecera.fecha,
+    time: data.cabecera.hora,
+    series: data.cabecera.serie,
+    numbering: data.cabecera.numeracion,
+    status: data.cabecera.estado,
+    observations: data.cabecera.observacion,
+    notes: data.cabecera.nota,
+    instructions: data.cabecera.instruccion,
+    idTypeDelivery: data.cabecera.idTipoEntrega,
+    typeDelivery: Object.values(TYPE_DELIVERY).find(type => type.id === data.cabecera.idTipoEntrega)!,
+    scheduledDate: data.cabecera.fechaPedido,
+    scheduledTime: data.cabecera.horaPedido,
     currency: {
-      code: result.cabecera.codiso,
+      code: data.cabecera.codiso,
     } as Currency,
-    orderDetails: result.detalles.map((item: {
+    orderDetails: data.detalles.map((item: {
       id: number
       imagen: string
       codigo: string
@@ -819,7 +718,8 @@ export const fetchGetOrder = async (idOrder: string): Promise<Order> => {
 export const fetchLogin = async (body: { email: string, password: string }): Promise<Person> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/persona/login`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/persona/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -828,22 +728,15 @@ export const fetchLogin = async (body: { email: string, password: string }): Pro
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || 'Error fetching filtered products');
-  }
-
-  const result = await response.json();
-
   return {
-    idPerson: result.idPersona,
-    idTypeDocument: result.idTipoDocumento,
-    document: result.documento,
-    information: result.informacion,
-    cellular: result.telefono,
-    phone: result.celular,
-    email: result.email,
-    address: result.direccion,
+    idPerson: data.idPersona,
+    idTypeDocument: data.idTipoDocumento,
+    document: data.documento,
+    information: data.informacion,
+    cellular: data.telefono,
+    phone: data.celular,
+    email: data.email,
+    address: data.direccion,
   } as Person;
 }
 
@@ -855,27 +748,20 @@ export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
     "idPersona": idPerson,
   });
 
-  const response = await fetch(
-    `${process.env.APP_BACK_END || url}/api/persona/id?${params}`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/persona/id?${params}`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || 'Error fetching product');
-  }
-
-  const result = await response.json();
-
   return {
-    idPerson: result.idPersona,
-    idTypeDocument: result.idTipoDocumento,
-    document: result.documento,
-    information: result.informacion,
-    cellular: result.telefono,
-    phone: result.celular,
-    email: result.email,
-    address: result.direccion,
+    idPerson: data.idPersona,
+    idTypeDocument: data.idTipoDocumento,
+    document: data.documento,
+    information: data.informacion,
+    cellular: data.telefono,
+    phone: data.celular,
+    email: data.email,
+    address: data.direccion,
   } as Person;
 }
 
@@ -883,19 +769,12 @@ export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
 export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(
-    `${process.env.APP_BACK_END || url}/api/tipodocumento/combo`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<[]>(`${url}/api/tipodocumento/combo`, {
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || 'Error fetching product');
-  }
-
-  const result = await response.json();
-
-  return result.map((item: {
+  return data.map((item: {
     idTipoDocumento: string,
     nombre: string,
     longitud: number,
@@ -914,8 +793,9 @@ export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
 export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(
-    `${process.env.APP_BACK_END || url}/api/persona/${body.idPersona}`, {
+
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/persona/${body.idPersona}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -924,21 +804,15 @@ export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> =
     next: { revalidate: 0 }
   });
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || 'Error fetching product');
-  }
-
-  const result = await response.json();
-
-  return result.message;
+  return data.message;
 }
 
 // Función para crear una consulta
 export const fetchCreateConsult = async (body: Consult): Promise<string> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const response = await fetch(`${url}/api/consulta`, {
+  // Obtener los datos de la respuesta
+  const data = await apiFetch<any>(`${url}/api/consulta`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -955,11 +829,5 @@ export const fetchCreateConsult = async (body: Consult): Promise<string> => {
     next: { revalidate: 0 }
   });
 
-  const result = await response.text();
-
-  if (!response.ok) {
-    throw new Error(result || 'Error fetching create consult');
-  }
-
-  return result;
+  return data;
 }

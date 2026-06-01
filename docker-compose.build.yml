@@ -1,18 +1,17 @@
+x-service-template: &catalog-service
+  build:
+    context: .
+    dockerfile: Dockerfile
+
 services:
-  test-services:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: test-catalog
+  sysintegra-services:
+    <<: *catalog-service
+    image: sysintegra-catalog
 
   leatsac-services:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    <<: *catalog-service
     image: leatsac-catalog
 
   importmuneli-services:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    <<: *catalog-service
     image: importmuneli-catalog

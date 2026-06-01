@@ -371,3 +371,31 @@ export function formatTime(time: string, addSeconds: boolean = false): string {
 
   return `${formattedHour}:${mm} ${ampm}`;
 }
+
+/**
+ * Realiza una petición HTTP y devuelve una respuesta JSON tipada.
+ *
+ * @template T Tipo esperado de la respuesta.
+ * @param url URL del recurso.
+ * @param options Configuración de la petición.
+ * @returns Datos JSON tipados.
+ * @throws {Error} Cuando la respuesta HTTP no es exitosa.
+ */
+export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const response = await fetch(url, options);
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'Error fetching internal data');
+  }
+
+  const contentType = response.headers.get('content-type');
+
+  if (!contentType?.includes('application/json')) {
+    throw new Error('The response is not JSON');
+  }
+
+  const data = await response.json();
+  
+  return data as T;
+}
