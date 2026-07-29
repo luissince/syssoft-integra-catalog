@@ -48,7 +48,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
       return
     }
 
-    router.push(`/product/${item.id}`)
+    router.push(`/product/${item.idProduct}`)
   }
 
   return (
@@ -102,7 +102,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
 
             {
               !authEnabled && (
-                <div className="text-blue-600 font-bold text-base">
+                <div className="text-blue-600 font-bold text-base text-right">
                   {formatCurrency(item.price, currency.code)}
                   {item.measurement?.name && <small className="text-xs"> x {item.measurement.name}</small>}
                 </div>

@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, Phone, MapPin, Package, Check, Calendar, User, MapPinHouse, Blinds, House, EyeOff, Eye } from "lucide-react";
 import type { MenuItem } from "@/types";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useAuth } from "@/context/AuthContext";
 import { FaWhatsapp } from "react-icons/fa";
 import { MdDeliveryDining } from "react-icons/md";
@@ -175,7 +174,7 @@ export function AdminPanel({
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto p-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold font-display text-primary mb-2">
+          <h1 className="text-4xl font-bold  text-primary mb-2">
             Panel de Cliente
           </h1>
           <p className="text-muted-foreground">
@@ -400,7 +399,7 @@ export function AdminPanel({
                               <FaAmazonPay className="w-4 h-4 mr-2" /> Pago:
                             </p>
 
-                            <p className="text-primary font-bold text-lg font-display">
+                            <p className="text-primary font-bold text-lg ">
                               {formatCurrency(total, order.currency.code)}
                             </p>
                           </div>
@@ -477,7 +476,7 @@ export function AdminPanel({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-bold text-lg text-foreground font-display">
+                    <h3 className="font-bold text-lg text-foreground ">
                       Pedido #
                     </h3>
                     <p className="text-sm text-muted-foreground">
@@ -531,7 +530,7 @@ export function AdminPanel({
 
                       </p>
                       <p className="text-muted-foreground flex items-center"><FaAmazonPay className="w-4 h-4 mr-2" /> Pago: </p>
-                      <p className="text-primary font-bold text-lg font-display">
+                      <p className="text-primary font-bold text-lg ">
                         {formatCurrency(0, currency!.code)}
                       </p>
                     </div>
@@ -594,7 +593,7 @@ export function AdminPanel({
           <TabsContent value="information" className="space-y-6">
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="font-display text-xl text-foreground">Editar Datos de Cliente</CardTitle>
+                <CardTitle className=" text-xl text-foreground">Editar Datos de Cliente</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -704,9 +703,9 @@ export function AdminPanel({
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-bold text-lg text-foreground font-display">{item.name}</h3>
+                        <h3 className="font-bold text-lg text-foreground ">{item.name}</h3>
                         <p className="text-sm text-muted-foreground">{item.description}</p>
-                        <p className="text-primary font-bold text-lg font-display">
+                        <p className="text-primary font-bold text-lg ">
                           {formatCurrency(item.price, currency!.code)}
                         </p>
                       </div>
@@ -743,7 +742,7 @@ export function AdminPanel({
                         <CardContent className="p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div>
-                              <h3 className="font-bold text-lg text-foreground font-display">Pedido #{order.id}</h3>
+                              <h3 className="font-bold text-lg text-foreground ">Pedido #{order.id}</h3>
                               <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
                             </div>
                             <Badge className={`${getStatusColor(order.status)} text-white border-0`}>
@@ -818,7 +817,7 @@ export function AdminPanel({
                                     <span>Delivery +{order.payment.deliveryFee}:</span>
                                   </div>
                                 )}
-                                <p className="text-primary font-bold text-lg font-display">
+                                <p className="text-primary font-bold text-lg ">
                                   Total: {formatCurrency(order.payment.total, currency!.code)}
                                 </p>
                               </div>
@@ -884,7 +883,7 @@ export function AdminPanel({
                         <CardContent className="p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div>
-                              <h3 className="font-bold text-lg text-foreground font-display">Pedido #{order.id}</h3>
+                              <h3 className="font-bold text-lg text-foreground ">Pedido #{order.id}</h3>
                               <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
                             </div>
                             <Badge className={`${getStatusColor(order.status)} text-white border-0`}>
@@ -959,7 +958,7 @@ export function AdminPanel({
                                     <span>Delivery +{order.payment.deliveryFee}:</span>
                                   </div>
                                 )}
-                                <p className="text-primary font-bold text-lg font-display">
+                                <p className="text-primary font-bold text-lg ">
                                   Total: {formatCurrency(order.payment.total, currency!.code)}
                                 </p>
                               </div>
@@ -1018,7 +1017,7 @@ export function AdminPanel({
               {editingItem ? (
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="font-display text-xl text-foreground">Editar Plato</CardTitle>
+                    <CardTitle className=" text-xl text-foreground">Editar Plato</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -1080,7 +1079,7 @@ export function AdminPanel({
               ) : (
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="font-display text-xl text-foreground">Agregar Nuevo Plato</CardTitle>
+                    <CardTitle className=" text-xl text-foreground">Agregar Nuevo Plato</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -1152,9 +1151,9 @@ export function AdminPanel({
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-bold text-lg text-foreground font-display">{item.name}</h3>
+                          <h3 className="font-bold text-lg text-foreground ">{item.name}</h3>
                           <p className="text-sm text-muted-foreground">{item.description}</p>
-                          <p className="text-primary font-bold text-lg font-display">
+                          <p className="text-primary font-bold text-lg ">
                             {formatCurrency(item.price, currency!.code)}
                           </p>
                         </div>
@@ -1256,7 +1255,7 @@ export default function AdminComponent({ company, branch, categories, listTypeDo
   };
 
   if (!isMounted || isLoading) {
-    return <Welcome company={company} branch={branch} />;
+    return <Welcome company={company} />;
   }
 
   return (

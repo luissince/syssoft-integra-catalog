@@ -4,10 +4,17 @@ import { Suspense } from "react";
 import Welcome from "@/components/Welcome";
 
 export default async function CheckoutPage() {
-    const company = await getCompanyInfo();
-    const branches = await getBranches();
-    const taxes = await getTaxes();
-    const listTypeDocument = await getListTypeDocument();
+    const [
+        company,
+        branches,
+        taxes,
+        listTypeDocument
+    ] = await Promise.all([
+        getCompanyInfo(),
+        getBranches(),
+        getTaxes(),
+        getListTypeDocument()
+    ]);
 
     const branch = branches.find((branch) => branch.primary === true)!;
     const tax = taxes.find((tax) => tax.prefered === true)!;
@@ -15,7 +22,7 @@ export default async function CheckoutPage() {
     const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
     return (
-        <Suspense fallback={<Welcome company={company} branch={branch} />}>
+        <Suspense fallback={<Welcome company={company} />}>
             <CheckoutComponent
                 listTypeDocument={listTypeDocument}
                 company={company}

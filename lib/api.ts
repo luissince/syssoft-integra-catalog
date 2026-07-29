@@ -1,25 +1,61 @@
-import { fetchAllOrder, fetchBranches, fetchCategories, fetchCompanyBanners, fetchCompanyInfo, fetchCreateConsult, fetchCreateOrder, fetchCurrencies, fetchCurrencyInfo, fetchCustomerById, fetchGetOrder, fetchListTypeDocument, fetchLogin, fetchPaymentReceipts, fetchProductById, fetchProducts, fetchProductsAll, fetchProductsRelated, fetchTaxes, fetchUpdateCustomer, fetchWhatsappInfo } from "@/data/data-rest";
-import { Branch, Category, Company, CompanyBanner, Consult, Currency, FilterOptions, Order, PaymentReceipt, Person, Product, Tax, TypeDocument, Whatsapp } from "@/types/api-type";
+import { 
+    fetchAllOrder, 
+    fetchBranches, 
+    fetchCategories, 
+    fetchCompanyBanners, 
+    fetchCompanyInfo, 
+    fetchCreateConsult, 
+    fetchCreateOrder, 
+    fetchCurrencies,
+    fetchCurrencyInfo, 
+    fetchCustomerById, 
+    fetchGetOrder, 
+    fetchListTypeDocument, 
+    fetchLogin, 
+    fetchPaymentReceipts, 
+    fetchProductById, 
+    fetchProducts, 
+    fetchProductsRelated, 
+    fetchTaxes, 
+    fetchUpdateCustomer, 
+    fetchWhatsappInfo 
+} from "@/data/data-rest";
+import { 
+    Branch, 
+    Category, 
+    Company,
+    CompanyBanner, 
+    Consult, 
+    Currency, 
+    FilterOptions, 
+    Order, 
+    PaymentReceipt, 
+    Person, 
+    Product, 
+    Tax, 
+    TypeDocument,
+    Whatsapp 
+} from "@/types/api-type";
 import { FormCustomer, FormOrder } from "@/types/form";
 
-// Obtener todos los productos 
-export async function getProductsAll(): Promise<Product[]> {
-    try {
-        const data = await fetchProductsAll();
-        return data;
-    } catch (error) {
-        return [];
-    }
-}
-
 // Obtener todos los productos por filtro
-export async function getProducts(search = "", currentPage: number = 0, totalPage: number = 6, filters: FilterOptions | null = null): Promise<{ products: Product[], count: number }> {
+export async function getProducts({
+    search,
+    currentPage = 0,
+    totalPage = 6,
+    filters = null
+}: {
+    search?: string
+    currentPage: number
+    totalPage: number
+    filters?: FilterOptions | null
+}): Promise<{ data: Product[], count: number }> {
     try {
         const data = await fetchProducts(search, currentPage, totalPage, filters);
         return data;
     } catch (error) {
         return {
-            products: [],
+            data: [],
             count: 0
         };
     }

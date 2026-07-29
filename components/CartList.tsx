@@ -35,7 +35,7 @@ export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: C
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-foreground flex items-center justify-between font-display">
+        <CardTitle className="text-foreground flex items-center justify-between">
           <div className="flex items-center">
             <ShoppingCart className="w-5 h-5 mr-2 text-primary" />
             <span>Mi Pedido ({cart.length} items)</span>
@@ -105,8 +105,8 @@ export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: C
         </div>
         <div className="border-t border-border pt-4 space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-foreground font-display">Total:</span>
-            <Badge className="bg-primary text-primary-foreground text-lg px-4 py-2 font-display font-semibold">
+            <span className="text-lg font-semibold text-foreground">Total:</span>
+            <Badge className="bg-primary text-primary-foreground text-lg px-4 py-2 font-semibold">
               {formatCurrency(total, currency!.code)}
             </Badge>
           </div>

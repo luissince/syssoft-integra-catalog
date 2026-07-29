@@ -1,8 +1,7 @@
+// app/layout.tsx
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
-import { Inter, Playfair_Display } from "next/font/google"
+import { Inter, Playfair_Display, Roboto_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
@@ -18,7 +17,7 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
-})
+});
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -26,18 +25,40 @@ const playfair = Playfair_Display({
   display: "swap",
 })
 
-export async function generateMetadata(): Promise<Metadata> {
-  const company = await getCompanyInfo();
+const mono = Roboto_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
-  return {
-    title: company.name,
-    description: company.aboutUs,
-    // keywords: restaurantData.restaurant.keywords,
-    generator: "https://www.syssoftintegra.com/",
-    icons: {
-      icon: company.icon,
-      apple: company.icon,
-    },
+export async function generateMetadata(): Promise<Metadata> {
+
+  try {
+
+    const company = await getCompanyInfo();
+
+    return {
+      title: company.name,
+      description: company.aboutUs,
+      // keywords: restaurantData.restaurant.keywords,
+      generator: "https://www.syssoftintegra.com/",
+      icons: {
+        icon: company.icon,
+        apple: company.icon,
+      }
+    };
+
+  } catch (error) {
+
+    console.error("Metadata error:", error);
+
+    return {
+      title: "Sistema",
+      description: "Tienda online",
+      generator: "https://www.syssoftintegra.com/",
+      icons: {
+        icon: "/favicon.ico"
+      }
+    };
   }
 }
 
@@ -52,23 +73,29 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const currency = await getCurrencyInfo();
-  const whatsapp = await getWhatsappInfo();
+  const [
+    currency,
+    whatsapp
+  ] = await Promise.all([
+    getCurrencyInfo(),
+    getWhatsappInfo()
+  ]);
+
+  if (!currency) {
+    throw new Error();
+  }
+
+  if (!whatsapp) {
+    throw new Error();
+  }
 
   return (
-    <html lang="es" suppressHydrationWarning>
-      <head>
-        <style>{`
-          html {
-            font-family: ${GeistSans.style.fontFamily};
-            --font-sans: ${GeistSans.variable};
-            --font-mono: ${GeistMono.variable};
-            --font-inter: ${inter.style.fontFamily};
-            --font-playfair: ${playfair.style.fontFamily};
-          }
-        `}</style>
-      </head>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+    <html lang="es" className={`
+    ${inter.variable}
+    ${playfair.variable}
+    ${mono.variable}
+  `} suppressHydrationWarning>
+      <body className={`${inter.className} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
           <AuthProvider>
             <CurrencyProvider initialCurrency={currency}>

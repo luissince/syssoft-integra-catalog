@@ -45,6 +45,7 @@ export interface TypeDelivery {
 
 export interface Product {
   id: string
+  idProduct: string
   code: string
   sku: string
   codeBar: string

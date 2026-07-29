@@ -59,7 +59,7 @@ export default function CheckoutComponent({ company, branch, branches, tax, list
     };
 
     if (!isMounted) {
-        return <Welcome company={company} branch={branch} />;
+        return <Welcome company={company} />;
     }
 
     if (completedOrder) {

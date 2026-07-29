@@ -65,7 +65,7 @@ export function RegisterCard() {
       </DialogTrigger>
       <DialogContent className="bg-card text-card-foreground border-border max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Crear Cuenta</DialogTitle>
+          <DialogTitle className="text-xl">Crear Cuenta</DialogTitle>
            <DialogDescription>
           </DialogDescription>
         </DialogHeader>

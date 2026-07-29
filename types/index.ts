@@ -108,19 +108,19 @@ export interface Zone {
 }
 
 export interface Restaurant {
-    typeDocument: string
-    document: string
-    owner: string
-    name: string
-    icon: Image
-    logo: Image
-    banner?: Image[]
-    phone: string
-    address: string
-    hours: string
-    whatsapp: string
-    description: string
-    keywords: string | string[]
+  typeDocument: string
+  document: string
+  owner: string
+  name: string
+  icon: Image
+  logo: Image
+  banner?: Image[]
+  phone: string
+  address: string
+  hours: string
+  whatsapp: string
+  description: string
+  keywords: string | string[]
 }
 
 export interface RestaurantData {
