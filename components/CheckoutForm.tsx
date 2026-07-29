@@ -395,7 +395,7 @@ export function CheckoutForm({
     <div className="grid lg:grid-cols-2 gap-8">
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground font-display text-xl">
+          <CardTitle className="text-foreground text-xl">
             Información de Entrega
           </CardTitle>
         </CardHeader>
@@ -403,7 +403,7 @@ export function CheckoutForm({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Cómo quieres recibir tu pedido */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">
+              <h3 className="font-semibold text-foreground">
                 ¿Cómo quieres recibir tu pedido?
               </h3>
 
@@ -583,7 +583,7 @@ export function CheckoutForm({
 
             {/* Información del cliente */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">
+              <h3 className="font-semibold text-foreground">
                 Datos del Cliente
               </h3>
 
@@ -779,7 +779,7 @@ export function CheckoutForm({
               formData.idTypeDelivery ===
                 TYPE_DELIVERY.DELIVERY_SCHEDULED.id) && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-foreground font-display">
+                <h3 className="font-semibold text-foreground">
                   Dirección de Entrega
                 </h3>
                 <div>
@@ -877,7 +877,7 @@ export function CheckoutForm({
 
             {/* Descuento */}
             {/* <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Descuento</h3>
+              <h3 className="font-semibold text-foreground">Descuento</h3>
               <div>
                 <Label htmlFor="discount" className="text-foreground font-medium">
                   Porcentaje de Descuento
@@ -897,7 +897,7 @@ export function CheckoutForm({
 
             {/* Método de pago */}
             {/* <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Método de Pago</h3>
+              <h3 className="font-semibold text-foreground">Método de Pago</h3>
               <p className="text-sm text-muted-foreground">
                 Los pagos son referenciales. Aún no se aceptan pagos en línea. Al momento de recoger su pedido, se le proporcionará toda la información necesaria para realizar el pago.
               </p>
@@ -922,7 +922,7 @@ export function CheckoutForm({
 
             {/* Notas del pedido */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">
+              <h3 className="font-semibold text-foreground">
                 Información Adicional
               </h3>
               <div>
@@ -985,7 +985,7 @@ export function CheckoutForm({
       </Card>
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground font-display text-xl">
+          <CardTitle className="text-foreground text-xl">
             Resumen del Pedido
           </CardTitle>
         </CardHeader>
@@ -1016,7 +1016,7 @@ export function CheckoutForm({
                     )}
                   </div>
                 </div>
-                <span className="text-primary font-bold font-display">
+                <span className="text-primary font-bold">
                   {formatCurrency(item.price * item.quantity, currency!.code)}
                 </span>
               </div>
@@ -1043,7 +1043,7 @@ export function CheckoutForm({
                 <span>{formatCurrency(deliveryFee, currency!.code)}</span>
               </div>
             )} */}
-            {/* <div className="flex justify-between text-xl font-bold text-primary pt-3 border-t border-border font-display">
+            {/* <div className="flex justify-between text-xl font-bold text-primary pt-3 border-t border-border">
               <span>Total:</span>
               <span>{formatCurrency(total, currency!.code)}</span>
             </div> */}

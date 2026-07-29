@@ -1,15 +1,15 @@
+// components/Welcome.tsx
 "use client";
+
 import { Branch, Company } from "@/types/api-type";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-// import restaurantData from "@/data/restaurant-data.json";
 
 interface WelcomeProps {
   company: Company;
-  branch: Branch;
 }
 
-const Welcome = ({ company, branch }: WelcomeProps) => {
+const Welcome = ({ company }: WelcomeProps) => {
   const [dots, setDots] = useState("");
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Welcome = ({ company, branch }: WelcomeProps) => {
         
         {/* Texto de bienvenida */}
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold font-display text-black">
+          <h1 className="text-2xl font-bold text-black">
             {/* {restaurantData.restaurant.owner} */}
             {company.name}
           </h1>
@@ -54,9 +54,9 @@ const Welcome = ({ company, branch }: WelcomeProps) => {
         {/* Indicador de carga */}
         <div className="space-y-4">
           <div className="flex justify-center space-x-2">
-            <div className="w-3 h-3 bg-primary rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-3 h-3 bg-primary rounded-full animate-bounce" />
+            <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
+            <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
           </div>
           <p className="text-sm text-muted-foreground">
             Preparando tu experiencia{dots}
@@ -67,7 +67,7 @@ const Welcome = ({ company, branch }: WelcomeProps) => {
         <div className="w-64 mx-auto bg-muted rounded-full h-2 overflow-hidden">
           <div className="h-full bg-primary rounded-full animate-pulse" style={{
             animation: 'loadingBar 2s ease-in-out infinite'
-          }}></div>
+          }}/>
         </div>
       </div>
       

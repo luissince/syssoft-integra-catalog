@@ -4,17 +4,14 @@ import { Clock, MapPin, Phone, MessageCircle, CreditCard, ExternalLink } from "l
 import { useContact } from "@/lib/contact";
 import { useRouter } from "next/navigation";
 import { Branch, Category, Company, Whatsapp } from "@/types/api-type";
-import Image from "next/image";
 
 interface FooterProps {
   company: Company;
-  categories: Category[];
   whatsapp: Whatsapp;
   branch: Branch;
-  setSelectedCategory: (category: string) => void;
 }
 
-export default function Footer({ company, categories, whatsapp, branch, setSelectedCategory }: FooterProps) {
+export default function Footer({ company, whatsapp, branch }: FooterProps) {
   const router = useRouter();
   const { handleCall, handleWhatsapp, getDefaultMessage, isMobile } = useContact();
 
@@ -54,22 +51,15 @@ export default function Footer({ company, categories, whatsapp, branch, setSelec
   return (
     <footer className="bg-card border-t border-border py-12 mt-auto">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           {/* Restaurant Info */}
-          <div className="md:col-span-2">
-            <div className="text-2xl font-bold font-display mb-4">
-              {/* <span className="text-primary">{restaurantData.restaurant.owner}</span>{" "}
-              <span className="text-foreground">{restaurantData.restaurant.name}</span> */}
+          <div className="col-span-1 md:col-span-6">
+            <div className="text-2xl font-bold mb-4">
               <span className="text-foreground">{company.name}</span>
             </div>
             <p className="text-muted-foreground mb-2 leading-relaxed">
-              {/* {restaurantData.restaurant.description} */}
               {company.information}
             </p>
-            {/* <p className="text-muted-foreground mb-6 leading-relaxed">
-              {restaurantData.restaurant.typeDocument}: {restaurantData.restaurant.document}
-            </p> */}
-
             {/* Botones de contacto principales */}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <Button
@@ -97,44 +87,11 @@ export default function Footer({ company, categories, whatsapp, branch, setSelec
                 </span>
               </Button>
             </div>
-
-            {/* Botón de Métodos de Pago */}
-            {/* <div className="mb-4">
-              <Button
-                onClick={handlePaymentMethodsClick}
-                variant="outline"
-                className="w-full sm:w-auto border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 flex items-center justify-center gap-2"
-              >
-                <CreditCard className="w-4 h-4" />
-                Ver Métodos de Pago
-                <ExternalLink className="w-3 h-3" />
-              </Button>
-              <p className="text-xs text-muted-foreground mt-1 text-center sm:text-left">
-                Yape, Plin, transferencias bancarias y más
-              </p>
-            </div> */}
-
-            {/* Información de contacto rápido */}
-            {/* <div className="text-sm text-muted-foreground">
-              {isMobile ? (
-                <div className="space-y-1">
-                  <p>📱 Toca para llamar o escribir por WhatsApp</p>
-                  <p>🗺️ Toca la dirección para ver en mapas</p>
-                  <p>💳 Ve todos nuestros métodos de pago</p>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  <p>💻 En móvil: llamadas y WhatsApp directos</p>
-                  <p>🖱️ Click en dirección para abrir mapas</p>
-                  <p>💳 Revisa nuestras opciones de pago</p>
-                </div>
-              )}
-            </div> */}
           </div>
 
           {/* Contact Info */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4 font-display">Contacto</h3>
+          <div className="col-span-1 md:col-span-3">
+            <h3 className="font-semibold text-foreground mb-4">Contacto</h3>
             <div className="space-y-3 text-sm">
               <button
                 onClick={handleMapClick}
@@ -180,63 +137,39 @@ export default function Footer({ company, categories, whatsapp, branch, setSelec
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4 font-display">Menú</h3>
-            <div className="space-y-2 text-sm">
-              {/* {restaurantData.categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <span>{category.icon}</span>
-                  <span>{category.name}</span>
-                </button>
-              ))} */}
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {/* <span>{category.icon}</span>
-                  <span>{category.name}</span> */}
-                  <Image
-                    src={category.image || "/placeholder.svg"}
-                    alt={category.name}
-                    width={20}
-                    height={20}
-                  />
-                  <span>{category.name}</span>
-                </button>
-              ))}
-            </div>
+          <div className="col-span-1 md:col-span-3">
+            {/* <h3 className="font-semibold text-foreground mb-4">Menú</h3> */}
+            <h3 className="font-medium text-foreground mb-4">Aceptamos</h3>
 
-            {/* <div className="mt-6">
-              <h4 className="font-medium text-foreground mb-2">Aceptamos</h4>
-              <div className="flex flex-wrap gap-2">
-                {restaurantData.paymentMethods
-                  .filter((method) => method.available)
-                  .slice(0, 6) // Mostrar solo los primeros 6
-                  .map((method) => (
-                    <span
-                      key={method.id}
-                      className="text-lg bg-muted/30 p-1 rounded"
-                      title={method.name}
-                    >
-                      {method.icon}
-                    </span>
-                  ))}
-                {restaurantData.paymentMethods.filter(m => m.available).length > 6 && (
-                  <button
-                    onClick={handlePaymentMethodsClick}
-                    className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-2 py-1 rounded transition-colors"
-                  >
-                    +{restaurantData.paymentMethods.filter(m => m.available).length - 6} más
-                  </button>
-                )}
-              </div>
-            </div> */}
+            <div className="flex justify-start gap-2">
+              <button
+                // onClick={() => handlePaymentMethod("TARJETA")}
+                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+              >
+                💳 Tarjeta
+              </button>
+
+              <button
+                // onClick={() => handlePaymentMethod("BILLETERA")}
+                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+              >
+                📱 Billetera digital
+              </button>
+
+              <button
+                // onClick={() => handlePaymentMethod("DEPOSITO")}
+                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+              >
+                🏦 Depósito bancario
+              </button>
+
+              <button
+                // onClick={() => handlePaymentMethod("EFECTIVO")}
+                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+              >
+                💵 Efectivo
+              </button>
+            </div>
 
             {/* Enlaces sociales adicionales */}
             <div className="mt-4 pt-4 border-t border-border">
@@ -249,14 +182,14 @@ export default function Footer({ company, categories, whatsapp, branch, setSelec
                 >
                   💬 Pedidos por WhatsApp
                 </Button>
-                {/* <Button
+                <Button
                   onClick={handleCallClick}
                   variant="ghost"
                   size="sm"
-                  className="justify-start p-0 h-auto text-primary hover:text-primary/80"
+                  className="justify-start p-0 h-auto text-gray-400 hover:text-gray-600"
                 >
-                  📞 Reservas telefónicas
-                </Button> */}
+                  📚 Libro de Reclamaciones
+                </Button>
                 {/* <Button
                   onClick={handlePaymentMethodsClick}
                   variant="ghost"
@@ -273,7 +206,6 @@ export default function Footer({ company, categories, whatsapp, branch, setSelec
         {/* Bottom Footer */}
         <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <div className="text-sm text-muted-foreground mb-4 md:mb-0">
-            {/* © {new Date().getFullYear()} {restaurantData.restaurant.name}. Todos los derechos reservados. */}
             © {new Date().getFullYear()} {company.name}. Todos los derechos reservados.
           </div>
           <div className="flex items-center space-x-2">

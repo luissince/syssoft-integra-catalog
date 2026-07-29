@@ -43,17 +43,14 @@ export function NavPrimary({ company, categories, whatsapp, branch, authEnabled,
             <div className="container mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-8">
-                        <div className="text-2xl font-bold font-display">
+                        <div className="text-2xl font-bold">
                             {/* <span className="text-primary">{company.name}</span> */}
                             <Image
                                 src={company.logo || "/placeholder.svg"}
                                 alt={company.name}
-                                width={120}
-                                height={40}
+                                width={100}
+                                height={50}
                             />
-                            {/* <div className="text-sm text-foreground">{company.name}</div> */}
-                            {/* <span className="text-primary">{restaurantData.restaurant.owner}</span>
-                            <div className="text-sm text-foreground">{restaurantData.restaurant.name}</div> */}
                         </div>
                         <nav className="hidden md:flex space-x-2">
                             <DropdownMenu>
@@ -70,7 +67,6 @@ export function NavPrimary({ company, categories, whatsapp, branch, authEnabled,
                                             onClick={() => setSelectedCategory(category.id)}
                                             className="flex items-center space-x-2 cursor-pointer"
                                         >
-                                            {/* <span>{category.icon}</span> */}
                                             <Image
                                                 src={category.image || "/placeholder.svg"}
                                                 alt={category.name}
@@ -80,16 +76,6 @@ export function NavPrimary({ company, categories, whatsapp, branch, authEnabled,
                                             <span>{category.name}</span>
                                         </DropdownMenuItem>
                                     ))}
-                                    {/* {restaurantData.categories.map((category) => (
-                                        <DropdownMenuItem
-                                            key={category.id}
-                                            onClick={() => setSelectedCategory(category.id)}
-                                            className="flex items-center space-x-2 cursor-pointer"
-                                        >
-                                            <span>{category.icon}</span>
-                                            <span>{category.name}</span>
-                                        </DropdownMenuItem>
-                                    ))} */}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </nav>
@@ -217,12 +203,6 @@ export function NavPrimary({ company, categories, whatsapp, branch, authEnabled,
                 <div className="md:hidden mt-4">
                     <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
                         <TabsList className="bg-muted w-full overflow-auto gap-x-2">
-                            {/* {restaurantData.categories.map((category) => (
-                                <TabsTrigger key={category.id} value={category.id} className="flex-1 text-xs">
-                                    <span className="mr-1">{category.icon}</span>
-                                    {category.name}
-                                </TabsTrigger>
-                            ))} */}
                             {categories.map((category) => (
                                 <TabsTrigger key={category.id} value={category.id} className="flex-1 text-xs">
                                     {/* <span className="mr-1">{category.icon}</span> */}
@@ -258,7 +238,7 @@ export function NavSecondary({ title = "Finalizar Pedido", authEnabled }: NavSec
                 <Button className="hidden md:flex" onClick={() => router.push("/")} variant="outline">
                     ← Volver al Menú
                 </Button>
-                <h1 className="text-2xl font-bold font-display text-primary">{title}</h1>
+                <h1 className="text-2xl font-bold text-primary">{title}</h1>
                 <div className="flex items-center space-x-4">
                     <ThemeToggle />
                     {authEnabled && (

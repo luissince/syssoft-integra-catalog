@@ -42,11 +42,11 @@ export const OrderCompletion: React.FC<OrderCompletionProps> = ({ order, restaur
       <div className="container mx-auto p-4">
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-foreground font-display text-xl">Pedido Completado</CardTitle>
+            <CardTitle className="text-foreground text-xl">Pedido Completado</CardTitle>
           </CardHeader>
           <CardContent ref={contentRef}>
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Gracias por tu pedido</h3>
+              <h3 className="font-semibold text-foreground">Gracias por tu pedido</h3>
               <p className="text-muted-foreground">Tu pedido ha sido recibido y está siendo procesado.</p>
               <div className="border-t border-border pt-4">
                 <h4 className="font-semibold text-foreground">Resumen del Pedido</h4>

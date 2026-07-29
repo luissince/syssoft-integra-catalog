@@ -1,65 +1,30 @@
 import { TYPE_DELIVERY } from "@/constants/type-delivery";
 import { TYPE_PRODUCT_LIST } from "@/constants/type-product";
 import { apiFetch } from "@/lib/utils";
-import { Branch, Category, Company, CompanyBanner, Consult, Currency, FilterOptions, Measurement, Order, OrderDetail, PaymentReceipt, Person, Product, Receipt, Tax, TypeDelivery, TypeDocument, Whatsapp } from "@/types/api-type";
+import {
+  Branch,
+  Category,
+  Company,
+  CompanyBanner,
+  Consult,
+  Currency,
+  FilterOptions,
+  Measurement,
+  Order,
+  OrderDetail,
+  PaymentReceipt,
+  Person,
+  Product,
+  Receipt,
+  Tax,
+  TypeDelivery,
+  TypeDocument,
+  Whatsapp
+} from "@/types/api-type";
 import { FormCustomer, FormOrder } from "@/types/form";
 
-// Función para obtener todos los productos
-export const fetchProductsAll = async (): Promise<Product[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
-
-  // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${url}/api/producto/filter/web/all`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    next: { revalidate: 0 }
-  });
-
-  const products = data.map((item: {
-    idProducto: string,
-    codigo: string,
-    descripcionCorta: string,
-    sku: string,
-    codigoBarras: string,
-    nombre: string,
-    precio: number,
-    imagen: string,
-    idTipoProducto: string,
-    idCategoria: string,
-    nombreCategoria: string,
-    idMedida: string,
-    nombreMedida: string,
-    cantidad: number;
-    id: number
-  }) => {
-    const product: Product = {
-      id: item.idProducto,
-      code: item.codigo,
-      sku: item.sku,
-      codeBar: item.codigoBarras,
-      name: item.nombre,
-      description: item.descripcionCorta,
-      price: item.precio,
-      idCategory: item.idCategoria,
-      category: { id: item.idCategoria, name: item.nombreCategoria },
-      idMeasurement: item.idMedida,
-      measurement: { id: item.idMedida, name: item.nombreMedida },
-      image: item.imagen,
-      discount: 0,
-      stock: item.cantidad,
-      typeProduct: TYPE_PRODUCT_LIST.find(type => type.id === item.idTipoProducto),
-    }
-
-    return product;
-  });
-
-  return products;
-}
-
 // Función para obtener todo los productos por filtro
-export const fetchProducts = async (search: string, currentPage: number, totalPage: number, filters: FilterOptions | null = null): Promise<{ products: Product[], count: number }> => {
+export const fetchProducts = async (search?: string, currentPage: number = 0, totalPage: number = 6, filters: FilterOptions | null = null): Promise<{ data: Product[], count: number }> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
   // Obtener los datos de la respuesta
@@ -71,8 +36,8 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
     body: JSON.stringify({
       buscar: search,
       filtros: filters,
-      posicionPagina: currentPage.toString(),
-      filasPorPagina: totalPage.toString()
+      posicionPagina: currentPage,
+      filasPorPagina: totalPage
     }),
     next: { revalidate: 0 }
   });
@@ -96,6 +61,7 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
   }) => {
     const product: Product = {
       id: item.id.toString(),
+      idProduct: item.idProducto,
       code: item.codigo,
       sku: item.sku,
       codeBar: item.codigoBarras,
@@ -116,7 +82,7 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
   });
 
   return {
-    "products": products,
+    "data": products,
     "count": data.count
   };
 }
@@ -125,17 +91,48 @@ export const fetchProducts = async (search: string, currentPage: number, totalPa
 export const fetchProductById = async (id: string): Promise<Product> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const params = new URLSearchParams({
-    "codigo": id,
-  });
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/producto/filter/web/id?${params}`, {
+  const data = await apiFetch<any>(`${url}/api/producto/filter/web/${id}`, {
     next: { revalidate: 0 }
   });
 
+  let images = [];
+
+  if (data.imagen) {
+    images.push({
+      id: "principal-1",
+      name: data.nombre,
+      url: data.imagen,
+      width: 600,
+      height: 400
+    })
+  }
+
+  if (data.imagenes.lenght !== 0) {
+    data.imagenes.forEach((image: any) => {
+      images.push({
+        id: image.idImagen,
+        name: image.nombre,
+        url: image.url,
+        width: image.ancho,
+        height: image.alto
+      })
+    })
+  }
+
+  if (!data.imagen && (!data.imagenes || data.imagenes.length === 0)) {
+    images.push({
+      id: "1",
+      name: "Default",
+      url: "/placeholder.svg",
+      width: 600,
+      height: 400
+    })
+  }
+
   return {
-    id: data.idProducto,
+    id: data.id,
+    idProduct: data.idProducto,
     code: data.codigo,
     sku: data.sku,
     codeBar: data.codigoBarras,
@@ -156,15 +153,7 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     brand: { id: data.marca.idMarca, name: data.marca.nombre },
     measurement: { id: data.medida.idMedida, name: data.medida.nombre },
     details: data.detalles.map((item: { id: string, nombre: string, valor: string }) => ({ id: item.id, name: item.nombre, value: item.valor })),
-    images: data.imagenes.map((image: any) => {
-      return {
-        id: image.idImagen,
-        name: image.nombre,
-        url: image.url,
-        width: image.ancho,
-        height: image.alto
-      }
-    }),
+    images: images,
     colors: data.colores.map((item: { id: string, idAtributo: string, nombre: string, hexadecimal: string }) => ({ id: item.idAtributo, name: item.nombre, hexadecimal: item.hexadecimal })),
     sizes: data.tallas.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
     flavors: data.sabores.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
@@ -175,13 +164,8 @@ export const fetchProductById = async (id: string): Promise<Product> => {
 export const fetchProductsRelated = async (idProduct: string, idCategory: string): Promise<Product[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const params = new URLSearchParams({
-    "idProducto": idProduct,
-    "idCategoria": idCategory,
-  });
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/producto/filter/web/related/id?${params}`, {
+  const data = await apiFetch<any>(`${url}/api/producto/filter/web/related/${idProduct}/${idCategory}`, {
     next: { revalidate: 0 }
   });
 
@@ -234,23 +218,27 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
 export const fetchCategories = async (): Promise<Category[]> => {
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  // Obtener los datos de la respuesta
   const data = await apiFetch<[]>(`${url}/api/categoria/combo`, {
     next: { revalidate: 0 }
   });
 
-  return data.map((item: {
-    idCategoria: string,
-    nombre: string,
-    imagen: string
-  }) => {
-    return {
+  return [
+    {
+      id: "",
+      name: "TODOS",
+      image: ""
+    },
+    ...data.map((item: {
+      idCategoria: string,
+      nombre: string,
+      imagen: string
+    }) => ({
       id: item.idCategoria,
       name: item.nombre,
       image: item.imagen
-    }
-  });
-}
+    }))
+  ];
+};
 
 // Función para obtener la información de la empresa
 export const fetchCompanyInfo = async (): Promise<Company> => {
@@ -322,21 +310,33 @@ export const fetchBranches = async (): Promise<Branch[]> => {
     next: { revalidate: 0 }
   });
 
-  const branches: Branch[] = data.map((branch: {
-    idSucursal: string,
-    nombre: string,
-    email: string,
-    telefono: string,
-    celular: string,
-    paginaWeb: string,
-    direccion: string,
-    googleMaps: string,
-    horarioAtencion: string,
-    estado: number,
-    principal: number,
-    imagen: string
-  }) => {
-    return {
+  const branches: Branch[] = [
+    {
+      id: "",
+      name: "Todos",
+      address: "",
+      email: "",
+      phone: "",
+      schedule: "",
+      mapUrl: "",
+      image: "",
+      state: false,
+      primary: false,
+    },
+    ...data.map((branch: {
+      idSucursal: string,
+      nombre: string,
+      email: string,
+      telefono: string,
+      celular: string,
+      paginaWeb: string,
+      direccion: string,
+      googleMaps: string,
+      horarioAtencion: string,
+      estado: number,
+      principal: number,
+      imagen: string
+    }) => ({
       id: branch.idSucursal,
       name: branch.nombre,
       address: branch.direccion,
@@ -345,10 +345,10 @@ export const fetchBranches = async (): Promise<Branch[]> => {
       schedule: branch.horarioAtencion,
       mapUrl: branch.googleMaps,
       image: branch.imagen,
-      state: branch.estado === 1 ? true : false,
-      primary: branch.principal === 1 ? true : false,
-    } as Branch
-  });
+      state: branch.estado === 1,
+      primary: branch.principal === 1,
+    } as Branch))
+  ];
 
   return branches;
 }

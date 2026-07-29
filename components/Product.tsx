@@ -26,7 +26,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/context/AuthContext"
 import Welcome from "@/components/Welcome"
 import { NavSecondary } from "@/components/Nav"
-import { Branch, Company, Product } from "@/types/api-type"
+import { Branch, Company, Product, Whatsapp } from "@/types/api-type"
 import { cn, formatCurrency } from "@/lib/utils"
 import { MenuCard } from "./MenuCard"
 import { Label } from "./ui/label"
@@ -35,6 +35,7 @@ import { useWishlist } from "@/context/WishlistContext"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { TYPE_PRODUCT } from "@/constants/type-product"
 import { useCurrency } from "@/context/CurrencyContext"
+import Footer from "./Footer"
 
 interface ProductImage {
   id: string
@@ -47,6 +48,7 @@ interface ProductImage {
 interface PropsProductComponent {
   company: Company
   branch: Branch
+  whatsapp: Whatsapp
   product: Product
   relatedProducts: Product[]
   authEnabled: boolean
@@ -68,13 +70,7 @@ function ProductImageGallery({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [zoomLevel, setZoomLevel] = useState(1)
 
-  const safeImages = images.length > 0 ? images : [{
-    id: "1",
-    name: "Vista principal",
-    url: "/placeholder.svg",
-    width: 600,
-    height: 400
-  }]
+  const safeImages = images;
 
   const handlePrevious = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? safeImages.length - 1 : prev - 1))
@@ -101,15 +97,17 @@ function ProductImageGallery({
     setZoomLevel((prev) => Math.max(prev - 0.5, 1))
   }
 
+  const currentImage = safeImages[currentImageIndex] ?? safeImages[0];
+
   return (
     <>
       {/* Imagen principal */}
       <div className="relative aspect-square rounded-xl overflow-hidden shadow-lg mb-4 group">
         <Image
-          src={safeImages[currentImageIndex].url || "/placeholder.svg"}
+          src={currentImage.url}
           alt={productName}
           fill
-          className={cn("object-cover", outOfStock ? "opacity-70" : "")}
+          className={cn("object-cover", outOfStock ? "opacity-90" : "")}
           priority
         />
 
@@ -295,7 +293,7 @@ function ProductImageGallery({
   )
 }
 
-export default function ProductComponent({ company, branch, product, relatedProducts, authEnabled }: PropsProductComponent) {
+export default function ProductComponent({ company, branch, whatsapp, product, relatedProducts, authEnabled }: PropsProductComponent) {
   const params = useParams()
   const router = useRouter()
   const { currency } = useCurrency()
@@ -317,21 +315,6 @@ export default function ProductComponent({ company, branch, product, relatedProd
     router.push("/")
     return null
   }
-
-  // Preparar imágenes para la galería
-  const images: ProductImage[] = product.images?.map((img, index) => ({
-    id: `${index + 1}`,
-    name: `Vista ${index + 1}`,
-    url: img.url || "/placeholder.svg",
-    width: 600,
-    height: 400
-  })) || [{
-    id: "1",
-    name: "Vista principal",
-    url: product.image || "/placeholder.svg",
-    width: 600,
-    height: 400
-  }]
 
   // Determinar el estado de stock
   const isOutOfStock = (product.typeProduct?.id !== TYPE_PRODUCT.SERVICE.id) && product.stock === 0
@@ -417,7 +400,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
   }
 
   if (!isMounted) {
-    return <Welcome company={company} branch={branch} />
+    return <Welcome company={company} />
   }
 
   return (
@@ -443,7 +426,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
           {/* Galería de imágenes */}
           <div>
             <ProductImageGallery
-              images={images}
+              images={product.images!}
               productName={product.name}
               outOfStock={isOutOfStock}
             />
@@ -656,7 +639,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
               <div className="flex flex-col md:flex-row md:justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
                 <div className="w-full md:w-auto flex flex-row md:flex-col justify-between items-center md:items-start">
                   <div className="text-sm text-muted-foreground">Total</div>
-                  <div className="text-2xl font-bold text-primary font-display">
+                  <div className="text-2xl font-bold text-primary">
                     {formatCurrency(product.price * quantity, currency!.code)}
                   </div>
                 </div>
@@ -731,7 +714,7 @@ export default function ProductComponent({ company, branch, product, relatedProd
         {relatedProducts.length > 0 && (
           <div className="mt-20">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold font-display">También te puede gustar</h2>
+              <h2 className="text-3xl font-bold">También te puede gustar</h2>
               <button
                 onClick={() => router.push("/")}
                 className="flex items-center text-primary text-sm font-medium hover:underline"
@@ -754,6 +737,12 @@ export default function ProductComponent({ company, branch, product, relatedProd
           </div>
         )}
       </div>
+
+      <Footer
+        company={company}
+        whatsapp={whatsapp}
+        branch={branch}
+      />
     </div>
   )
 }
