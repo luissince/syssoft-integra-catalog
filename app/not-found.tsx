@@ -1,11 +1,12 @@
-// app/not-found.tsx
-import { getCompanyInfo, getBranches } from "@/lib/api";
-import NotFound from "@/components/NotFound";
+import ErrorPage from "@/components/ErrorPage";
 
-export default async function GlobalNotFound() {
-  const company = await getCompanyInfo();
-  const branches = await getBranches();
-  const branch = branches?.find((branch) => branch.primary === true)!;
-
-  return <NotFound company={company} branch={branch} />;
+export default function NotFound() {
+  return (
+    <ErrorPage
+      code="404"
+      title="Página no encontrada"
+      message="La página que buscas parece haberse perdido"
+      icon="🔍"
+    />
+  );
 }
