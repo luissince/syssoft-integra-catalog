@@ -1,6 +1,7 @@
 import { TYPE_DELIVERY } from "@/constants/type-delivery";
 import { TYPE_PRODUCT_LIST } from "@/constants/type-product";
-import { apiFetch } from "@/lib/utils";
+import { apiFetch, apiRequestFetch } from "@/lib/utils";
+import { ApiResult } from "@/types";
 import {
   Branch,
   Category,
@@ -143,7 +144,6 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     idCategory: data.idCategoria,
     idBrand: data.idMarca,
     image: data.imagen,
-    difficulty: "hard",
     isNew: true,
     discount: 0,
     stock: data.cantidad,
@@ -170,11 +170,13 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
   });
 
   return data.map((item: {
+    id: number
     idProducto: string,
     nombre: string,
     codigo: string,
     sku: string,
     codigoBarras: string,
+    idTipoProducto: string,
     descripcionCorta: string,
     descripcionLarga: string,
     precio: number,
@@ -192,7 +194,8 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
     nombreMedida: string,
   }) => {
     return {
-      id: item.idProducto,
+      id: item.id.toString(),
+      idProduct: item.idProducto,
       code: item.codigo,
       name: item.nombre,
       description: item.descripcionCorta,
@@ -201,7 +204,6 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
       idCategory: item.idCategoria,
       idBrand: item.idMarca,
       image: item.imagen,
-      difficulty: "hard",
       isNew: true,
       discount: 0,
       stock: item.cantidad,
@@ -210,6 +212,7 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
       category: { id: item.idCategoria, name: item.categoriaNombre },
       brand: { id: item.idMarca, name: item.marcaNombre },
       measurement: { id: item.idMedida, name: item.nombreMedida },
+      typeProduct: TYPE_PRODUCT_LIST.find(type => type.id === item.idTipoProducto),
     }
   });
 }
@@ -310,45 +313,31 @@ export const fetchBranches = async (): Promise<Branch[]> => {
     next: { revalidate: 0 }
   });
 
-  const branches: Branch[] = [
-    {
-      id: "",
-      name: "Todos",
-      address: "",
-      email: "",
-      phone: "",
-      schedule: "",
-      mapUrl: "",
-      image: "",
-      state: false,
-      primary: false,
-    },
-    ...data.map((branch: {
-      idSucursal: string,
-      nombre: string,
-      email: string,
-      telefono: string,
-      celular: string,
-      paginaWeb: string,
-      direccion: string,
-      googleMaps: string,
-      horarioAtencion: string,
-      estado: number,
-      principal: number,
-      imagen: string
-    }) => ({
-      id: branch.idSucursal,
-      name: branch.nombre,
-      address: branch.direccion,
-      email: branch.email,
-      phone: branch.celular,
-      schedule: branch.horarioAtencion,
-      mapUrl: branch.googleMaps,
-      image: branch.imagen,
-      state: branch.estado === 1,
-      primary: branch.principal === 1,
-    } as Branch))
-  ];
+  const branches: Branch[] = data.map((branch: {
+    idSucursal: string,
+    nombre: string,
+    email: string,
+    telefono: string,
+    celular: string,
+    paginaWeb: string,
+    direccion: string,
+    googleMaps: string,
+    horarioAtencion: string,
+    estado: number,
+    principal: number,
+    imagen: string
+  }) => ({
+    id: branch.idSucursal,
+    name: branch.nombre,
+    address: branch.direccion,
+    email: branch.email,
+    phone: branch.celular,
+    schedule: branch.horarioAtencion,
+    mapUrl: branch.googleMaps,
+    image: branch.imagen,
+    state: branch.estado === 1,
+    primary: branch.principal === 1,
+  } as Branch));
 
   return branches;
 }
@@ -476,7 +465,7 @@ export const fetchCreateOrder = async (formOrder: FormOrder): Promise<{ idOrder:
   const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/pedido/create/web`, {
+  const data = await apiFetch<any>(`${url}/api/pedido/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -739,6 +728,21 @@ export const fetchLogin = async (body: { email: string, password: string }): Pro
     address: data.direccion,
   } as Person;
 }
+
+// Función para registrar el cliente
+export const fetchRegisterConsumer = async (body: FormCustomer): Promise<ApiResult<string>> => {
+  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  // Obtener los datos de la respuesta
+  return await apiRequestFetch<string>(`${url}/api/persona/create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 
 // Función para obtener datos de un usuarios
 export const fetchCustomerById = async (idPerson: string): Promise<Person> => {

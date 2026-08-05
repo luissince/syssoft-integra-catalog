@@ -1,8 +1,19 @@
+import { ApiResult } from "@/types";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 type SupportedCurrency = 'PEN' | 'USD' | 'EUR';
 type SupportedLocale = 'es-PE' | 'en-US' | 'de-DE';
+
+/**
+ *
+ * @param {Number} time Tiempo de espera del time out
+ * @returns {Promise<void>}
+ */
+export function sleep(time: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 
 /**
  * Combina clases de Tailwind usando clsx y twMerge, 
@@ -378,24 +389,81 @@ export function formatTime(time: string, addSeconds: boolean = false): string {
  * @template T Tipo esperado de la respuesta.
  * @param url URL del recurso.
  * @param options Configuración de la petición.
- * @returns Datos JSON tipados.
+ * @returns Datos JSON tipados o texto.
  * @throws {Error} Cuando la respuesta HTTP no es exitosa.
  */
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(url, options);
+  const headers = new Headers(options.headers);
+
+  headers.set("X-App", "catalog-next");
+  // headers.set("X-Version", process.env.NEXT_PUBLIC_APP_VERSION ?? "dev");
+
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
 
   if (!response.ok) {
     const text = await response.text();
     throw new Error(text || 'Error fetching internal data');
   }
 
-  const contentType = response.headers.get('content-type');
+  const contentType = response.headers.get("content-type") ?? "";
 
-  if (!contentType?.includes('application/json')) {
-    throw new Error('The response is not JSON');
+  if (contentType.includes("application/json")) {
+    return (await response.json()) as T;
   }
 
-  const data = await response.json();
-  
-  return data as T;
+  if (contentType.startsWith("text/")) {
+    return await response.text() as T;
+  }
+
+  // Si no conoces el tipo
+  return await response.text() as T;
+
+}
+
+export async function apiRequestFetch<T>(
+  url: string,
+  options: RequestInit = {}
+): Promise<ApiResult<T>> {
+  const headers = new Headers(options.headers);
+
+  headers.set("X-App", "catalog-next");
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+
+      return {
+        success: false,
+        status: response.status,
+        message: text || 'Error fetching internal data',
+      };
+    }
+
+    const contentType = response.headers.get("content-type") ?? "";
+
+    const body = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+
+    return {
+      success: true,
+      status: response.status,
+      data: body as T,
+    };
+
+  } catch (err) {
+    return {
+      success: false,
+      status: 500,
+      message: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
 }

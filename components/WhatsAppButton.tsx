@@ -1,33 +1,32 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Whatsapp } from "@/types/api-type"
-import Link from "next/link"
+import { useContact } from "@/lib/contact"
+import { Company, Whatsapp } from "@/types/api-type"
 import { FaWhatsapp } from "react-icons/fa"
 
 interface WhatsAppButtonProps {
+  company: Company;
   whatsapp: Whatsapp,
 }
 
-export default function WhatsAppButton({whatsapp}:WhatsAppButtonProps) {
-  // Número de WhatsApp (reemplazar con el número real)
-  const whatsappNumber = whatsapp.number
+export default function WhatsAppButton({ company, whatsapp }: WhatsAppButtonProps) {
+  const { handleWhatsapp, getDefaultMessage } = useContact();
 
-  // Mensaje predeterminado (opcional)
-  const message = whatsapp.message
-
-  // URL de WhatsApp con el número y mensaje
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+  const handleWhatsAppClick = () => {
+    // const message = getDefaultMessage(restaurantData.restaurant.name);
+    const message = getDefaultMessage(company.name);
+    // handleWhatsapp(restaurantData.restaurant.whatsapp, message);
+    handleWhatsapp(whatsapp.number, message);
+  };
 
   return (
     <Button
-      asChild
+      onClick={handleWhatsAppClick}
       className="fixed bottom-32 right-[8%] z-50 rounded-full h-14 w-14 shadow-lg bg-[#25D366] hover:bg-[#128C7E] p-0 flex items-center justify-center"
     >
-      <Link href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-        <FaWhatsapp className="h-6 w-6" />
-        <span className="sr-only">Contactar por WhatsApp</span>
-      </Link>
+      <FaWhatsapp className="h-6 w-6" />
+      <span className="sr-only">Contactar por WhatsApp</span>
     </Button>
   )
 }

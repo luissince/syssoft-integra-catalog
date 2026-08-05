@@ -130,3 +130,10 @@ export interface RestaurantData {
   paymentMethods: PaymentMethod[]
   deliveryZones: DeliveryZone[]
 }
+
+export type ApiResult<T> = {
+  success: boolean;
+  status: number;
+  data?: T;
+  message?: string;
+};

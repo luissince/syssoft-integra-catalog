@@ -251,6 +251,7 @@ export async function loginCustomer(body: { email: string, password: string }): 
     }
 }
 
+
 // Función para obtener datos de un usuario
 export async function getCustomerById(idPerson: string): Promise<Person> {
     try {

@@ -17,7 +17,7 @@ export interface FormOrderDelivery {
     email: string
     telefono: string
     celular: string
-    direccion: string
+    direccion: any | string
     referencia: string
 }
 
@@ -33,24 +33,32 @@ export interface FormOrderCustomer {
 }
 
 export interface FormOrder {
-    cliente: FormOrderCustomer
 
-    idComprobante: string
-    idMoneda: string
     idSucursal: string
     idUsuario: string
+    idMoneda: string
+    idComprobante: string
+
     nota: string
-    observacion: string
     instruccion: string
+    // cliente: FormOrderCustomer
 
-    idTipoEntrega: string
-    idTipoPedido: string
-    fechaPedido: string
-    horaPedido: string
+    // idComprobante: string
+    // idMoneda: string
+    // idSucursal: string
+    // idUsuario: string
+    // nota: string
+    // observacion: string
+    // instruccion: string
 
-    entrega: FormOrderDelivery | null
+    // idTipoEntrega: string
+    // idTipoPedido: string
+    // fechaPedido: string
+    // horaPedido: string
 
-    detalles: FormOrderDetail[]
+    // entrega: FormOrderDelivery | null | any
+
+    // detalles: FormOrderDetail[]
 }
 
 export interface FormCustomer {

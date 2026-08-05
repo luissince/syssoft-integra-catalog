@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Star, Plus, Minus } from "lucide-react"
+import { Plus, Minus } from "lucide-react"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Currency, Product } from "@/types/api-type"
@@ -64,8 +64,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
             className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute top-3 right-3">
-            <Badge className="bg-primary text-primary-foreground shadow-lg">
-              <Star className="w-3 h-3 mr-1 fill-current" />
+            <Badge className="bg-card text-muted-foreground shadow-lg">
               {item.category?.name || "Categoría"}
             </Badge>
           </div>
@@ -75,7 +74,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
         {/* Contenedor del contenido (flex-1 para ocupar el espacio restante) */}
         <div className="p-5 flex flex-col flex-1">
           {/* Título (altura fija y line-clamp) */}
-          <h3 className="font-semibold text-xl mb-2 text-foreground leading-tight line-clamp-2 h-12">
+          <h3 className="font-semibold mb-2 text-foreground leading-tight line-clamp-2 h-12 uppercase">
             {item.name}
           </h3>
 
@@ -85,24 +84,24 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
           </p>
 
           {/* Stock/Badge (altura fija) */}
-          <div className="w-full flex items-center justify-between gap-2 mb-4 min-h-[2rem]">
+          <div className="w-full flex items-center justify-between  gap-2 mb-4 min-h-[2rem]">
             {item.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
               <Badge variant="secondary" className="bg-green-500 text-white border-green-600">
-                Servicio
+                <span className="text-sm">Servicio</span>
               </Badge>
             ) : item.stock > 0 ? (
               <Badge variant="secondary" className="bg-green-500 text-white border-green-600">
-                {item.stock} en stock
+                <span className="text-sm">{item.stock} en stock</span>
               </Badge>
             ) : (
-              <Badge variant="secondary" className="bg-red-500 border-red-200 text-white">
-                No disponible
+              <Badge variant="secondary" className="bg-destructive/100 border-destructive text-white">
+                <span className="text-sm">No disponible</span>
               </Badge>
             )}
 
             {
               !authEnabled && (
-                <div className="text-blue-600 font-bold text-base text-right">
+                <div className="text-muted-foreground font-bold text-right">
                   {formatCurrency(item.price, currency.code)}
                   {item.measurement?.name && <small className="text-xs"> x {item.measurement.name}</small>}
                 </div>
@@ -113,7 +112,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
           {/* Precio y botón (altura fija) */}
           {authEnabled && (
             <div className="flex items-center justify-between gap-2 mt-auto">
-              <div className="text-blue-600 font-bold text-base">
+              <div className="text-muted-foreground font-bold text-base">
                 {formatCurrency(item.price, currency.code)}
                 {item.measurement?.name && <small className="text-xs"> x {item.measurement.name}</small>}
               </div>
@@ -135,28 +134,33 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-6">
-                      <div>
-                        <Label className="text-foreground font-medium">Cantidad</Label>
-                        <div className="flex items-center space-x-3 mt-3">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                            className="h-10 w-10 p-0"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                          <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setQuantity(quantity + 1)}
-                            className="h-10 w-10 p-0"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
+                      {
+                        TYPE_PRODUCT.PRODUCT.id === item.typeProduct?.id && (
+                          <div>
+                            <Label className="text-foreground font-medium">Cantidad</Label>
+                            <div className="flex items-center space-x-3 mt-3">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                className="h-10 w-10 p-0"
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setQuantity(quantity + 1)}
+                                className="h-10 w-10 p-0"
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        )
+                      }
+
                       <div>
                         <Label htmlFor="notes" className="text-foreground font-medium">
                           Notas especiales (opcional)
@@ -190,6 +194,5 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
         </div>
       </CardContent>
     </Card>
-
   )
 }

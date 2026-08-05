@@ -1,9 +1,11 @@
-// import restaurantData from "@/data/restaurant-data.json";
+// components/Footer.tsx
+'use client';
+
 import { Button } from "./ui/button";
-import { Clock, MapPin, Phone, MessageCircle, CreditCard, ExternalLink } from "lucide-react";
+import { Clock, MapPin, Phone, MessageCircle } from "lucide-react";
 import { useContact } from "@/lib/contact";
 import { useRouter } from "next/navigation";
-import { Branch, Category, Company, Whatsapp } from "@/types/api-type";
+import { Branch, Company, Whatsapp } from "@/types/api-type";
 
 interface FooterProps {
   company: Company;
@@ -67,9 +69,8 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
                 className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2"
               >
                 <Phone className="w-4 h-4" />
-                {isMobile ? 'Llamar Ahora' : 'Llamar'}
+                Llamar
                 <span className="text-xs opacity-80">
-                  {/* {restaurantData.restaurant.phone} */}
                   {branch.phone}
                 </span>
               </Button>
@@ -122,17 +123,6 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
                   {branch.phone}
                 </span>
               </button>
-
-              <button
-                onClick={handleWhatsAppClick}
-                className="flex items-center space-x-2 hover:text-green-600 transition-colors cursor-pointer group mt-2"
-              >
-                <MessageCircle className="w-4 h-4 text-green-600 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                <span className="text-muted-foreground group-hover:text-green-600">
-                  {/* WhatsApp: {restaurantData.restaurant.whatsapp} */}
-                  WhatsApp: {whatsapp.number}
-                </span>
-              </button>
             </div>
           </div>
 
@@ -141,7 +131,7 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
             {/* <h3 className="font-semibold text-foreground mb-4">Menú</h3> */}
             <h3 className="font-medium text-foreground mb-4">Aceptamos</h3>
 
-            <div className="flex justify-start gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <button
                 // onClick={() => handlePaymentMethod("TARJETA")}
                 className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
@@ -178,9 +168,9 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
                   onClick={handleWhatsAppClick}
                   variant="ghost"
                   size="sm"
-                  className="justify-start p-0 h-auto text-green-600 hover:text-green-700"
+                  className="justify-start p-0 h-auto text-gray-400 hover:text-gray-600"
                 >
-                  💬 Pedidos por WhatsApp
+                  🏦 Numero de Cuentas
                 </Button>
                 <Button
                   onClick={handleCallClick}
