@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import { getBranches, getCompanyInfo, getProductById, getProductsRelated, getWhatsappInfo } from "@/lib/api";
 import ProductComponent from "@/components/Product";
-import { Suspense } from "react";
-import Welcome from "@/components/Welcome";
 
 interface ProductDetalleProps {
   params: Promise<{ id: string }>;
@@ -44,7 +42,6 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
-    <Suspense fallback={<Welcome company={company} />}>
       <ProductComponent
         company={company}
         branch={branch}
@@ -53,6 +50,5 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
         relatedProducts={relatedProducts}
         authEnabled={authEnabled}
       />
-    </Suspense>
   );
 }

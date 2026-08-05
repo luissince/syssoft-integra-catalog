@@ -27,8 +27,8 @@ export const OrderCompletion: React.FC<OrderCompletionProps> = ({ order, restaur
     const deliveryAddress = order.person.address || 'N/A';
     const message = `Hola, me gustaría confirmar mi pedido:
     \n\n*Resumen del Pedido:*
-    \n${order.orderDetails.map(item => ` - ${item.product.name} x ${item.quantity}: S/. ${(item.price * item.quantity).toFixed(2)}`).join('\n')}
-    \n\n*Total:* S/. ${formatCurrency(total, currency.code)}
+    \n${order.orderDetails.map(item => ` - ${item.product.name} x ${item.quantity}: ${formatCurrency(item.price * item.quantity, currency.code)}`).join('\n')}
+    \n\n*Total:* ${formatCurrency(total, currency.code)}
     \n\n*Dirección de entrega:* ${deliveryAddress}
     \n*Método de pago:* completar
     \n\nGracias.`;

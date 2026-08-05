@@ -1,14 +1,17 @@
-import { use, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, User } from "lucide-react";
+import { Eye, EyeOff, User, UserPlus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { RegisterCard } from "./RegisterCard";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { set } from "date-fns";
 
 export function LoginCard() {
+  const router = useRouter();
+
   const { toast } = useToast();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -19,6 +22,11 @@ export function LoginCard() {
 
   const refEmail = useRef<HTMLInputElement>(null);
   const refPassword = useRef<HTMLInputElement>(null);
+
+  const handleRegister = () => {
+    setIsDialogOpen(false);
+    router.push("/register");
+  };
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -93,21 +101,21 @@ export function LoginCard() {
               ref={refEmail}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 bg-muted border-border text-foreground"
+              className="bg-muted border-border text-foreground mt-2"
               placeholder="Ingrese su usuario"
             />
           </div>
           <div>
             <Label className="text-foreground font-medium">Contraseña</Label>
-            <div className="relative mt-2">
+            <div className="relative">
               <Input
                 id="password"
                 ref={refPassword}
                 type={showPassword ? "text" : "password"}
                 value={password}
                 placeholder="Ingrese su contraseña"
-                onChange={(e) => setPassword(e.target.value )}
-                className="bg-muted border-border text-foreground pr-10"
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-muted border-border text-foreground pr-10 mt-2"
               />
               <button
                 type="button"
@@ -123,8 +131,16 @@ export function LoginCard() {
             </div>
           </div>
           <DialogFooter>
-            <div className="flex justify-end w-full">
-              {/* <RegisterCard /> */}
+            <div className="flex justify-end w-full gap-3">
+              <Button
+                type="button"
+                onClick={handleRegister}
+                variant="outline"
+                className="text-xs">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Crear Cuenta
+              </Button>
+
               <Button
                 type="submit"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"

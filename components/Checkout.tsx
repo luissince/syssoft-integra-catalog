@@ -1,40 +1,34 @@
+// components/Checkout.tsx
 "use client";
-import { useState, useEffect, use } from "react";
+
+import { useState } from "react";
 import { CheckoutForm } from "@/components/CheckoutForm";
 import restaurantData from "@/data/restaurant-data.json";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { OrderCompletion } from "@/components/OrderCompletion";
-import { NavSecondary } from "@/components/Nav";
-import { Branch, Company, Order, Tax, TypeDocument } from "@/types/api-type";
-import Welcome from "./Welcome";
+import { Branch, Order } from "@/types/api-type";
 import { FormOrder } from "@/types/form";
-import { createOrder, getOrderById } from "@/lib/api";
+import { createOrder } from "@/lib/api";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useAlert } from "@/hooks/use-alert";
+import { PageBreadcrumb } from "./PageBreadcrumb";
+import Container from "./Container";
+import { useAuth } from "@/context/AuthContext";
 
 interface CheckoutProps {
-    company: Company;
     branch: Branch;
     branches: Branch[];
-    tax: Tax;
-    listTypeDocument: TypeDocument[];
-    authEnabled: boolean;
 }
 
-export default function CheckoutComponent({ company, branch, branches, tax, listTypeDocument ,authEnabled }: CheckoutProps) {
+export default function CheckoutComponent({ branch, branches }: CheckoutProps) {
     const router = useRouter()
     const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
 
-    const [isMounted, setIsMounted] = useState(false);
-
+    const { isAuthenticated, logout } = useAuth();
     const { cart, clearCart } = useCart();
     const { currency } = useCurrency();
     const alert = useAlert();
-
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
 
     const handleSubmitOrder = async (formOrder: FormOrder) => {
         alert.loading({
@@ -50,16 +44,17 @@ export default function CheckoutComponent({ company, branch, branches, tax, list
             return;
         }
 
-        const order = await getOrderById(idOrder!);
+        // const order = await getOrderById(idOrder!);
 
-        alert.close(() => {
-            setCompletedOrder(order);
-            clearCart();
-        });
+        // alert.close(() => {
+        //     setCompletedOrder(order);
+        //     clearCart();
+        // });
     };
 
-    if (!isMounted) {
-        return <Welcome company={company} />;
+    if (!isAuthenticated) {
+        router.push("/");
+        return null;
     }
 
     if (completedOrder) {
@@ -73,23 +68,23 @@ export default function CheckoutComponent({ company, branch, branches, tax, list
     }
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <NavSecondary authEnabled={authEnabled} />
+        <Container>
+            {/* Breadcrumb */}
+            <PageBreadcrumb
+                items={[
+                    { label: "Inicio", href: "/" },
+                    { label: "Checkout" },
+                ]}
+            />
 
             {/* Body */}
-            <div className="container mx-auto p-4">
-                <CheckoutForm
-                    listTypeDocument={listTypeDocument}
-                    branches={branches}
-                    tax={tax}
-                    currency={currency}
-                    cart={cart}
-                    paymentMethods={restaurantData.paymentMethods}
-                    onSubmitOrder={handleSubmitOrder}
-                    onBack={() => router.push("/")}
-                />
-            </div>
-        </div>
+            <CheckoutForm
+                branch={branch}
+                branches={branches}
+                currency={currency}
+                cart={cart}
+                onSubmitOrder={handleSubmitOrder}
+            />
+        </Container>
     );
 }

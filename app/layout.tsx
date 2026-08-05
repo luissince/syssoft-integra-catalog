@@ -1,17 +1,20 @@
 // app/layout.tsx
+
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Playfair_Display, Roboto_Mono } from "next/font/google"
-import "./globals.css"
+import "../styles/globals.css"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/context/AuthContext"
-import { getCompanyInfo, getCurrencyInfo, getWhatsappInfo } from "@/lib/api"
+import { getBranches, getCompanyInfo, getCurrencyInfo, getWhatsappInfo } from "@/lib/api"
 import { WishlistProvider } from "@/context/WishlistContext"
 import { CurrencyProvider } from "@/context/CurrencyContext"
 import WhatsAppButton from "@/components/WhatsAppButton"
 import ContactButton from "@/components/ContactButton"
+import Nav from "@/components/Nav"
+import Footer from "@/components/Footer"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,9 +34,7 @@ const mono = Roboto_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-
   try {
-
     const company = await getCompanyInfo();
 
     return {
@@ -46,11 +47,8 @@ export async function generateMetadata(): Promise<Metadata> {
         apple: company.icon,
       }
     };
-
   } catch (error) {
-
     console.error("Metadata error:", error);
-
     return {
       title: "Sistema",
       description: "Tienda online",
@@ -74,12 +72,20 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const [
+    company,
     currency,
-    whatsapp
+    whatsapp,
+    branches
   ] = await Promise.all([
+    getCompanyInfo(),
     getCurrencyInfo(),
-    getWhatsappInfo()
+    getWhatsappInfo(),
+    getBranches(),
   ]);
+
+  if (!company) {
+    throw new Error();
+  }
 
   if (!currency) {
     throw new Error();
@@ -88,6 +94,14 @@ export default async function RootLayout({
   if (!whatsapp) {
     throw new Error();
   }
+
+  if (!branches || branches.length === 0) {
+    throw new Error();
+  }
+
+  const branch = branches.find((branch) => branch.primary === true)!;
+
+  const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
     <html lang="es" className={`
@@ -101,9 +115,23 @@ export default async function RootLayout({
             <CurrencyProvider initialCurrency={currency}>
               <CartProvider>
                 <WishlistProvider>
-                  {children}
+                  <div className="min-h-screen bg-background">
+                    <Nav
+                      company={company}
+                      branch={branch}
+                      authEnabled={authEnabled}
+                    />
+
+                    {children}
+
+                    <Footer
+                      company={company}
+                      whatsapp={whatsapp}
+                      branch={branch}
+                    />
+                  </div>
                   <Toaster />
-                  <WhatsAppButton whatsapp={whatsapp} />
+                  <WhatsAppButton company={company} whatsapp={whatsapp} />
                   <ContactButton />
                 </WishlistProvider>
               </CartProvider>

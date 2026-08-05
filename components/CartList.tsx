@@ -106,13 +106,13 @@ export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: C
         <div className="border-t border-border pt-4 space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold text-foreground">Total:</span>
-            <Badge className="bg-primary text-primary-foreground text-lg px-4 py-2 font-semibold">
+            <p className="text-secondary-foreground text-lg font-semibold">
               {formatCurrency(total, currency!.code)}
-            </Badge>
+            </p>
           </div>
           <Button
             onClick={onCheckout}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3"
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium py-3"
           >
             Proceder al Checkout
           </Button>

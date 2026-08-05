@@ -1,7 +1,9 @@
 "use client";
 
+import { fetchRegisterConsumer } from '@/data/data-rest';
 import { loginCustomer } from '@/lib/api';
 import { Person } from '@/types/api-type';
+import { FormCustomer } from '@/types/form';
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
 interface AuthContextType {
@@ -9,7 +11,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   authLoading: boolean;
   login: (username: string, password: string) => Promise<Person | string>;
-  register: (person: Person) => boolean;
+  register: (person: FormCustomer) => Promise<boolean>;
   update: (person: Person) => void;
   logout: () => void;
 }
@@ -52,7 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("user", JSON.stringify(person));
   };
 
-  const register = (person: Person) => {
+  const register =  async (body: FormCustomer) => {
+    const { success } = await fetchRegisterConsumer(body);
+
+    if (!success) {
+      return false;
+    }
 
     return true;
   };

@@ -1,36 +1,20 @@
-import { getBranches, getCompanyInfo, getListTypeDocument, getTaxes } from "@/lib/api";
+import { getBranches } from "@/lib/api";
 import CheckoutComponent from "@/components/Checkout";
-import { Suspense } from "react";
-import Welcome from "@/components/Welcome";
+import { notFound } from "next/navigation";
 
 export default async function CheckoutPage() {
-    const [
-        company,
-        branches,
-        taxes,
-        listTypeDocument
-    ] = await Promise.all([
-        getCompanyInfo(),
-        getBranches(),
-        getTaxes(),
-        getListTypeDocument()
-    ]);
+    const branches = await getBranches();
+
+    if (!branches || branches.length === 0) {
+        notFound();
+    }
 
     const branch = branches.find((branch) => branch.primary === true)!;
-    const tax = taxes.find((tax) => tax.prefered === true)!;
-
-    const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
     return (
-        <Suspense fallback={<Welcome company={company} />}>
-            <CheckoutComponent
-                listTypeDocument={listTypeDocument}
-                company={company}
-                branch={branch}
-                branches={branches}
-                tax={tax}
-                authEnabled={authEnabled}
-            />
-        </Suspense>
+        <CheckoutComponent
+            branch={branch}
+            branches={branches}
+        />
     );
 }
