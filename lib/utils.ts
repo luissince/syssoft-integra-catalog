@@ -384,6 +384,22 @@ export function formatTime(time: string, addSeconds: boolean = false): string {
 }
 
 /**
+ * Formatea un número agregando ceros delante hasta alcanzar una longitud específica.
+ *
+ * @param {number} numero - El número que se va a formatear.
+ * @returns {string} El número formateado con ceros delante.
+ */
+export function formatNumberWithZeros(numero: number): string {
+  // Convierte el número a cadena y maneja números negativos
+  const numeroAbsoluto = Math.abs(numero);
+  const numeroFormateado = String(numeroAbsoluto).padStart(6, '0');
+
+  // Añade el signo negativo si el número original era negativo
+  return numero < 0 ? `-${numeroFormateado}` : numeroFormateado;
+}
+
+
+/**
  * Realiza una petición HTTP y devuelve una respuesta JSON tipada.
  *
  * @template T Tipo esperado de la respuesta.
@@ -424,21 +440,6 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
 }
 
 /**
- * Formatea un número agregando ceros delante hasta alcanzar una longitud específica.
- *
- * @param {number} numero - El número que se va a formatear.
- * @returns {string} El número formateado con ceros delante.
- */
-export function formatNumberWithZeros(numero: number): string {
-  // Convierte el número a cadena y maneja números negativos
-  const numeroAbsoluto = Math.abs(numero);
-  const numeroFormateado = String(numeroAbsoluto).padStart(6, '0');
-
-  // Añade el signo negativo si el número original era negativo
-  return numero < 0 ? `-${numeroFormateado}` : numeroFormateado;
-}
-
-/**
  * Realiza una petición HTTP y devuelve una respuesta JSON tipada.
  * 
  * @template T Tipo esperado de la respuesta.
@@ -458,6 +459,7 @@ export async function apiRequestFetch<T>(
     const response = await fetch(url, {
       ...options,
       headers,
+      credentials: "include",
     });
 
     if (!response.ok) {
