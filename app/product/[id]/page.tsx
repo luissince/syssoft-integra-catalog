@@ -12,8 +12,12 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   // Resolver params primero
   const { id } = await params;
 
+  console.log("➡️ SSR producto:", id);
+
+
   // Si no existe el id, mostrar 404
   if (!id) {
+    console.error("❌ ID no encontrado:", id);
     return notFound();
   }
 
@@ -30,6 +34,7 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
 
   // Si no existe el producto, mostrar 404
   if (!product) {
+    console.error("❌ Producto no encontrado:", id);
     return notFound();
   }
 
@@ -42,12 +47,12 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
-      <ProductComponent
-        branch={branch}
-        whatsapp={whatsapp}
-        product={product}
-        relatedProducts={relatedProducts}
-        authEnabled={authEnabled}
-      />
+    <ProductComponent
+      branch={branch}
+      whatsapp={whatsapp}
+      product={product}
+      relatedProducts={relatedProducts}
+      authEnabled={authEnabled}
+    />
   );
 }
