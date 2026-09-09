@@ -409,12 +409,14 @@ export function formatNumberWithZeros(numero: number): string {
  * @throws {Error} Cuando la respuesta HTTP no es exitosa.
  */
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const domain = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
   const headers = new Headers(options.headers);
 
   headers.set("X-App", "catalog-next");
   // headers.set("X-Version", process.env.NEXT_PUBLIC_APP_VERSION ?? "dev");
 
-  const response = await fetch(url, {
+  const response = await fetch(domain + url, {
     ...options,
     headers
   });
@@ -451,12 +453,14 @@ export async function apiRequestFetch<T>(
   url: string,
   options: RequestInit = {}
 ): Promise<ApiResult<T>> {
+  const domain = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
   const headers = new Headers(options.headers);
 
   headers.set("X-App", "catalog-next");
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(domain + url, {
       ...options,
       headers,
       credentials: "include",
