@@ -3,7 +3,8 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Playfair_Display, Roboto_Mono } from "next/font/google"
-import "../styles/globals.css"
+import "../styles/globals.css";
+import { getCurrentSession } from "@/lib/auth";
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
 import { Toaster } from "@/components/ui/toaster"
@@ -15,6 +16,7 @@ import WhatsAppButton from "@/components/WhatsAppButton"
 import ContactButton from "@/components/ContactButton"
 import Nav from "@/components/Nav"
 import Footer from "@/components/Footer"
+import { WhatsAppProvider } from "@/context/WhatsAppContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -75,33 +77,33 @@ export default async function RootLayout({
     company,
     currency,
     whatsapp,
-    branches
+    branches,
+    person
   ] = await Promise.all([
     getCompanyInfo(),
     getCurrencyInfo(),
     getWhatsappInfo(),
     getBranches(),
+    getCurrentSession(),
   ]);
 
   if (!company) {
-    throw new Error();
+    throw new Error("Company information not found");
   }
 
   if (!currency) {
-    throw new Error();
+    throw new Error("Currency information not found");
   }
 
   if (!whatsapp) {
-    throw new Error();
+    throw new Error("Whatsapp information not found");
   }
 
   if (!branches || branches.length === 0) {
-    throw new Error();
+    throw new Error("Branches not found");
   }
 
   const branch = branches.find((branch) => branch.primary === true)!;
-
-  const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
     <html lang="es" className={`
@@ -113,28 +115,31 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
           <AuthProvider>
             <CurrencyProvider initialCurrency={currency}>
-              <CartProvider>
-                <WishlistProvider>
-                  <div className="min-h-screen bg-background">
-                    <Nav
-                      company={company}
-                      branch={branch}
-                      authEnabled={authEnabled}
-                    />
+              <WhatsAppProvider initialWhatsapp={whatsapp}>
+                <CartProvider>
+                  <WishlistProvider>
+                    <div className="min-h-screen bg-background">
+                      <Nav
+                        company={company}
+                        branch={branch}
+                        person={person}
+                      />
 
-                    {children}
+                      {children}
 
-                    <Footer
+                      <Footer
+                        company={company}
+                        branch={branch}
+                      />
+                    </div>
+                    <Toaster />
+                    <WhatsAppButton
                       company={company}
-                      whatsapp={whatsapp}
-                      branch={branch}
                     />
-                  </div>
-                  <Toaster />
-                  <WhatsAppButton company={company} whatsapp={whatsapp} />
-                  <ContactButton />
-                </WishlistProvider>
-              </CartProvider>
+                    <ContactButton />
+                  </WishlistProvider>
+                </CartProvider>
+              </WhatsAppProvider>
             </CurrencyProvider>
           </AuthProvider>
         </ThemeProvider>

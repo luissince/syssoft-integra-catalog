@@ -1,22 +1,22 @@
 // components/Home.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import Welcome from "@/components/Welcome";
+import { useState, useEffect, Suspense } from "react";
 import { Category, Company, CompanyBanner, Product } from "@/types/api-type";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { useCurrency } from "@/context/CurrencyContext";
 import HeroBanner from "./HeroBanner";
 import ProductSection from "./ProductSection";
-import { getProducts } from "@/lib/api";
+import { fetchProducts } from "@/data/data-rest";
+import { SkeletonProducts } from "./ui/skeleton";
 
 interface HomeComponentProps {
     company: Company;
     categories: Category[];
     banners: CompanyBanner[];
     initialProducts: { data: Product[], count: number };
-    authEnabled?: boolean; // Pasar como prop desde el servidor
+    authEnabled?: boolean;
 }
 
 export default function HomeComponent({
@@ -29,25 +29,21 @@ export default function HomeComponent({
 
     const router = useRouter();
 
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
-
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-
-    const [itemsPerPage, setItemsPerPage] = useState(6);
-
-    const [products, setProducts] = useState(initialProducts.data);
-    const [totalProducts, setTotalProducts] = useState(initialProducts.count);
-
-    const [offset, setOffset] = useState(initialProducts.data.length);
 
     const [loading, setLoading] = useState(false);
 
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const [products, setProducts] = useState(initialProducts.data);
+    const [totalProducts, setTotalProducts] = useState(initialProducts.count);
+    const [itemsPerPage, setItemsPerPage] = useState(6);
+    const [offset, setOffset] = useState(initialProducts.data.length);
+
     const { cart, updateQuantity, removeFromCart, addToCart } = useCart();
 
-    // Estado para controlar si el componente está montado (evita hidratación)
     const { currency } = useCurrency();
-
 
     // Banner carousel effect
     useEffect(() => {
@@ -77,8 +73,13 @@ export default function HomeComponent({
     const filterProducts = async (reset = true) => {
         try {
             setLoading(true);
-            const result = await getProducts({
+            const result = await fetchProducts({
                 search: searchQuery,
+                filters: {
+                    categories: [{
+                        id: selectedCategory
+                    }]
+                },
                 currentPage: reset ? 0 : offset,
                 totalPage: itemsPerPage,
             });
@@ -124,35 +125,39 @@ export default function HomeComponent({
                 currentBannerIndex={currentBannerIndex}
             />
 
-            <ProductSection
-                categories={categories}
-                selectedCategory={selectedCategory}
-                products={products}
-                searchQuery={searchQuery}
 
-                authEnabled={authEnabled}
-                currency={currency}
-                cart={cart}
+            {loading ? (
+                <SkeletonProducts />
+            ) : (
+                <ProductSection
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
 
-                itemsPerPage={itemsPerPage}
-                totalProducts={totalProducts}
-                loading={loading}
+                    products={products}
 
-                setSelectedCategory={setSelectedCategory}
+                    searchQuery={searchQuery}
+                    itemsPerPage={itemsPerPage}
+                    totalProducts={totalProducts}
 
-                setSearchQuery={setSearchQuery}
-                clearSearch={clearSearch}
+                    authEnabled={authEnabled}
+                    currency={currency}
+                    cart={cart}
 
-                changeItemsPerPage={changeItemsPerPage}
+                    setSearchQuery={setSearchQuery}
+                    clearSearch={clearSearch}
 
-                loadMoreItems={loadMoreItems}
+                    changeItemsPerPage={changeItemsPerPage}
 
-                addToCart={addToCart}
-                updateQuantity={updateQuantity}
-                removeFromCart={removeFromCart}
+                    loadMoreItems={loadMoreItems}
 
-                router={router}
-            />
+                    addToCart={addToCart}
+                    updateQuantity={updateQuantity}
+                    removeFromCart={removeFromCart}
+
+                    router={router}
+                />
+            )}
         </>
     );
 }

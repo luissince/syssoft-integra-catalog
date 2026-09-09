@@ -11,8 +11,8 @@ import { formatCurrency } from "@/lib/utils"
 
 interface CartProps {
   cart: Cart[]
-  onUpdateQuantity: (id: string, quantity: number) => void
-  onRemoveItem: (id: string) => void
+  onUpdateQuantity: (idProduct: string, quantity: number) => void
+  onRemoveItem: (idProduct: string) => void
   onCheckout: () => void
 }
 
@@ -45,7 +45,7 @@ export function CartList({ cart, onUpdateQuantity, onRemoveItem, onCheckout }: C
       <CardContent className="space-y-4">
         <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-2">
           {cart.map((item) => (
-            <div key={item.id} className="flex flex-col space-y-3 p-3 bg-muted/50 rounded-lg border border-border/50">
+            <div key={item.idProduct} className="flex flex-col space-y-3 p-3 bg-muted/50 rounded-lg border border-border/50">
               <div className="flex items-center space-x-3">
                 <Image
                   src={item.image || "/placeholder.svg"}

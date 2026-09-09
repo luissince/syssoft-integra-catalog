@@ -6,16 +6,18 @@ import { Clock, MapPin, Phone, MessageCircle } from "lucide-react";
 import { useContact } from "@/lib/contact";
 import { useRouter } from "next/navigation";
 import { Branch, Company, Whatsapp } from "@/types/api-type";
+import Container from "./Container";
+import { useWhatsApp } from "@/context/WhatsAppContext";
 
 interface FooterProps {
   company: Company;
-  whatsapp: Whatsapp;
   branch: Branch;
 }
 
-export default function Footer({ company, whatsapp, branch }: FooterProps) {
+export default function Footer({ company, branch }: FooterProps) {
   const router = useRouter();
   const { handleCall, handleWhatsapp, getDefaultMessage, isMobile } = useContact();
+  const { whatsapp } = useWhatsApp();
 
   const handleCallClick = () => {
     // handleCall(restaurantData.restaurant.phone);
@@ -51,8 +53,8 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
   };
 
   return (
-    <footer className="bg-card border-t border-border py-12 mt-auto">
-      <div className="container mx-auto px-4">
+    <footer className="bg-card border-t border-border mt-auto">
+      <Container>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           {/* Restaurant Info */}
           <div className="col-span-1 md:col-span-6">
@@ -66,7 +68,7 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <Button
                 onClick={handleCallClick}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2"
+                variant="outline"
               >
                 <Phone className="w-4 h-4" />
                 Llamar
@@ -78,7 +80,7 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
               <Button
                 onClick={handleWhatsAppClick}
                 variant="outline"
-                className="border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950 flex items-center justify-center gap-2"
+                className="border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
               >
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp
@@ -210,7 +212,7 @@ export default function Footer({ company, whatsapp, branch }: FooterProps) {
             </a>
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }

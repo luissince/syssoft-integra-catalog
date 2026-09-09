@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft, RefreshCw } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -23,7 +22,7 @@ export default function ErrorPage({
 
   const [dots, setDots] = useState("");
 
-  const router = useRouter();
+  // const router = useRouter();
 
 
   useEffect(() => {
@@ -81,7 +80,7 @@ export default function ErrorPage({
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
 
           <Button
-            onClick={() => router.push("/")}
+            
           >
             <Home className="w-4 h-4 mr-2"/>
             Inicio
@@ -90,7 +89,7 @@ export default function ErrorPage({
 
           <Button
             variant="outline"
-            onClick={() => router.back()}
+            
           >
             <ArrowLeft className="w-4 h-4 mr-2"/>
             Regresar

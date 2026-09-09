@@ -55,7 +55,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
     <Card className="group bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full flex flex-col">
       <CardContent className="p-0 flex flex-col h-full" onClick={handleCardClick}>
         {/* Contenedor de la imagen (altura fija) */}
-        <div className={`relative overflow-hidden h-48 ${item.image ? "" : "bg-[#eaeaea]"}`}>
+        <div className={`relative overflow-hidden h-48 rounded-tl-md rounded-tr-md ${item.image ? "" : "bg-[#eaeaea]"}`}>
           <Image
             src={item.image || "/placeholder.svg"}
             alt={item.name}
@@ -103,7 +103,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
               !authEnabled && (
                 <div className="text-muted-foreground font-bold text-right">
                   {formatCurrency(item.price, currency.code)}
-                  {item.measurement?.name && <small className="text-xs"> x {item.measurement.name}</small>}
+                  {item.measure?.name && <small className="text-xs"> x {item.measure.name}</small>}
                 </div>
               )
             }
@@ -114,7 +114,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
             <div className="flex items-center justify-between gap-2 mt-auto">
               <div className="text-muted-foreground font-bold text-base">
                 {formatCurrency(item.price, currency.code)}
-                {item.measurement?.name && <small className="text-xs"> x {item.measurement.name}</small>}
+                {item.measure?.name && <small className="text-xs"> x {item.measure.name}</small>}
               </div>
               <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

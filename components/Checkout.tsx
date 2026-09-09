@@ -1,72 +1,97 @@
 // components/Checkout.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckoutForm } from "@/components/CheckoutForm";
-import restaurantData from "@/data/restaurant-data.json";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { OrderCompletion } from "@/components/OrderCompletion";
-import { Branch, Order } from "@/types/api-type";
+import { Agency, Branch, Order, PaymentReceipt, Person, Tax } from "@/types/api-type";
 import { FormOrder } from "@/types/form";
-import { createOrder } from "@/lib/api";
-import { useCurrency } from "@/context/CurrencyContext";
 import { useAlert } from "@/hooks/use-alert";
 import { PageBreadcrumb } from "./PageBreadcrumb";
 import Container from "./Container";
-import { useAuth } from "@/context/AuthContext";
+import { fetchCreateOrder, fetchGetOrder } from "@/data/data-rest";
+import Welcome from "./Welcome";
 
 interface CheckoutProps {
+    taxes: Tax[];
     branch: Branch;
     branches: Branch[];
+    receipts: PaymentReceipt[];
+    person: Person
+    agencies: Agency[]
 }
 
-export default function CheckoutComponent({ branch, branches }: CheckoutProps) {
+export default function CheckoutComponent({ taxes, branch, branches, receipts, person, agencies }: CheckoutProps) {
     const router = useRouter()
-    const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
+    const [completedOrder, setCompletedOrder] = useState<Order>();
+    const [loading, setLoading] = useState(true);
+    const [redirecting, setRedirecting] = useState(false);
 
-    const { isAuthenticated, logout } = useAuth();
     const { cart, clearCart } = useCart();
-    const { currency } = useCurrency();
     const alert = useAlert();
+
+    useEffect(() => {
+        if (completedOrder) return;
+
+
+        if (cart.length === 0) {
+            setRedirecting(true);
+            router.replace("/");
+            return;
+        }
+
+        setLoading(false);
+    }, [cart.length, completedOrder, router]);
 
     const handleSubmitOrder = async (formOrder: FormOrder) => {
         alert.loading({
             message: "Procesando pedido...",
         });
 
-        const { status, idOrder, message } = await createOrder(formOrder);
+        const createOrderResult = await fetchCreateOrder(formOrder);
 
-        if (!status) {
+        if (!createOrderResult.success) {
             alert.error({
-                message: message,
+                message: createOrderResult.message,
             });
             return;
         }
 
-        // const order = await getOrderById(idOrder!);
+        const orderResult = await fetchGetOrder(createOrderResult.data?.idPedido!);
 
-        // alert.close(() => {
-        //     setCompletedOrder(order);
-        //     clearCart();
-        // });
+        if (!orderResult.success) {
+            alert.error({
+                message: orderResult.message,
+            });
+            return;
+        }
+
+        alert.close(() => {
+            setCompletedOrder(orderResult.data);
+            clearCart();
+        });
     };
 
-    if (!isAuthenticated) {
-        router.push("/");
-        return null;
+    // Mientras valida carrito o está redireccionando
+    if (loading || redirecting) {
+        return <Welcome />;
     }
 
+    // Pedido completado
     if (completedOrder) {
         return (
-            <OrderCompletion
-                order={completedOrder}
-                restaurant={restaurantData.restaurant}
-                onBackToMenu={() => router.push("/")}
-            />
+            <Container>
+                <OrderCompletion
+                    order={completedOrder}
+                    onBackToMenu={() => router.push("/")}
+                />
+            </Container>
         );
     }
 
+    // Checkout normal
     return (
         <Container>
             {/* Breadcrumb */}
@@ -79,10 +104,12 @@ export default function CheckoutComponent({ branch, branches }: CheckoutProps) {
 
             {/* Body */}
             <CheckoutForm
+                taxes={taxes}
                 branch={branch}
                 branches={branches}
-                currency={currency}
-                cart={cart}
+                receipts={receipts}
+                person={person}
+                agencies={agencies}
                 onSubmitOrder={handleSubmitOrder}
             />
         </Container>

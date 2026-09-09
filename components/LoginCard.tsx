@@ -4,24 +4,46 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, User, UserPlus } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { set } from "date-fns";
+import { fetchLoginCustomer } from "@/data/data-rest";
 
-export function LoginCard() {
+interface Props {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function LoginCard({
+  open,
+  onOpenChange,
+}: Props) {
   const router = useRouter();
 
   const { toast } = useToast();
-  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const isControlled = open !== undefined;
+
+  const isDialogOpen = isControlled ? open : internalOpen;
+
 
   const refEmail = useRef<HTMLInputElement>(null);
   const refPassword = useRef<HTMLInputElement>(null);
+
+  const setIsDialogOpen = (value: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(value);
+    }
+
+    if (!isControlled) {
+      setInternalOpen(value);
+    }
+  };
 
   const handleRegister = () => {
     setIsDialogOpen(false);
@@ -57,13 +79,14 @@ export function LoginCard() {
     }
 
     setLoading(true);
-    const result = await login(email, password);
+
+    const { success,message } = await fetchLoginCustomer({ email, password });
 
     // Error en la consulta
-    if (typeof result === "string") {
+    if (!success) {
       toast({
         title: "Error de autenticación",
-        description: result,
+        description: message,
         variant: "destructive",
       });
       setLoading(false);
@@ -76,8 +99,8 @@ export function LoginCard() {
     setPassword("");
     setLoading(false);
     setIsDialogOpen(false);
+    router.refresh();
   };
-
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

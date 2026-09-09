@@ -7,7 +7,7 @@ export default async function ContactPage() {
     const branches = await getBranches()
 
     if (!branches || branches.length === 0) {
-        notFound();
+        return notFound();
     }
 
     return (
