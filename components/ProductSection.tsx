@@ -1,7 +1,7 @@
 // components/ProductSection.tsx
 "use client";
 
-import { ArrowBigDown, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 
 import {
@@ -32,18 +32,17 @@ import Image from "next/image";
 interface Props {
     categories: any[];
     selectedCategory: string;
-    products: Product[];
-    searchQuery: string;
+    setSelectedCategory: (category: string) => void;
 
+    products: Product[];
+    
+    searchQuery: string;
     itemsPerPage: number;
     totalProducts: number;
-    loading: boolean;
 
     authEnabled: boolean;
     currency: any;
     cart: any[];
-
-    setSelectedCategory: (category: string) => void;
 
     setSearchQuery: (value: string) => void;
     clearSearch: () => void;
@@ -62,9 +61,9 @@ interface Props {
 export default function ProductSection({
     categories,
     selectedCategory,
+
     products,
     searchQuery,
-
 
     authEnabled,
     currency,
@@ -72,7 +71,6 @@ export default function ProductSection({
 
     itemsPerPage,
     totalProducts,
-    loading,
 
     setSelectedCategory,
 
@@ -223,7 +221,7 @@ export default function ProductSection({
                         <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 pb-8">
                             {products.map((item) => (
                                 <MenuCard
-                                    key={item.id}
+                                    key={item.idProduct}
                                     item={item}
                                     onAddToCart={addToCart}
                                     currency={currency}

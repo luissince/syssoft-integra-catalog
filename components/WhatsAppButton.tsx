@@ -1,17 +1,18 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useWhatsApp } from "@/context/WhatsAppContext"
 import { useContact } from "@/lib/contact"
 import { Company, Whatsapp } from "@/types/api-type"
 import { FaWhatsapp } from "react-icons/fa"
 
 interface WhatsAppButtonProps {
   company: Company;
-  whatsapp: Whatsapp,
 }
 
-export default function WhatsAppButton({ company, whatsapp }: WhatsAppButtonProps) {
+export default function WhatsAppButton({ company }: WhatsAppButtonProps) {
   const { handleWhatsapp, getDefaultMessage } = useContact();
+  const { whatsapp } = useWhatsApp();
 
   const handleWhatsAppClick = () => {
     // const message = getDefaultMessage(restaurantData.restaurant.name);

@@ -6,11 +6,11 @@ import { createContext, useContext, ReactNode, useState, useEffect } from 'react
 interface CartContextType {
     cart: Cart[];
     addToCart: (item: Product, quantity?: number, notes?: string) => void;
-    removeFromCart: (id: string) => void;
-    updateQuantity: (id: string, quantity: number) => void;
-    updateNotes: (id: string, notes: string) => void;
+    removeFromCart: (idProduct: string) => void;
+    updateQuantity: (idProduct: string, quantity: number) => void;
+    updateNotes: (idProduct: string, notes: string) => void;
     clearCart: () => void;
-    isInCart: (id: string) => boolean;
+    isInCart: (idProduct: string) => boolean;
     getCartTotal: () => number;
     getCartItemsCount: () => number;
 }
@@ -33,38 +33,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const addToCart = (item: Product, quantity = 1, notes?: string) => {
         setCart((prevCart) => {
-            const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+            const existingItem = prevCart.find((cartItem) => cartItem.idProduct === item.idProduct);
             if (existingItem) {
                 return prevCart.map((cartItem) =>
-                    cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + quantity, notes } : cartItem,
+                    cartItem.idProduct === item.idProduct ? { ...cartItem, quantity: cartItem.quantity + quantity, notes } : cartItem,
                 );
             }
             return [...prevCart, { ...item, quantity, notes }];
         });
     };
 
-    const removeFromCart = (id: string) => {
-        setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+    const removeFromCart = (idProduct: string) => {
+        setCart((prevCart) => prevCart.filter((item) => item.idProduct !== idProduct));
     };
 
-    const updateQuantity = (id: string, quantity: number) => {
+    const updateQuantity = (idProduct: string, quantity: number) => {
         if (quantity <= 0) {
-            removeFromCart(id);
+            removeFromCart(idProduct);
             return;
         }
-        setCart((prevCart) => prevCart.map((item) => (item.id === id ? { ...item, quantity } : item)));
+        setCart((prevCart) => prevCart.map((item) => (item.idProduct === idProduct ? { ...item, quantity } : item)));
     };
 
-    const updateNotes = (id: string, notes: string) => {
-        setCart((prevCart) => prevCart.map((item) => (item.id === id ? { ...item, notes } : item)));
+    const updateNotes = (idProduct: string, notes: string) => {
+        setCart((prevCart) => prevCart.map((item) => (item.idProduct === idProduct ? { ...item, notes } : item)));
     };
 
     const clearCart = () => {
         setCart([]);
     };
 
-    const isInCart = (id: string) => {
-        return cart.some(item => item.id === id);
+    const isInCart = (idProduct: string) => {
+        return cart.some(item => item.idProduct === idProduct);
     };
 
     const getCartTotal = () => {

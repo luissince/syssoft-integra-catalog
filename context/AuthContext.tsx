@@ -1,7 +1,6 @@
 "use client";
 
 import { fetchRegisterConsumer } from '@/data/data-rest';
-import { loginCustomer } from '@/lib/api';
 import { Person } from '@/types/api-type';
 import { FormCustomer } from '@/types/form';
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
@@ -10,7 +9,6 @@ interface AuthContextType {
   user: Person | null;
   isAuthenticated: boolean;
   authLoading: boolean;
-  login: (username: string, password: string) => Promise<Person | string>;
   register: (person: FormCustomer) => Promise<boolean>;
   update: (person: Person) => void;
   logout: () => void;
@@ -33,21 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setAuthLoading(false);
   }, []);
-
-  const login = async (email: string, password: string): Promise<Person | string> => {
-    const customer = await loginCustomer({ email, password });
-
-    if (typeof customer === "string") {
-      return customer;
-    }
-
-    localStorage.setItem("isAuthenticated", JSON.stringify(true));
-    localStorage.setItem("user", JSON.stringify(customer));
-
-    setIsAuthenticated(true);
-    setUser(customer);
-    return customer;
-  };
 
   const update = (person: Person) => {
     setUser(person);
@@ -72,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, authLoading, login, register, update, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, authLoading, register, update, logout }}>
       {children}
     </AuthContext.Provider>
   );

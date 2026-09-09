@@ -5,27 +5,47 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { useAuth } from "@/context/AuthContext";
 import { LogOut, Phone, Settings, MenuIcon, User, UserPlus } from "lucide-react";
 import { LoginCard } from "./LoginCard";
 import { useContact } from "@/lib/contact";
-import { Branch, Company } from "@/types/api-type";
+import { Branch, Company, Person } from "@/types/api-type";
 import Image from "next/image";
 import Container from "./Container";
+import { fetchLogoutCustomer } from "@/data/data-rest";
+import { useState } from "react";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
 
 interface NavProps {
     company: Company;
     branch: Branch;
-    authEnabled: boolean;
+    person: Person | null;
 }
 
-export default function Nav({ company, branch, authEnabled }: NavProps) {
+export default function Nav({ company, branch, person }: NavProps) {
     const router = useRouter();
-    const { isAuthenticated, logout } = useAuth();
     const { handleCall } = useContact();
+
+    const [loginOpen, setLoginOpen] = useState(false);
+
+    const { theme, setTheme } = useTheme();
+
 
     const handleCallClick = () => {
         handleCall(branch.phone);
+    };
+
+    const toggleTheme = () => {
+        setTheme(theme === "light" ? "dark" : "light");
+    };
+    const handleLogout = async () => {
+        const { success } = await fetchLogoutCustomer();
+
+        if (!success) {
+            return;
+        }
+
+        router.refresh();
     };
 
     return (
@@ -47,17 +67,18 @@ export default function Nav({ company, branch, authEnabled }: NavProps) {
                         {/* Botones de contacto - Desktop */}
                         <Button
                             onClick={handleCallClick}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground"
                             size="sm"
                         >
                             <Phone className="w-4 h-4 mr-2" />
                             Llamar
                         </Button>
 
-                        <ThemeToggle />
+                        <ThemeToggle
 
-                        {authEnabled && (
-                            isAuthenticated ? (
+                        />
+
+                        {
+                            person ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" className="flex items-center">
@@ -69,16 +90,19 @@ export default function Nav({ company, branch, authEnabled }: NavProps) {
                                             <Settings className="w-4 h-4 text-primary mr-2" />
                                             <span>Administrar</span>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                                             <LogOut className="w-4 h-4 text-primary mr-2" />
                                             <span>Cerrar Sesión</span>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <LoginCard />
+                                <LoginCard
+                                    open={loginOpen}
+                                    onOpenChange={setLoginOpen}
+                                />
                             )
-                        )}
+                        }
                     </div>
 
 
@@ -98,25 +122,30 @@ export default function Nav({ company, branch, authEnabled }: NavProps) {
                                     </div>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => {
+                                    onClick={toggleTheme}
+                                    className="cursor-pointer"
+                                >
+                                    {theme === "light" ? (
+                                        <Moon className="w-4 h-4 mr-2" />
+                                    ) : (
+                                        <Sun className="w-4 h-4 mr-2" />
+                                    )}
 
-                                    }}
+                                    <div className="flex flex-col">
+                                        <span>
+                                            {theme === "light"
+                                                ? "Modo oscuro"
+                                                : "Modo claro"}
+                                        </span>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setLoginOpen(true)}
                                     className="cursor-pointer"
                                 >
                                     <User className="w-4 h-4 mr-2" />
                                     <div className="flex flex-col">
                                         <span>Iniciar Sesión</span>
-                                    </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => {
-
-                                    }}
-                                    className="cursor-pointer"
-                                >
-                                    <UserPlus className="w-4 h-4 mr-2" />
-                                    <div className="flex flex-col">
-                                        <span>Crear Cuenta</span>
                                     </div>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

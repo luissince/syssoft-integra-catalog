@@ -1,3 +1,5 @@
+// pages/product/[id].tsx
+
 import { notFound } from "next/navigation";
 import { getBranches, getCompanyInfo, getProductById, getProductsRelated, getWhatsappInfo } from "@/lib/api";
 import ProductComponent from "@/components/Product";
@@ -12,17 +14,15 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
 
   // Si no existe el id, mostrar 404
   if (!id) {
-    notFound();
+    return notFound();
   }
 
   // Cargar datos en paralelo para mejor performance
   const [
-    company,
     branches,
     whatsapp,
     product
   ] = await Promise.all([
-    getCompanyInfo(),
     getBranches(),
     getWhatsappInfo(),
     getProductById(id)
@@ -30,7 +30,7 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
 
   // Si no existe el producto, mostrar 404
   if (!product) {
-    notFound();
+    return notFound();
   }
 
   // Cargar productos relacionados después de confirmar que el producto existe
@@ -43,7 +43,6 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
 
   return (
       <ProductComponent
-        company={company}
         branch={branch}
         whatsapp={whatsapp}
         product={product}

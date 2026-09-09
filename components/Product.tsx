@@ -46,7 +46,6 @@ interface ProductImage {
 }
 
 interface PropsProductComponent {
-  company: Company
   branch: Branch
   whatsapp: Whatsapp
   product: Product
@@ -293,7 +292,7 @@ function ProductImageGallery({
   )
 }
 
-export default function ProductComponent({ company, product, relatedProducts, authEnabled }: PropsProductComponent) {
+export default function ProductComponent({ product, relatedProducts, authEnabled }: PropsProductComponent) {
   const params = useParams()
   const router = useRouter()
   const { currency } = useCurrency()
@@ -304,7 +303,7 @@ export default function ProductComponent({ company, product, relatedProducts, au
 
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState("")
-  const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.id) || false)
+  const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.idProduct) || false)
 
 
   if (!params.id) {
@@ -344,7 +343,7 @@ export default function ProductComponent({ company, product, relatedProducts, au
     if (!addToWishlist || !removeFromWishlist) return
 
     if (isWishlisted) {
-      removeFromWishlist(product.id)
+      removeFromWishlist(product.idProduct)
       setIsWishlisted(false)
       toast({
         title: "Eliminado de favoritos",
@@ -426,7 +425,7 @@ export default function ProductComponent({ company, product, relatedProducts, au
           {/* Precio */}
           <div className="flex items-center gap-3 py-2">
             <span className="text-blue-600 font-bold text-xl">
-              {formatCurrency(product.price, currency!.code)} x {product.measurement?.name}
+              {formatCurrency(product.price, currency!.code)} x {product.measure?.name}
             </span>
           </div>
 
@@ -687,9 +686,9 @@ export default function ProductComponent({ company, product, relatedProducts, au
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {relatedProducts.slice(0, 4).map((item, index) => (
+            {relatedProducts.slice(0, 4).map((item) => (
               <MenuCard
-                key={index}
+                key={item.idProduct}
                 item={item}
                 onAddToCart={addToCart}
                 currency={currency}

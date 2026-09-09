@@ -1,4 +1,4 @@
-import { ApiResult } from "@/types";
+import { ApiResult } from "@/types/api-type";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -423,6 +423,29 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
 
 }
 
+/**
+ * Formatea un número agregando ceros delante hasta alcanzar una longitud específica.
+ *
+ * @param {number} numero - El número que se va a formatear.
+ * @returns {string} El número formateado con ceros delante.
+ */
+export function formatNumberWithZeros(numero: number): string {
+  // Convierte el número a cadena y maneja números negativos
+  const numeroAbsoluto = Math.abs(numero);
+  const numeroFormateado = String(numeroAbsoluto).padStart(6, '0');
+
+  // Añade el signo negativo si el número original era negativo
+  return numero < 0 ? `-${numeroFormateado}` : numeroFormateado;
+}
+
+/**
+ * Realiza una petición HTTP y devuelve una respuesta JSON tipada.
+ * 
+ * @template T Tipo esperado de la respuesta.
+ * @param url 
+ * @param options 
+ * @returns 
+ */
 export async function apiRequestFetch<T>(
   url: string,
   options: RequestInit = {}
@@ -458,7 +481,6 @@ export async function apiRequestFetch<T>(
       status: response.status,
       data: body as T,
     };
-
   } catch (err) {
     return {
       success: false,

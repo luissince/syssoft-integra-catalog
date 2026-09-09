@@ -5,10 +5,9 @@ import {
   getCategories,
   getCompanyBanners,
   getCompanyInfo,
-  getProducts,
 } from "@/lib/api";
 import HomeComponent from "@/components/Home";
-import { sleep } from "@/lib/utils";
+import { fetchProducts } from "@/data/data-rest";
 
 export default async function Home() {
   const [
@@ -22,7 +21,7 @@ export default async function Home() {
     getCategories(),
     getCompanyBanners(),
     getBranches(),
-    getProducts({
+    fetchProducts({
       currentPage: 0,
       totalPage: 6,
     }),

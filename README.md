@@ -163,7 +163,7 @@ import { Paginated, Product } from "@/lib/types";
 
 export const metadata = { title: "Productos | Catálogo" };
 
-async function getProducts(search: string, page: number, limit: number) {
+async function fetchProducts(search: string, page: number, limit: number) {
   const q = new URLSearchParams({ search, page: String(page), limit: String(limit) });
   return apiFetch<Paginated<Product>>(`/api/productos?${q.toString()}`);
 }
@@ -173,7 +173,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Rec
   const page = Number(searchParams.page ?? "1");
   const limit = Number(searchParams.limit ?? "12");
 
-  const { data, total } = await getProducts(search, page, limit);
+  const { data, total } = await fetchProducts(search, page, limit);
 
   return (
     <main className="mx-auto max-w-6xl p-4">

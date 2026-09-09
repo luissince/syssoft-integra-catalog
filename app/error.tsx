@@ -3,6 +3,7 @@
 import ErrorPage from "@/components/ErrorPage";
 
 export default function Error({
+  error,
   reset
 }: {
   error: Error & { digest?: string },
@@ -13,7 +14,7 @@ export default function Error({
     <ErrorPage
       code="500"
       title="Error del servidor"
-      message="Ocurrió un problema inesperado"
+      message={error.message || "Se ha producido un error inesperado"}
       icon="⚠️"
     />
   );
