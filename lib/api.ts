@@ -33,6 +33,7 @@ export async function getProductById(code: string): Promise<Product | null> {
         const data = await fetchProductById(code);
         return data;
     } catch (error) {
+        console.error("❌ Error al obtener producto:", error);
         return null;
     }
 }
