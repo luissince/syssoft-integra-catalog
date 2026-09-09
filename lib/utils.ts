@@ -412,14 +412,18 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   const domain =
     typeof window !== "undefined"
       ? ""
-      : process.env.APP_BACK_END + "/api" || "";
+      : process.env.APP_BACK_END || "";
+
+  const endpoint = url.startsWith("/api")
+    ? url
+    : `/api${url}`;
 
   const headers = new Headers(options.headers);
 
   headers.set("X-App", "catalog-next");
   // headers.set("X-Version", process.env.NEXT_PUBLIC_APP_VERSION ?? "dev");
 
-  const response = await fetch(domain + url, {
+  const response = await fetch(domain + endpoint, {
     ...options,
     headers
   });
@@ -459,14 +463,18 @@ export async function apiRequestFetch<T>(
   const domain =
     typeof window !== "undefined"
       ? ""
-      : process.env.APP_BACK_END + "/api" || "";
+      : process.env.APP_BACK_END || "";
+
+  const endpoint = url.startsWith("/api")
+    ? url
+    : `/api${url}`;
 
   const headers = new Headers(options.headers);
 
   headers.set("X-App", "catalog-next");
 
   try {
-    const response = await fetch(domain + url, {
+    const response = await fetch(domain + endpoint, {
       ...options,
       headers,
       credentials: "include",
