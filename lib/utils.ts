@@ -412,7 +412,7 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   const domain =
     typeof window !== "undefined"
       ? ""
-      : process.env.APP_BACK_END || "";
+      : process.env.APP_BACK_END + "/api" || "";
 
   const headers = new Headers(options.headers);
 
@@ -459,7 +459,7 @@ export async function apiRequestFetch<T>(
   const domain =
     typeof window !== "undefined"
       ? ""
-      : process.env.APP_BACK_END || "";
+      : process.env.APP_BACK_END + "/api" || "";
 
   const headers = new Headers(options.headers);
 
