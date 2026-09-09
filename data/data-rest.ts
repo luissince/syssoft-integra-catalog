@@ -58,7 +58,7 @@ export const fetchProducts = async ({
 export const fetchProductById = async (id: string): Promise<Product> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/producto/filter/web/${id}`, {
+  const data = await apiFetch<any>(`/producto/filter/web/${id}`, {
     next: { revalidate: 0 }
   });
 
@@ -127,7 +127,7 @@ export const fetchProductById = async (id: string): Promise<Product> => {
 export const fetchProductsRelated = async (idProduct: string, idCategory: string): Promise<Product[]> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/producto/filter/web/related/${idProduct}/${idCategory}`, {
+  const data = await apiFetch<any>(`/producto/filter/web/related/${idProduct}/${idCategory}`, {
     next: { revalidate: 0 }
   });
 
@@ -180,7 +180,7 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
 // Función para obtener las categorías
 export const fetchCategories = async (): Promise<Category[]> => {
 
-  const data = await apiFetch<[]>(`/api/categoria/combo`, {
+  const data = await apiFetch<[]>(`/categoria/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -206,7 +206,7 @@ export const fetchCategories = async (): Promise<Category[]> => {
 export const fetchCompanyInfo = async (): Promise<Company> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/empresa/web/info`, {
+  const data = await apiFetch<any>(`/empresa/web/info`, {
     next: { revalidate: 0 }
   });
 
@@ -234,7 +234,7 @@ export const fetchCompanyInfo = async (): Promise<Company> => {
 export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/empresa/web/banners`, {
+  const data = await apiFetch<[]>(`/empresa/web/banners`, {
     next: { revalidate: 0 }
   });
 
@@ -261,7 +261,7 @@ export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
 export const fetchBranches = async (): Promise<Branch[]> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/sucursal/list/web`, {
+  const data = await apiFetch<[]>(`/sucursal/list/web`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -304,7 +304,7 @@ export const fetchBranches = async (): Promise<Branch[]> => {
 export const fetchAgencies = async (): Promise<ApiResult<Agency[]>> => {
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Agency[]>(`/api/agencia/combo`, {
+  return await apiRequestFetch<Agency[]>(`/agencia/combo`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -317,7 +317,7 @@ export const fetchAgencies = async (): Promise<ApiResult<Agency[]>> => {
 export const fetchTaxes = async (): Promise<Tax[]> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/impuesto/combo`, {
+  const data = await apiFetch<[]>(`/impuesto/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -342,7 +342,7 @@ export const fetchTaxes = async (): Promise<Tax[]> => {
 export const fetchCurrencies = async (): Promise<Currency[]> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/moneda/combo`, {
+  const data = await apiFetch<[]>(`/moneda/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -369,7 +369,7 @@ export const fetchCurrencies = async (): Promise<Currency[]> => {
 export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/empresa//web/whatsapp`, {
+  const data = await apiFetch<any>(`/empresa//web/whatsapp`, {
     next: { revalidate: 0 }
   });
 
@@ -386,7 +386,7 @@ export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
 export const fetchCurrencyInfo = async (): Promise<Currency> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/moneda/nacional`, {
+  const data = await apiFetch<any>(`/moneda/nacional`, {
     next: { revalidate: 0 }
   });
 
@@ -405,7 +405,7 @@ export const fetchCurrencyInfo = async (): Promise<Currency> => {
 export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentReceipt[]> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
+  const data = await apiFetch<[]>(`/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
     next: { revalidate: 0 }
   });
 
@@ -430,7 +430,7 @@ export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentRec
 export const fetchCreateOrder = async (formOrder: FormOrder): Promise<ApiResult<FormOrderResponse>> => {
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<FormOrderResponse>(`/api/pedido/create`, {
+  return await apiRequestFetch<FormOrderResponse>(`/pedido/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -453,7 +453,7 @@ export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiRes
   const query = searchParams.toString();
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<{ orders: Order[], count: number }>(`/api/pedido/list?${query}`, {
+  return await apiRequestFetch<{ orders: Order[], count: number }>(`/pedido/list?${query}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -466,14 +466,14 @@ export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiRes
 export const fetchGetOrder = async (idOrder: string): Promise<ApiResult<Order>> => {
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Order>(`/api/pedido/detail/${idOrder}`);
+  return await apiRequestFetch<Order>(`/pedido/detail/${idOrder}`);
 }
 
 // Función para obtener los datos de inicio de sesión
 export const fetchLoginCustomer = async (body: { email: string, password: string }): Promise<ApiResult<FormCustomer>> => {
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<FormCustomer>(`/api/persona/login`, {
+  return await apiRequestFetch<FormCustomer>(`/persona/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -487,7 +487,7 @@ export const fetchLoginCustomer = async (body: { email: string, password: string
 export const fetchRegisterConsumer = async (body: FormCustomer): Promise<ApiResult<string>> => {
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<string>(`/api/persona/create`, {
+  return await apiRequestFetch<string>(`/persona/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -500,7 +500,7 @@ export const fetchRegisterConsumer = async (body: FormCustomer): Promise<ApiResu
 export const fetchValidateConsumer = async (cookieStore: string): Promise<ApiResult<Person>> => {
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Person>(`/api/persona/validate`, {
+  return await apiRequestFetch<Person>(`/persona/validate`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -514,7 +514,7 @@ export const fetchValidateConsumer = async (cookieStore: string): Promise<ApiRes
 export const fetchLogoutCustomer = async () => {
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<string>(`/api/persona/logout`, {
+  return await apiRequestFetch<string>(`/persona/logout`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -530,7 +530,7 @@ export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
   });
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/persona/id?${params}`, {
+  const data = await apiFetch<any>(`/persona/id?${params}`, {
     next: { revalidate: 0 }
   });
 
@@ -550,7 +550,7 @@ export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
 export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/tipodocumento/combo`, {
+  const data = await apiFetch<[]>(`/tipodocumento/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -573,7 +573,7 @@ export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
 export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/persona/${body.idPersona}`, {
+  const data = await apiFetch<any>(`/persona/${body.idPersona}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -589,7 +589,7 @@ export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> =
 export const fetchCreateConsult = async (body: Consult): Promise<string> => {
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/consulta`, {
+  const data = await apiFetch<any>(`/consulta`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
