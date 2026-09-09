@@ -12,9 +12,6 @@ export async function getCurrentSession(): Promise<Person | null> {
         return null;
     }
 
-    console.log("cookieStore");
-    console.log(cookieStore.toString());
-
     const { success, data } = await fetchValidateConsumer(cookieStore.toString());
 
     if (!success) {
