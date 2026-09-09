@@ -1,7 +1,7 @@
 // pages/product/[id].tsx
 
 import { notFound } from "next/navigation";
-import { getBranches, getCompanyInfo, getProductById, getProductsRelated, getWhatsappInfo } from "@/lib/api";
+import { getBranches, getProductById, getProductsRelated, getWhatsappInfo } from "@/lib/api";
 import ProductComponent from "@/components/Product";
 
 interface ProductDetalleProps {
@@ -12,12 +12,8 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   // Resolver params primero
   const { id } = await params;
 
-  console.log("➡️ SSR producto:", id);
-
-
   // Si no existe el id, mostrar 404
   if (!id) {
-    console.error("❌ ID no encontrado:", id);
     return notFound();
   }
 
@@ -34,7 +30,6 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
 
   // Si no existe el producto, mostrar 404
   if (!product) {
-    console.error("❌ Producto no encontrado:", id);
     return notFound();
   }
 

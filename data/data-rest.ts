@@ -34,13 +34,15 @@ export const fetchProducts = async ({
   filters?: FilterOptions | null,
 }):
   Promise<{ data: Product[], count: number }> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
   return await apiFetch<{
     data: Product[],
     count: number
-  }>(`${url}/api/producto/filter/web`, {
+  }>(`${url}/producto/filter/web`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -57,10 +59,12 @@ export const fetchProducts = async ({
 
 // Función para obtener en detalle de un producto
 export const fetchProductById = async (id: string): Promise<Product> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/producto/filter/web/${id}`, {
+  const data = await apiFetch<any>(`${url}/producto/filter/web/${id}`, {
     next: { revalidate: 0 }
   });
 
@@ -127,10 +131,12 @@ export const fetchProductById = async (id: string): Promise<Product> => {
 
 // Función para obtener los productos relacionados
 export const fetchProductsRelated = async (idProduct: string, idCategory: string): Promise<Product[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/producto/filter/web/related/${idProduct}/${idCategory}`, {
+  const data = await apiFetch<any>(`${url}/producto/filter/web/related/${idProduct}/${idCategory}`, {
     next: { revalidate: 0 }
   });
 
@@ -182,9 +188,11 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
 
 // Función para obtener las categorías
 export const fetchCategories = async (): Promise<Category[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
-  const data = await apiFetch<[]>(`${url}/api/categoria/combo`, {
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
+
+  const data = await apiFetch<[]>(`${url}/categoria/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -208,10 +216,14 @@ export const fetchCategories = async (): Promise<Category[]> => {
 
 // Función para obtener la información de la empresa
 export const fetchCompanyInfo = async (): Promise<Company> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
+
+  console.log(url);
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/empresa/web/info`, {
+  const data = await apiFetch<any>(`${url}/empresa/web/info`, {
     next: { revalidate: 0 }
   });
 
@@ -237,10 +249,12 @@ export const fetchCompanyInfo = async (): Promise<Company> => {
 
 // Función para obtener los banners de la empresa
 export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${url}/api/empresa/web/banners`, {
+  const data = await apiFetch<[]>(`${url}/empresa/web/banners`, {
     next: { revalidate: 0 }
   });
 
@@ -265,10 +279,12 @@ export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
 
 // Función para obtener la lista de sucursales
 export const fetchBranches = async (): Promise<Branch[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${url}/api/sucursal/list/web`, {
+  const data = await apiFetch<[]>(`${url}/sucursal/list/web`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -309,10 +325,12 @@ export const fetchBranches = async (): Promise<Branch[]> => {
 
 // Función para obtener las agencias
 export const fetchAgencies = async (): Promise<ApiResult<Agency[]>> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Agency[]>(`${url}/api/agencia/combo`, {
+  return await apiRequestFetch<Agency[]>(`${url}/agencia/combo`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -323,10 +341,12 @@ export const fetchAgencies = async (): Promise<ApiResult<Agency[]>> => {
 
 // Función para obtener la lista de impuestos
 export const fetchTaxes = async (): Promise<Tax[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${url}/api/impuesto/combo`, {
+  const data = await apiFetch<[]>(`${url}/impuesto/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -349,10 +369,12 @@ export const fetchTaxes = async (): Promise<Tax[]> => {
 
 // Función para obtener la lista de monedas
 export const fetchCurrencies = async (): Promise<Currency[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${url}/api/moneda/combo`, {
+  const data = await apiFetch<[]>(`${url}/moneda/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -377,10 +399,12 @@ export const fetchCurrencies = async (): Promise<Currency[]> => {
 
 // Función para obtener la información del whatsapp
 export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/empresa//web/whatsapp`, {
+  const data = await apiFetch<any>(`${url}/empresa//web/whatsapp`, {
     next: { revalidate: 0 }
   });
 
@@ -395,10 +419,12 @@ export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
 
 // Función para obtener de la moneda de la empresa
 export const fetchCurrencyInfo = async (): Promise<Currency> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/moneda/nacional`, {
+  const data = await apiFetch<any>(`${url}/moneda/nacional`, {
     next: { revalidate: 0 }
   });
 
@@ -415,10 +441,12 @@ export const fetchCurrencyInfo = async (): Promise<Currency> => {
 
 // Función para obtener la información del comprobante o documento
 export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentReceipt[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${url}/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
+  const data = await apiFetch<[]>(`${url}/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
     next: { revalidate: 0 }
   });
 
@@ -441,10 +469,12 @@ export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentRec
 
 // Función para registrar el pedido
 export const fetchCreateOrder = async (formOrder: FormOrder): Promise<ApiResult<FormOrderResponse>> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<FormOrderResponse>(`${url}/api/pedido/create`, {
+  return await apiRequestFetch<FormOrderResponse>(`${url}/pedido/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -455,7 +485,9 @@ export const fetchCreateOrder = async (formOrder: FormOrder): Promise<ApiResult<
 
 // Función para obtener todos los pedidos
 export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiResult<{ orders: Order[], count: number }>> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   const searchParams = new URLSearchParams();
 
@@ -468,7 +500,7 @@ export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiRes
   const query = searchParams.toString();
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<{ orders: Order[], count: number }>(`${url}/api/pedido/list?${query}`, {
+  return await apiRequestFetch<{ orders: Order[], count: number }>(`${url}/pedido/list?${query}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -479,20 +511,23 @@ export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiRes
 
 // Función para obtener un pedido
 export const fetchGetOrder = async (idOrder: string): Promise<ApiResult<Order>> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Order>(`${url}/api/pedido/detail/${idOrder}`);
+  return await apiRequestFetch<Order>(`${url}/pedido/detail/${idOrder}`);
 }
 
 // Función para obtener los datos de inicio de sesión
 export const fetchLoginCustomer = async (body: { email: string, password: string }): Promise<ApiResult<FormCustomer>> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<FormCustomer>(`${url}/api/persona/login`, {
+  return await apiRequestFetch<FormCustomer>(`${url}/persona/login`, {
     method: "POST",
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -503,10 +538,12 @@ export const fetchLoginCustomer = async (body: { email: string, password: string
 
 // Función para registrar el cliente
 export const fetchRegisterConsumer = async (body: FormCustomer): Promise<ApiResult<string>> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<string>(`${url}/api/persona/create`, {
+  return await apiRequestFetch<string>(`${url}/persona/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -517,12 +554,13 @@ export const fetchRegisterConsumer = async (body: FormCustomer): Promise<ApiResu
 
 // Función para validar el inicio de sesión
 export const fetchValidateConsumer = async (cookieStore: string): Promise<ApiResult<Person>> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Person>(`${url}/api/persona/validate`, {
+  return await apiRequestFetch<Person>(`${url}/persona/validate`, {
     method: "GET",
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       "Cookie": cookieStore,
@@ -533,12 +571,13 @@ export const fetchValidateConsumer = async (cookieStore: string): Promise<ApiRes
 
 // Función para cerrar sesión
 export const fetchLogoutCustomer = async () => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<string>(`${url}/api/persona/logout`, {
+  return await apiRequestFetch<string>(`${url}/persona/logout`, {
     method: "POST",
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -547,14 +586,16 @@ export const fetchLogoutCustomer = async () => {
 
 // Función para obtener datos de un usuarios
 export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   const params = new URLSearchParams({
     "idPersona": idPerson,
   });
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/persona/id?${params}`, {
+  const data = await apiFetch<any>(`${url}/persona/id?${params}`, {
     next: { revalidate: 0 }
   });
 
@@ -572,10 +613,12 @@ export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
 
 // Función para obtener la lista de tipos de documento
 export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${url}/api/tipodocumento/combo`, {
+  const data = await apiFetch<[]>(`${url}/tipodocumento/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -596,11 +639,12 @@ export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
 
 // Función para actualizar el cliente
 export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
 
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/persona/${body.idPersona}`, {
+  const data = await apiFetch<any>(`${url}/persona/${body.idPersona}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -614,10 +658,12 @@ export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> =
 
 // Función para crear una consulta
 export const fetchCreateConsult = async (body: Consult): Promise<string> => {
-  const url = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+
+  const baseUrl = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END || "";
+  const url = process.env.NEXT_PUBLIC_ENV === "development" ? `${baseUrl}/api` : baseUrl;
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${url}/api/consulta`, {
+  const data = await apiFetch<any>(`${url}/consulta`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
