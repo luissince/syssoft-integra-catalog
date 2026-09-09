@@ -39,7 +39,7 @@ export const fetchProducts = async ({
   return await apiFetch<{
     data: Product[],
     count: number
-  }>(`/api/producto/filter/web`, {
+  }>(`/producto/filter/web`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
