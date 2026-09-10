@@ -17,6 +17,7 @@ import ContactButton from "@/components/ContactButton"
 import Nav from "@/components/Nav"
 import Footer from "@/components/Footer"
 import { WhatsAppProvider } from "@/context/WhatsAppContext";
+import AuthSyncProvider from "@/components/AuthSyncProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -112,37 +113,39 @@ export default async function RootLayout({
     ${mono.variable}
   `} suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
-          <AuthProvider>
-            <CurrencyProvider initialCurrency={currency}>
-              <WhatsAppProvider initialWhatsapp={whatsapp}>
-                <CartProvider>
-                  <WishlistProvider>
-                    <div className="min-h-screen bg-background">
-                      <Nav
-                        company={company}
-                        branch={branch}
-                        person={person}
-                      />
+        <AuthSyncProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
+            <AuthProvider>
+              <CurrencyProvider initialCurrency={currency}>
+                <WhatsAppProvider initialWhatsapp={whatsapp}>
+                  <CartProvider>
+                    <WishlistProvider>
+                      <div className="min-h-screen bg-background">
+                        <Nav
+                          company={company}
+                          branch={branch}
+                          person={person}
+                        />
 
-                      {children}
+                        {children}
 
-                      <Footer
+                        <Footer
+                          company={company}
+                          branch={branch}
+                        />
+                      </div>
+                      <Toaster />
+                      <WhatsAppButton
                         company={company}
-                        branch={branch}
                       />
-                    </div>
-                    <Toaster />
-                    <WhatsAppButton
-                      company={company}
-                    />
-                    <ContactButton />
-                  </WishlistProvider>
-                </CartProvider>
-              </WhatsAppProvider>
-            </CurrencyProvider>
-          </AuthProvider>
-        </ThemeProvider>
+                      <ContactButton />
+                    </WishlistProvider>
+                  </CartProvider>
+                </WhatsAppProvider>
+              </CurrencyProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </AuthSyncProvider>
       </body>
     </html>
   )

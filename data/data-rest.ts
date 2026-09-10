@@ -21,6 +21,23 @@ import {
 } from "@/types/api-type";
 import { FormCustomer, FormOrder, FormOrderResponse } from "@/types/form";
 
+const domainBase = process.env.APP_BACK_END || process.env.NEXT_PUBLIC_APP_BACK_END;
+const domainOwn = process.env.NEXTAUTH_URL;
+
+// Función para obtener las agencias
+export const fetchGetToken = async (Cookie: string): Promise<ApiResult<{ accessToken: string }>> => {
+  // Obtener los datos de la respuesta
+  return await apiRequestFetch<{ accessToken: string }>(`${domainOwn}/api/get-token`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+       "Cookie": Cookie,
+    },
+    cache: "no-store",
+  });
+}
+
+
 // Función para obtener todo los productos por filtro
 export const fetchProducts = async ({
   search,
@@ -34,13 +51,13 @@ export const fetchProducts = async ({
   filters?: FilterOptions | null,
 }):
   Promise<{ data: Product[], count: number }> => {
-  
+
 
   // Obtener los datos de la respuesta
   return await apiFetch<{
     data: Product[],
     count: number
-  }>(`/api/producto/filter/web`, {
+  }>(`${domainBase}/api/producto/filter/web`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -57,10 +74,8 @@ export const fetchProducts = async ({
 
 // Función para obtener en detalle de un producto
 export const fetchProductById = async (id: string): Promise<Product> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/producto/filter/web/${id}`, {
+  const data = await apiFetch<any>(`${domainBase}/api/producto/filter/web/${id}`, {
     next: { revalidate: 0 }
   });
 
@@ -127,10 +142,8 @@ export const fetchProductById = async (id: string): Promise<Product> => {
 
 // Función para obtener los productos relacionados
 export const fetchProductsRelated = async (idProduct: string, idCategory: string): Promise<Product[]> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/producto/filter/web/related/${idProduct}/${idCategory}`, {
+  const data = await apiFetch<any>(`${domainBase}/api/producto/filter/web/related/${idProduct}/${idCategory}`, {
     next: { revalidate: 0 }
   });
 
@@ -182,9 +195,7 @@ export const fetchProductsRelated = async (idProduct: string, idCategory: string
 
 // Función para obtener las categorías
 export const fetchCategories = async (): Promise<Category[]> => {
-  
-
-  const data = await apiFetch<[]>(`/api/categoria/combo`, {
+  const data = await apiFetch<[]>(`${domainBase}/api/categoria/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -208,10 +219,10 @@ export const fetchCategories = async (): Promise<Category[]> => {
 
 // Función para obtener la información de la empresa
 export const fetchCompanyInfo = async (): Promise<Company> => {
-  
+
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/empresa/web/info`, {
+  const data = await apiFetch<any>(`${domainBase}/api/empresa/web/info`, {
     next: { revalidate: 0 }
   });
 
@@ -237,10 +248,8 @@ export const fetchCompanyInfo = async (): Promise<Company> => {
 
 // Función para obtener los banners de la empresa
 export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/empresa/web/banners`, {
+  const data = await apiFetch<[]>(`${domainBase}/api/empresa/web/banners`, {
     next: { revalidate: 0 }
   });
 
@@ -265,10 +274,8 @@ export const fetchCompanyBanners = async (): Promise<CompanyBanner[]> => {
 
 // Función para obtener la lista de sucursales
 export const fetchBranches = async (): Promise<Branch[]> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/sucursal/list/web`, {
+  const data = await apiFetch<[]>(`${domainBase}/api/sucursal/list/web`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -309,10 +316,8 @@ export const fetchBranches = async (): Promise<Branch[]> => {
 
 // Función para obtener las agencias
 export const fetchAgencies = async (): Promise<ApiResult<Agency[]>> => {
-  
-
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Agency[]>(`/api/agencia/combo`, {
+  return await apiRequestFetch<Agency[]>(`${domainBase}/api/agencia/combo`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -323,10 +328,8 @@ export const fetchAgencies = async (): Promise<ApiResult<Agency[]>> => {
 
 // Función para obtener la lista de impuestos
 export const fetchTaxes = async (): Promise<Tax[]> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/impuesto/combo`, {
+  const data = await apiFetch<[]>(`${domainBase}/api/impuesto/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -349,10 +352,8 @@ export const fetchTaxes = async (): Promise<Tax[]> => {
 
 // Función para obtener la lista de monedas
 export const fetchCurrencies = async (): Promise<Currency[]> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/moneda/combo`, {
+  const data = await apiFetch<[]>(`${domainBase}/api/moneda/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -377,10 +378,8 @@ export const fetchCurrencies = async (): Promise<Currency[]> => {
 
 // Función para obtener la información del whatsapp
 export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/empresa//web/whatsapp`, {
+  const data = await apiFetch<any>(`${domainBase}/api/empresa//web/whatsapp`, {
     next: { revalidate: 0 }
   });
 
@@ -395,10 +394,8 @@ export const fetchWhatsappInfo = async (): Promise<Whatsapp> => {
 
 // Función para obtener de la moneda de la empresa
 export const fetchCurrencyInfo = async (): Promise<Currency> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/moneda/nacional`, {
+  const data = await apiFetch<any>(`${domainBase}/api/moneda/nacional`, {
     next: { revalidate: 0 }
   });
 
@@ -415,10 +412,8 @@ export const fetchCurrencyInfo = async (): Promise<Currency> => {
 
 // Función para obtener la información del comprobante o documento
 export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentReceipt[]> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
+  const data = await apiFetch<[]>(`${domainBase}/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
     next: { revalidate: 0 }
   });
 
@@ -441,10 +436,8 @@ export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentRec
 
 // Función para registrar el pedido
 export const fetchCreateOrder = async (formOrder: FormOrder): Promise<ApiResult<FormOrderResponse>> => {
-  
-
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<FormOrderResponse>(`/api/pedido/create`, {
+  return await apiRequestFetch<FormOrderResponse>(`${domainBase}/api/pedido/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -455,8 +448,6 @@ export const fetchCreateOrder = async (formOrder: FormOrder): Promise<ApiResult<
 
 // Función para obtener todos los pedidos
 export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiResult<{ orders: Order[], count: number }>> => {
-  
-
   const searchParams = new URLSearchParams();
 
   Object.entries(params ?? {}).forEach(([key, value]) => {
@@ -468,7 +459,7 @@ export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiRes
   const query = searchParams.toString();
 
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<{ orders: Order[], count: number }>(`/api/pedido/list?${query}`, {
+  return await apiRequestFetch<{ orders: Order[], count: number }>(`${domainBase}/api/pedido/list?${query}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -479,18 +470,14 @@ export const fetchAllOrder = async (params: Record<string, any>): Promise<ApiRes
 
 // Función para obtener un pedido
 export const fetchGetOrder = async (idOrder: string): Promise<ApiResult<Order>> => {
-  
-
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Order>(`/api/pedido/detail/${idOrder}`);
+  return await apiRequestFetch<Order>(`${domainBase}/api/pedido/detail/${idOrder}`);
 }
 
 // Función para obtener los datos de inicio de sesión
-export const fetchLoginCustomer = async (body: { email: string, password: string }): Promise<ApiResult<FormCustomer>> => {
-  
-
+export const fetchLoginCustomer = async (body: { email: string, password: string }): Promise<ApiResult<{ person: Person, token: string }>> => {
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<FormCustomer>(`/api/persona/login`, {
+  return await apiRequestFetch<{ person: Person, token: string }>(`${domainBase}/api/persona/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -502,10 +489,8 @@ export const fetchLoginCustomer = async (body: { email: string, password: string
 
 // Función para registrar el cliente
 export const fetchRegisterConsumer = async (body: FormCustomer): Promise<ApiResult<string>> => {
-  
-
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<string>(`/api/persona/create`, {
+  return await apiRequestFetch<string>(`${domainBase}/api/persona/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -515,15 +500,13 @@ export const fetchRegisterConsumer = async (body: FormCustomer): Promise<ApiResu
 }
 
 // Función para validar el inicio de sesión
-export const fetchValidateConsumer = async (cookieStore: string): Promise<ApiResult<Person>> => {
-  
-
+export const fetchValidateConsumer = async (token: string): Promise<ApiResult<Person>> => {
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<Person>(`/api/persona/validate`, {
+  return await apiRequestFetch<Person>(`${domainBase}/api/persona/validate`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Cookie": cookieStore,
+      "Authorization": `Bearer ${token}`,
     },
     cache: "no-store",
   });
@@ -531,10 +514,8 @@ export const fetchValidateConsumer = async (cookieStore: string): Promise<ApiRes
 
 // Función para cerrar sesión
 export const fetchLogoutCustomer = async () => {
-  
-
   // Obtener los datos de la respuesta
-  return await apiRequestFetch<string>(`/api/persona/logout`, {
+  return await apiRequestFetch<string>(`${domainBase}/api/persona/logout`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -544,14 +525,12 @@ export const fetchLogoutCustomer = async () => {
 
 // Función para obtener datos de un usuarios
 export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
-  
-
   const params = new URLSearchParams({
     "idPersona": idPerson,
   });
 
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/persona/id?${params}`, {
+  const data = await apiFetch<any>(`${domainBase}/api/persona/id?${params}`, {
     next: { revalidate: 0 }
   });
 
@@ -569,10 +548,8 @@ export const fetchCustomerById = async (idPerson: string): Promise<Person> => {
 
 // Función para obtener la lista de tipos de documento
 export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`/api/tipodocumento/combo`, {
+  const data = await apiFetch<[]>(`${domainBase}/api/tipodocumento/combo`, {
     next: { revalidate: 0 }
   });
 
@@ -593,11 +570,8 @@ export const fetchListTypeDocument = async (): Promise<TypeDocument[]> => {
 
 // Función para actualizar el cliente
 export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> => {
-  
-
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/persona/${body.idPersona}`, {
+  const data = await apiFetch<any>(`${domainBase}/api/persona/${body.idPersona}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -611,10 +585,8 @@ export const fetchUpdateCustomer = async (body: FormCustomer): Promise<string> =
 
 // Función para crear una consulta
 export const fetchCreateConsult = async (body: Consult): Promise<string> => {
-  
-
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`/api/consulta`, {
+  const data = await apiFetch<any>(`${domainBase}/api/consulta`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
