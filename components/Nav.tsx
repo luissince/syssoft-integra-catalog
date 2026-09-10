@@ -12,9 +12,11 @@ import { Branch, Company, Person } from "@/types/api-type";
 import Image from "next/image";
 import Container from "./Container";
 import { fetchLogoutCustomer } from "@/data/data-rest";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { notifyAuthChange } from "@/lib/utils";
 
 interface NavProps {
     company: Company;
@@ -25,11 +27,8 @@ interface NavProps {
 export default function Nav({ company, branch, person }: NavProps) {
     const router = useRouter();
     const { handleCall } = useContact();
-
     const [loginOpen, setLoginOpen] = useState(false);
-
     const { theme, setTheme } = useTheme();
-
 
     const handleCallClick = () => {
         handleCall(branch.phone);
@@ -38,6 +37,7 @@ export default function Nav({ company, branch, person }: NavProps) {
     const toggleTheme = () => {
         setTheme(theme === "light" ? "dark" : "light");
     };
+
     const handleLogout = async () => {
         const { success } = await fetchLogoutCustomer();
 
@@ -45,6 +45,11 @@ export default function Nav({ company, branch, person }: NavProps) {
             return;
         }
 
+        await signOut({
+            redirect: false,
+        });
+
+        notifyAuthChange("LOGOUT");
         router.refresh();
     };
 
@@ -73,9 +78,7 @@ export default function Nav({ company, branch, person }: NavProps) {
                             Llamar
                         </Button>
 
-                        <ThemeToggle
-
-                        />
+                        <ThemeToggle />
 
                         {
                             person ? (
@@ -114,13 +117,22 @@ export default function Nav({ company, branch, person }: NavProps) {
                                     <MenuIcon className="w-4 h-4" />
                                 </Button>
                             </DropdownMenuTrigger>
+
                             <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuItem onClick={handleCallClick} className="cursor-pointer">
+
+                                {/* Llamar */}
+                                <DropdownMenuItem
+                                    onClick={handleCallClick}
+                                    className="cursor-pointer"
+                                >
                                     <Phone className="w-4 h-4 mr-2" />
+
                                     <div className="flex flex-col">
                                         <span>Llamar</span>
                                     </div>
                                 </DropdownMenuItem>
+
+                                {/* Tema */}
                                 <DropdownMenuItem
                                     onClick={toggleTheme}
                                     className="cursor-pointer"
@@ -139,15 +151,47 @@ export default function Nav({ company, branch, person }: NavProps) {
                                         </span>
                                     </div>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setLoginOpen(true)}
-                                    className="cursor-pointer"
-                                >
-                                    <User className="w-4 h-4 mr-2" />
-                                    <div className="flex flex-col">
-                                        <span>Iniciar Sesión</span>
-                                    </div>
-                                </DropdownMenuItem>
+
+                                {person ? (
+                                    <>
+                                        {/* Administrar */}
+                                        <DropdownMenuItem
+                                            onClick={() => router.push("/admin")}
+                                            className="cursor-pointer"
+                                        >
+                                            <Settings className="w-4 h-4 mr-2" />
+
+                                            <div className="flex flex-col">
+                                                <span>Administrar</span>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        {/* Cerrar sesión */}
+                                        <DropdownMenuItem
+                                            onClick={handleLogout}
+                                            className="cursor-pointer"
+                                        >
+                                            <LogOut className="w-4 h-4 mr-2" />
+
+                                            <div className="flex flex-col">
+                                                <span>Cerrar Sesión</span>
+                                            </div>
+                                        </DropdownMenuItem>
+                                    </>
+                                ) : (
+                                    /* Iniciar sesión */
+                                    <DropdownMenuItem
+                                        onClick={() => setLoginOpen(true)}
+                                        className="cursor-pointer"
+                                    >
+                                        <User className="w-4 h-4 mr-2" />
+
+                                        <div className="flex flex-col">
+                                            <span>Iniciar Sesión</span>
+                                        </div>
+                                    </DropdownMenuItem>
+                                )}
+
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

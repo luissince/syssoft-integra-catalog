@@ -1,22 +1,30 @@
 // lib/auth.ts
 
-import { fetchValidateConsumer } from "@/data/data-rest";
+import { fetchGetToken, fetchValidateConsumer } from "@/data/data-rest";
 import { Person } from "@/types/api-type";
 import { cookies } from "next/headers";
 
 export async function getCurrentSession(): Promise<Person | null> {
+    try {
+        // Obtener el JWT de Express almacenado dentro
+        // del JWT de NextAuth       
+        const token = await fetchGetToken(cookies().toString());
 
-    const cookieStore = cookies();
+        if (!token.success || !token.data) {
+            return null;
+        }
 
-    if (!cookieStore) {
+        const accessToken = token.data.accessToken;
+
+        const { success, data } = await fetchValidateConsumer(accessToken);
+
+        if (!success || !data) {
+            return null;
+        }
+
+        return data;
+    } catch (error) {
+        console.error("getCurrentSession ERROR", error);
         return null;
     }
-
-    const { success, data } = await fetchValidateConsumer(cookieStore.toString());
-
-    if (!success) {
-        return null;
-    }
-
-    return data!;
 }
