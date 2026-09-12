@@ -1,0 +1,158 @@
+name: SysSoftIntegra Catalog Deploy
+
+on:
+  push:
+    branches:
+      - test
+      - master
+      - preview
+
+  workflow_dispatch:
+
+jobs:
+
+  # ============================================================
+  # PREPARE
+  # ============================================================
+
+  prepare:
+    name: Prepare deployment
+    runs-on: ubuntu-latest
+
+    outputs:
+      environment: ${{ steps.config.outputs.environment }}
+      repository: ${{ steps.config.outputs.repository }}
+      clients: ${{ steps.config.outputs.clients }}
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+      # --------------------------------------------------------
+      # READ CONFIGURATION
+      # --------------------------------------------------------
+
+      - name: Read deployment configuration
+        shell: bash
+        run: |
+
+          echo "🔎 Reading deployment configuration..."
+
+          CONFIG="deploy/config.yml"
+
+          if [ ! -f "$CONFIG" ]; then
+            echo "❌ Configuration file not found: $CONFIG"
+            exit 1
+          fi
+
+
+      # --------------------------------------------------------
+      # DETERMINE ENVIRONMENT FROM BRANCH
+      # --------------------------------------------------------
+
+      - name: Determine environment
+        id: environment
+        shell: bash
+        run: |
+
+          BRANCH="${GITHUB_REF_NAME}"
+
+          echo "Branch: $BRANCH"
+
+
+          case "$BRANCH" in
+
+            test)
+              ENVIRONMENT="test"
+              ;;
+
+            preview)
+              ENVIRONMENT="preview"
+              ;;
+
+            master)
+              ENVIRONMENT="production"
+              ;;
+
+            *)
+              echo "❌ Unsupported branch: $BRANCH"
+              exit 1
+              ;;
+
+          esac
+
+
+          echo "Environment: $ENVIRONMENT"
+
+          echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
+
+
+      # --------------------------------------------------------
+      # INSTALL YQ
+      # --------------------------------------------------------
+
+      - name: Install yq
+        shell: bash
+        run: |
+
+          sudo wget -q \
+            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 \
+            -O /usr/local/bin/yq
+
+          sudo chmod +x /usr/local/bin/yq
+
+
+      # --------------------------------------------------------
+      # LOAD CONFIGURATION
+      # --------------------------------------------------------
+
+      - name: Load deployment configuration
+        id: config
+        shell: bash
+        run: |
+
+          ENVIRONMENT="${{ steps.environment.outputs.environment }}"
+          CONFIG="deploy/config.yml"
+
+          echo "Environment: $ENVIRONMENT"
+
+
+          # ----------------------------------------------------
+          # GET ECR REPOSITORY
+          # ----------------------------------------------------
+
+          # REPOSITORY=$(yq -r ".repositories.${ENVIRONMENT}" "$CONFIG")
+          REPOSITORY=$(yq -r ".repositories" "$CONFIG")
+
+
+          if [ "$REPOSITORY" = "null" ] || [ -z "$REPOSITORY" ]; then
+            echo "❌ Repository not configured for $ENVIRONMENT"
+            exit 1
+          fi
+
+
+          # ----------------------------------------------------
+          # GET CLIENTS
+          # ----------------------------------------------------
+
+          CLIENTS=$(yq -r \
+            ".clients | to_entries | map(select(.value.deploy == \"${ENVIRONMENT}\")) | map(.key) | @json" \
+            "$CONFIG")
+
+
+          if [ "$CLIENTS" = "[]" ]; then
+            echo "❌ No clients configured for $ENVIRONMENT"
+            exit 1
+          fi
+
+
+          echo "Repository: $REPOSITORY"
+          echo "Clients: $CLIENTS"
+
+
+          echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
+          echo "repository=$REPOSITORY" >> "$GITHUB_OUTPUT"
+          echo "clients=$CLIENTS" >> "$GITHUB_OUTPUT"
+

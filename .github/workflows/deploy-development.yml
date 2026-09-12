@@ -1,9 +1,10 @@
 name: Docker Image CI - SysSoftIntegra Catalog Development
 
 on:
-  push:
-    branches: 
-      - "test"
+  workflow_dispatch:
+  # push:
+  #   branches: 
+  #     - "test"
 
 jobs:
   build-and-push:

@@ -1,9 +1,11 @@
 name: Docker Image CI - SysSoftIntegra Catalog Production
 
+
 on:
-  push:
-    branches: 
-      - "master"
+  workflow_dispatch:
+  # push:
+  #   branches: 
+  #     - "master"
 
 jobs:
   build-and-push:
@@ -122,7 +124,7 @@ jobs:
 
       - name: Delete old images from ECR
         run: |
-          REPO="syssoftintegra/catalog-development"
+          REPO="syssoftintegra/catalog-production"
           ENV="${{ matrix.environment }}"
           TAG="${ENV}-latest"
 
