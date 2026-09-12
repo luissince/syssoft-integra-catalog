@@ -1,3 +1,8 @@
+# branchs:
+  # test
+  # production
+  # preview
+
 repositories: syssoftintegra/catalog
 
 clients:
@@ -12,4 +17,4 @@ clients:
 
   importmuneli:
     service: importmuneli-services
-    deploy: production
+    deploy: preview
