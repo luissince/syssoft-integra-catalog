@@ -201,16 +201,16 @@ export default function ContactComponent({ branches }: Props) {
                 <div className="flex items-start gap-4">
                   <Building2 className="h-6 w-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-medium">{branch.name}</h3>
-                    <p className="text-muted-foreground">{branch.schedule}</p>
+                    <h3 className="text-sm font-medium uppercase">{branch.name}</h3>
+                    <p className="text-sm text-muted-foreground">{branch.schedule}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <MapPin className="h-6 w-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-medium">Dirección</h3>
-                    <p className="text-muted-foreground">{branch.address}</p>
+                    <h3 className="text-sm font-medium uppercase">Dirección</h3>
+                    <p className="text-sm text-muted-foreground">{branch.address}</p>
                     <a
                       href={branch.mapUrl}
                       target="_blank"
@@ -225,16 +225,16 @@ export default function ContactComponent({ branches }: Props) {
                 <div className="flex items-start gap-4">
                   <Mail className="h-6 w-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-medium">Email</h3>
-                    <p className="text-muted-foreground">{branch.email}</p>
+                    <h3 className="text-sm font-medium uppercase">Email</h3>
+                    <p className="text-sm text-muted-foreground">{branch.email}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <Phone className="h-6 w-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-medium">Teléfono</h3>
-                    <p className="text-muted-foreground">{branch.phone}</p>
+                    <h3 className="text-sm font-medium uppercase">Teléfono</h3>
+                    <p className="text-sm text-muted-foreground">{branch.phone}</p>
                   </div>
                 </div>
               </TabsContent>
