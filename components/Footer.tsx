@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Branch, Company, Whatsapp } from "@/types/api-type";
 import Container from "./Container";
 import { useWhatsApp } from "@/context/WhatsAppContext";
+import { APP_COMMIT, APP_VERSION } from "@/lib/version";
 
 interface FooterProps {
   company: Company;
@@ -200,8 +201,10 @@ export default function Footer({ company, branch }: FooterProps) {
           <div className="text-sm text-muted-foreground mb-4 md:mb-0">
             © {new Date().getFullYear()} {company.name}. Todos los derechos reservados.
           </div>
-          <div className="flex items-center space-x-2">
+
+          <div className="flex items-center space-x-1">
             <div className="text-sm text-muted-foreground">Creado por</div>
+
             <a
               href="https://www.syssoftintegra.com/"
               className="text-sm font-bold text-foreground hover:text-primary transition-colors"
@@ -210,6 +213,10 @@ export default function Footer({ company, branch }: FooterProps) {
             >
               @SysSoft Integra
             </a>
+          </div>
+
+          <div className="text-xs text-muted-foreground">
+            v{APP_VERSION} · {APP_COMMIT.slice(0, 7)}
           </div>
         </div>
       </Container>
