@@ -1,3 +1,4 @@
+# docker-compose.build.yml
 x-service-template: &catalog-service
   build:
     context: .

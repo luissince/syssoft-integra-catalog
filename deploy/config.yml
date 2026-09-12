@@ -1,0 +1,15 @@
+repositories: syssoftintegra/catalog
+
+clients:
+
+  sysintegra:
+    service: sysintegra-services
+    deploy: test
+
+  leatsac:
+    service: leatsac-services
+    deploy: production
+
+  importmuneli:
+    service: importmuneli-services
+    deploy: production
