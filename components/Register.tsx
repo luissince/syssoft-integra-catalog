@@ -143,7 +143,7 @@ export default function RegisterComponent({ listTypeDocument }: RegisterCardProp
       />
 
       {/* Body */}
-      <div className="w-full flex items-center justify-center py-4 lg:py-6">
+      <div className="w-full flex items-center justify-center py-2 lg:py-4">
         <form className="space-y-4 w-full lg:w-2/4" onSubmit={handleRegister}>
           {/* Document type */}
           <div>

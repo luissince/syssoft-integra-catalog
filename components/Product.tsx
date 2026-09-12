@@ -24,8 +24,7 @@ import {
 } from "lucide-react"
 import { useCart } from "@/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import { useAuth } from "@/context/AuthContext"
-import { Branch, Company, Product, Whatsapp } from "@/types/api-type"
+import { Branch, Product, Whatsapp } from "@/types/api-type"
 import { cn, formatCurrency } from "@/lib/utils"
 import { MenuCard } from "./MenuCard"
 import { Label } from "./ui/label"
@@ -101,12 +100,16 @@ function ProductImageGallery({
   return (
     <>
       {/* Imagen principal */}
-      <div className="relative aspect-square rounded-xl overflow-hidden mb-4 group">
+      <div className="relative w-full min-w-0 aspect-square overflow-hidden rounded-xl mb-4 group">
         <Image
           src={currentImage.url}
           alt={productName}
           fill
-          className={cn("object-cover", outOfStock ? "opacity-90" : "")}
+          sizes="100%"
+          className={cn(
+            "object-contain p-[10%]",
+            outOfStock ? "opacity-90" : ""
+          )}
           priority
         />
 
@@ -295,16 +298,14 @@ function ProductImageGallery({
 export default function ProductComponent({ product, relatedProducts, authEnabled }: PropsProductComponent) {
   const params = useParams()
   const router = useRouter()
+
   const { currency } = useCurrency()
   const { addToCart } = useCart()
-  const { isAuthenticated } = useAuth()
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { toast } = useToast()
-
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState("")
   const [isWishlisted, setIsWishlisted] = useState(isInWishlist?.(product.idProduct) || false)
-
 
   if (!params.id) {
     router.push("/")
@@ -314,7 +315,6 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
   // Determinar el estado de stock
   const isOutOfStock = (product.typeProduct?.id !== TYPE_PRODUCT.SERVICE.id) && product.stock === 0
   const isLowStock = product.typeProduct?.id !== TYPE_PRODUCT.SERVICE.id && product.stock > 0 && product.stock <= 5
-
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change
     if (newQuantity >= 1 && (product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id || newQuantity <= product.stock)) {
@@ -418,62 +418,67 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
         {/* Información del plato */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{product.name}</h1>
-            <p className="text-muted-foreground text-base leading-relaxed">{product.description}</p>
+            <h1 className="text-xl lg:text-2xl font-bold text-foreground">{product.name}</h1>
+            <p className="text-muted-foreground text-sm lg:text-base leading-relaxed">{product.description}</p>
           </div>
 
           {/* Precio */}
           <div className="flex items-center gap-3 py-2">
-            <span className="text-blue-600 font-bold text-xl">
+            <span className="text-blue-600 font-bold text-base lg:text-xl">
               {formatCurrency(product.price, currency!.code)} x {product.measure?.name}
             </span>
           </div>
 
           {/* Estado de disponibilidad */}
           <div className="py-4 border-t border-b space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground w-32">Categoría:</span>
-              <span>{product.category?.name}</span>
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2">
+              <span className="text-sm text-muted-foreground w-32">Código:</span>
+              <span className="text-sm lg:text-base">{product.code}</span>
             </div>
-            <div className="flex items-center gap-2">
+
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2">
+              <span className="text-sm text-muted-foreground w-32">Sku:</span>
+              <span className="text-sm lg:text-base">{product.sku}</span>
+            </div>
+
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2">
+              <span className="text-sm text-muted-foreground w-32">Código de Barras:</span>
+              <span className="text-sm lg:text-base">{product.codeBar}</span>
+            </div>
+
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2">
+              <span className="text-sm text-muted-foreground w-32">Categoría:</span>
+              <span className="text-sm lg:text-base">{product.category?.name}</span>
+            </div>
+
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2">
               <span className="text-sm text-muted-foreground w-32">Disponibilidad:</span>
               {product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
-                <span className="text-blue-600 font-medium flex items-center">
+                <span className="text-blue-600 font-medium flex items-center text-sm lg:text-base">
                   <AlertCircle className="h-4 w-4 mr-1" />
                   Siempre disponible
                 </span>
               ) : isOutOfStock ? (
-                <span className="text-destructive font-medium flex items-center">
+                <span className="text-destructive font-medium flex items-center text-sm lg:text-base">
                   <AlertCircle className="h-4 w-4 mr-1" />
                   No disponible
                 </span>
               ) : isLowStock ? (
-                <span className="text-amber-600 font-medium flex items-center">
+                <span className="text-amber-600 font-medium flex items-center text-sm lg:text-base">
                   <AlertCircle className="h-4 w-4 mr-1" />
                   ¡Últimas {product.stock} porciones!
                 </span>
               ) : (
-                <span className="text-green-600 font-medium flex items-center">
+                <span className="text-green-600 font-medium flex items-center text-sm lg:text-base">
                   <AlertCircle className="h-4 w-4 mr-1" />
                   Disponible
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
+
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2">
               <span className="text-sm text-muted-foreground w-32">Marca:</span>
-              <span>{product.brand?.name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground w-32">Código:</span>
-              <span>{product.code}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground w-32">Sku:</span>
-              <span>{product.sku}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground w-32">Código de Barras:</span>
-              <span>{product.codeBar}</span>
+              <span className="text-sm lg:text-base">{product.brand?.name}</span>
             </div>
           </div>
 
@@ -483,12 +488,12 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
             <div className="flex flex-col gap-3">
               {
                 authEnabled && (
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Cantidad:</span>
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+                    <p className="font-medium text-sm lg:text-base">Cantidad:</p>
                     <div className="flex items-center space-x-3">
                       {
                         product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
-                          <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                          <span className="w-12 text-center font-semibold text-sm lg:text-base">{quantity}</span>
                         )
                           : (
                             <>
@@ -496,15 +501,16 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleQuantityChange(-1)}
-                                disabled={quantity <= 1}
+                                disabled={quantity <= 1 || isOutOfStock}
                                 className="h-10 w-10 p-0"
                               >
                                 <Minus className="w-4 h-4" />
                               </Button>
-                              <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                              <span className="w-12 text-center font-semibold text-sm lg:text-base">{quantity}</span>
                               <Button
                                 size="sm"
                                 variant="outline"
+                                disabled={isOutOfStock}
                                 onClick={() => handleQuantityChange(1)}
                                 className="h-10 w-10 p-0"
                               >
@@ -538,7 +544,6 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
                 authEnabled && (
                   <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <Button
-                      size="lg"
                       className="w-full"
                       disabled={isOutOfStock}
                       onClick={handleAddToCart}
@@ -548,7 +553,6 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
                     </Button>
                     <Button
                       variant="outline"
-                      size="lg"
                       className="w-full"
                       disabled={isOutOfStock}
                       onClick={handleBuyNow}
@@ -601,7 +605,7 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
             <div className="flex flex-col md:flex-row md:justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
               <div className="w-full md:w-auto flex flex-row md:flex-col justify-between items-center md:items-start">
                 <div className="text-sm text-muted-foreground">Total</div>
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-xl lg:text-2xl font-bold text-primary">
                   {formatCurrency(product.price * quantity, currency!.code)}
                 </div>
               </div>
@@ -675,8 +679,8 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
       {/* Platos relacionados */}
       {relatedProducts.length > 0 && (
         <div className="mt-20">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold">También te puede gustar</h2>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-3">
+            <h2 className="text-xl lg:text-2xl font-bold">También te puede gustar</h2>
             <button
               onClick={() => router.push("/")}
               className="flex items-center text-primary text-sm font-medium hover:underline"
@@ -690,8 +694,6 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
               <MenuCard
                 key={item.idProduct}
                 item={item}
-                onAddToCart={addToCart}
-                currency={currency}
                 authEnabled={authEnabled}
               />
             ))}
