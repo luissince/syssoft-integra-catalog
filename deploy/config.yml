@@ -3,7 +3,7 @@
 # branchs:
   # test
   # production
-  # preview
+  # canary
 
 repositories: syssoftintegra/catalog
 
@@ -19,4 +19,4 @@ clients:
 
   importmuneli:
     service: importmuneli-services
-    deploy: preview
+    deploy: canary

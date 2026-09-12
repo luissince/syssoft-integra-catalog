@@ -5,7 +5,7 @@ on:
     branches:
       - test
       - master
-      - preview
+      - canary
 
   workflow_dispatch:
 
@@ -68,8 +68,8 @@ jobs:
               ENVIRONMENT="test"
               ;;
 
-            preview)
-              ENVIRONMENT="preview"
+            canary)
+              ENVIRONMENT="canary"
               ;;
 
             master)
