@@ -23,11 +23,23 @@ Catálogo web construido con **Next.js 14 (App Router)** que consume la API del 
 Crea un archivo `.env.local` en la raíz:
 
 ```env
+# APP_BACK_END="http://localhost:5002"
 APP_BACK_END="http://localhost:5002"
+
+# NEXT_PUBLIC_APP_BACK_END="http://localhost:5002"
 NEXT_PUBLIC_APP_BACK_END="http://localhost:5002"
+
+# true active login, false desactive login
 AUTH_ENABLED=false
+
+# development or production
 NEXT_PUBLIC_ENV=development
-ENV=development
+
+# NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="http://localhost:3000"
+
+# NEXTAUTH_SECRET="secret"
+NEXTAUTH_SECRET="secret"
 ````
 
 **Qué hace cada una:**
@@ -36,6 +48,7 @@ ENV=development
 * `NEXT_PUBLIC_APP_BACK_END`: Base URL para peticiones **del cliente** (expuesta).
 * `AUTH_ENABLED`: Activan o desactivan autenticación (server/client).
 * `ENV` / `NEXT_PUBLIC_ENV`: Modo de ejecución/etiquetado del entorno.
+* `NEXTAUTH_URL` / `NEXTAUTH_SECRET`: Configuración de `next-auth`.
 
 > En producción usa HTTPS y dominio real en `*_APP_BACK_END`.
 
