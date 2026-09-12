@@ -57,15 +57,15 @@ export default function Nav({ company, branch, person }: NavProps) {
         <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
             <Container>
                 <div className="flex items-center justify-between">
-                    <div className="w-24">
+                    <div className="w-16 lg:w-24">
                         <Image
                             src={company.logo || "/placeholder.svg"}
                             alt={company.name}
                             width={100}
                             height={50}
-                            className="w-full h-auto"
+                            className="w-full h-auto cursor-pointer"
+                            onClick={() => router.push("/")}
                         />
-
                     </div>
                     {/* Desktop */}
                     <div className="hidden lg:flex items-center space-x-2 md:space-x-4 text-sm">

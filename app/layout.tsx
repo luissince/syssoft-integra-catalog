@@ -18,6 +18,7 @@ import Nav from "@/components/Nav"
 import Footer from "@/components/Footer"
 import { WhatsAppProvider } from "@/context/WhatsAppContext";
 import AuthSyncProvider from "@/components/AuthSyncProvider";
+import CartButton from "@/components/CartButton";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -135,6 +136,7 @@ export default async function RootLayout({
                         />
                       </div>
                       <Toaster />
+                      <CartButton />
                       <WhatsAppButton
                         company={company}
                       />

@@ -56,10 +56,10 @@ export default function HeroBanner({
             <div className="container mx-auto px-4 relative z-10">
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div className="flex flex-col gap-4">
-                        <h1 className="text-2xl md:text-4xl font-bold font-display">
+                        <h1 className="text-3xl md:text-4xl font-bold font-display">
                             <span className="text-primary drop-shadow-sm">{company.name}</span>
                         </h1>
-                        <p className="text-muted-foreground text-lg leading-relaxed drop-shadow-sm">
+                        <p className="text-muted-foreground text-base lg:text-lg leading-relaxed drop-shadow-sm">
                             {company.information}
                         </p>
                     </div>
