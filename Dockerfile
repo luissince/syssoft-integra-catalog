@@ -13,6 +13,16 @@ RUN npm ci
 # Copiar archivos
 COPY . .
 
+# ============================================
+# Información de versión
+# ============================================
+
+ARG NEXT_PUBLIC_APP_VERSION
+ARG NEXT_PUBLIC_APP_COMMIT
+
+ENV NEXT_PUBLIC_APP_VERSION=$NEXT_PUBLIC_APP_VERSION
+ENV NEXT_PUBLIC_APP_COMMIT=$NEXT_PUBLIC_APP_COMMIT
+
 # Compilar
 RUN npm run build
 

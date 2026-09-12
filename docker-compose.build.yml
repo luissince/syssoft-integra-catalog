@@ -3,6 +3,9 @@ x-service-template: &catalog-service
   build:
     context: .
     dockerfile: Dockerfile
+    args:
+      NEXT_PUBLIC_APP_VERSION: ${NEXT_PUBLIC_APP_VERSION}
+      NEXT_PUBLIC_APP_COMMIT: ${NEXT_PUBLIC_APP_COMMIT}
 
 services:
   sysintegra-services:
