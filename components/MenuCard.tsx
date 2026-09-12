@@ -115,17 +115,17 @@ export function MenuCard({ item, authEnabled }: MenuCardProps) {
 
           {/* Precio y botón (altura fija) */}
           {authEnabled && (
-            <div className="flex items-center justify-between gap-2 mt-auto">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2 mt-auto">
               <div className="text-muted-foreground font-bold text-base">
                 {formatCurrency(item.price, currency.code)}
                 {item.measure?.name && <small className="text-xs"> x {item.measure.name}</small>}
               </div>
-              <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+              <div className="w-full lg:w-auto flex lg:justify-end" onClick={(e) => e.stopPropagation()}>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
                       size="sm"
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4"
+                      className="w-full lg:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4"
                     >
                       Agregar
                     </Button>
