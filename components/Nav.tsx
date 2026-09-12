@@ -57,13 +57,13 @@ export default function Nav({ company, branch, person }: NavProps) {
         <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
             <Container>
                 <div className="flex items-center justify-between">
-                    <div className="w-16 lg:w-24">
+                    <div className="flex h-16 w-28 items-center lg:h-20 lg:w-36">
                         <Image
                             src={company.logo || "/placeholder.svg"}
                             alt={company.name}
-                            width={100}
-                            height={50}
-                            className="w-full h-auto cursor-pointer"
+                            width={112}
+                            height={56}
+                            className="max-h-full max-w-full object-contain cursor-pointer"
                             onClick={() => router.push("/")}
                         />
                     </div>
