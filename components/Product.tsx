@@ -160,7 +160,7 @@ function ProductImageGallery({
 
       {/* Miniaturas */}
       {safeImages.length > 1 && (
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           {safeImages.map((image, index) => (
             <button
               key={index}
