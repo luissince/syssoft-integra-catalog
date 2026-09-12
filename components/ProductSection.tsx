@@ -35,14 +35,12 @@ interface Props {
     setSelectedCategory: (category: string) => void;
 
     products: Product[];
-    
+
     searchQuery: string;
     itemsPerPage: number;
     totalProducts: number;
 
     authEnabled: boolean;
-    currency: any;
-    cart: any[];
 
     setSearchQuery: (value: string) => void;
     clearSearch: () => void;
@@ -50,29 +48,20 @@ interface Props {
     changeItemsPerPage: (value: number) => void;
 
     loadMoreItems: () => void;
-
-    addToCart: (item: any) => void;
-    updateQuantity: (id: string, value: number) => void;
-    removeFromCart: (id: string) => void;
-
-    router: any;
 }
 
 export default function ProductSection({
     categories,
     selectedCategory,
+    setSelectedCategory,
 
     products,
+
     searchQuery,
-
-    authEnabled,
-    currency,
-    cart,
-
     itemsPerPage,
     totalProducts,
 
-    setSelectedCategory,
+    authEnabled,
 
     setSearchQuery,
     clearSearch,
@@ -80,12 +69,6 @@ export default function ProductSection({
     changeItemsPerPage,
 
     loadMoreItems,
-
-    addToCart,
-    updateQuantity,
-    removeFromCart,
-
-    router,
 }: Props) {
 
     return (
@@ -95,7 +78,7 @@ export default function ProductSection({
                     <div className="flex-1">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-4">
                             <div>
-                                <h2 className="text-3xl font-bold text-foreground">
+                                <h2 className="text-xl lg:text-2xl font-bold text-foreground">
                                     {categories.find((cat) => cat.id === selectedCategory)?.name || "Todos los productos"}
                                 </h2>
                                 <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 mt-2">
@@ -223,8 +206,6 @@ export default function ProductSection({
                                 <MenuCard
                                     key={item.idProduct}
                                     item={item}
-                                    onAddToCart={addToCart}
-                                    currency={currency}
                                     authEnabled={authEnabled}
                                 />
                             ))}
@@ -241,13 +222,8 @@ export default function ProductSection({
                     </div>
 
                     {authEnabled && (
-                        <div className="w-full max-w-sm hidden lg:block">
-                            <CartList
-                                cart={cart}
-                                onUpdateQuantity={updateQuantity}
-                                onRemoveItem={removeFromCart}
-                                onCheckout={() => router.push("/checkout")}
-                            />
+                        <div className="w-full max-w-md hidden lg:block">
+                            <CartList />
                         </div>
                     )}
                 </div>

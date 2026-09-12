@@ -9,10 +9,6 @@ import {
     Product
 } from "@/types/api-type";
 
-import { useCart } from "@/context/CartContext";
-import { useRouter } from "next/navigation";
-import { useCurrency } from "@/context/CurrencyContext";
-
 import HeroBanner from "./HeroBanner";
 import ProductSection from "./ProductSection";
 
@@ -37,9 +33,6 @@ export default function HomeComponent({
     initialProducts,
     authEnabled = false
 }: HomeComponentProps) {
-
-    const router = useRouter();
-
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
     const [loading, setLoading] = useState(false);
 
@@ -51,9 +44,6 @@ export default function HomeComponent({
 
     const [itemsPerPage, setItemsPerPage] = useState(6);
     const [offset, setOffset] = useState(initialProducts.data.length);
-
-    const { cart, updateQuantity, removeFromCart, addToCart } = useCart();
-    const { currency } = useCurrency();
 
     // Banner
     useEffect(() => {
@@ -194,21 +184,12 @@ export default function HomeComponent({
                     totalProducts={totalProducts}
 
                     authEnabled={authEnabled}
-                    currency={currency}
-
-                    cart={cart}
 
                     setSearchQuery={setSearchQuery}
                     clearSearch={clearSearch}
 
                     changeItemsPerPage={changeItemsPerPage}
                     loadMoreItems={loadMoreItems}
-
-                    addToCart={addToCart}
-                    updateQuantity={updateQuantity}
-                    removeFromCart={removeFromCart}
-
-                    router={router}
                 />
             )}
         </>

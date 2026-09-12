@@ -15,16 +15,20 @@ import { useToast } from "@/hooks/use-toast"
 import { Currency, Product } from "@/types/api-type"
 import { TYPE_PRODUCT } from "@/constants/type-product"
 import { formatCurrency } from "@/lib/utils"
+import { useCurrency } from "@/context/CurrencyContext"
+import { useCart } from "@/context/CartContext"
 
 interface MenuCardProps {
   item: Product;
-  onAddToCart: (item: Product, quantity: number, notes?: string) => void;
-  currency: Currency;
   authEnabled: boolean;
 }
 
-export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardProps) {
+export function MenuCard({ item, authEnabled }: MenuCardProps) {
+
   const router = useRouter()
+  const { addToCart } = useCart();
+  const { currency } = useCurrency();
+
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -36,7 +40,7 @@ export function MenuCard({ item, onAddToCart, currency, authEnabled }: MenuCardP
       description: item.name,
       variant: "default",
     })
-    onAddToCart(item, quantity, notes)
+    addToCart(item, quantity, notes)
     setQuantity(1)
     setNotes("")
     setIsDialogOpen(false)
