@@ -59,10 +59,10 @@ export default function Footer({ company, branch }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           {/* Restaurant Info */}
           <div className="col-span-1 md:col-span-6">
-            <div className="text-2xl font-bold mb-4">
-              <span className="text-foreground">{company.name}</span>
+            <div className="mb-4">
+              <span className="text-xl lg:text-2xl font-bold text-foreground">{company.name}</span>
             </div>
-            <p className="text-muted-foreground mb-2 leading-relaxed">
+            <p className="text-sm lg:text-base text-muted-foreground mb-2 leading-relaxed">
               {company.information}
             </p>
             {/* Botones de contacto principales */}
