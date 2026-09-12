@@ -1,28 +1,45 @@
+// components/admin.tsx
+
 import AdminComponent from "@/components/AdminPanel";
-import Welcome from "@/components/Welcome";
-import { getAllOrder, getBranches, getCategories, getCompanyInfo, getListTypeDocument } from "@/lib/api";
-import { Suspense } from "react";
+import { fetchAllOrder } from "@/data/data-rest";
+import {
+    getCompanyInfo,
+    getListTypeDocument
+} from "@/lib/api";
+import { getCurrentSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function Component() {
-    const company = await getCompanyInfo();
-    const branches = await getBranches();
-    const categories = await getCategories();
-    const listTypeDocument = await getListTypeDocument();
-    const orders = await getAllOrder();
+    const person = await getCurrentSession();
 
-    const branch = branches.find((branch) => branch.primary === true)!;
-    const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
+    if (person === null) {
+        return redirect("/");
+    }
+
+    const [
+        company,
+        listTypeDocument,
+        orders
+    ] = await Promise.all([
+        getCompanyInfo(),
+        getListTypeDocument(),
+        fetchAllOrder({
+            opcion: 3,
+            buscar: person.idPerson, posicionPagina: 0,
+            filasPorPagina: 5
+        })
+    ]);
+
+    if (!orders.success) {
+        throw new Error("No se pudo obtener los pedidos");
+    }
 
     return (
-        <Suspense fallback={<Welcome company={company} branch={branch} />}>
-            <AdminComponent
-                company={company}
-                branch={branch}
-                categories={categories}
-                listTypeDocument={listTypeDocument}
-                orders={orders}
-                authEnabled={authEnabled}
-            />
-        </Suspense>
+        <AdminComponent
+            company={company}
+            listTypeDocument={listTypeDocument}
+            initialOrders={orders.data!}
+            person={person}
+        />
     );
 }

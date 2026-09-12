@@ -1,40 +1,45 @@
+// app/page.tsx
 import { notFound } from "next/navigation";
-import { getBranches, getCategories, getCompanyBanners, getCompanyInfo, getProductsAll, getWhatsappInfo } from "@/lib/api";
+import {
+  getBranches,
+  getCategories,
+  getCompanyBanners,
+  getCompanyInfo,
+} from "@/lib/api";
 import HomeComponent from "@/components/Home";
-import { Suspense } from "react";
-import Welcome from "@/components/Welcome";
+import { fetchProducts } from "@/data/data-rest";
 
 export default async function Home() {
-  const company = await getCompanyInfo();
-  const categories = await getCategories();
-  const banners = await getCompanyBanners();
-  const whatsapp = await getWhatsappInfo();
-  const branches = await getBranches();
-  const products = await getProductsAll();
-
-  const branch = branches.find((branch) => branch.primary === true)!;
+  const [
+    company,
+    categories,
+    banners,
+    branches,
+    products
+  ] = await Promise.all([
+    getCompanyInfo(),
+    getCategories(),
+    getCompanyBanners(),
+    getBranches(),
+    fetchProducts({
+      currentPage: 0,
+      totalPage: 6,
+    }),
+  ]);
 
   const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
-
 
   if (!branches || branches.length === 0) {
     notFound();
   }
 
   return (
-    <Suspense fallback={<Welcome company={company} branch={branch} />}>
-      <HomeComponent
-        company={company}
-        banners={banners}
-        categories={[
-          { id: "", name: "Todos", description: "Todos los productos", image: "" },
-          ...categories
-        ]}
-        whatsapp={whatsapp}
-        branch={branch}
-        initialProducts={products}
-        authEnabled={authEnabled}
-      />
-    </Suspense>
+    <HomeComponent
+      company={company}
+      banners={banners}
+      categories={categories}
+      initialProducts={products}
+      authEnabled={authEnabled}
+    />
   );
 }

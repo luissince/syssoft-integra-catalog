@@ -1,9 +1,10 @@
 name: Docker Image CI - SysSoftIntegra Catalog Development
 
 on:
-  push:
-    branches: 
-      - "test"
+  workflow_dispatch:
+  # push:
+  #   branches: 
+  #     - "test"
 
 jobs:
   build-and-push:
@@ -31,6 +32,8 @@ jobs:
           NEXT_PUBLIC_APP_BACK_END="${{secrets.NEXT_PUBLIC_APP_BACK_END}}"
           AUTH_ENABLED="${{secrets.AUTH_ENABLED}}"
           NEXT_PUBLIC_ENV="${{secrets.NEXT_PUBLIC_ENV}}"
+          NEXTAUTH_SECRET="${{secrets.NEXTAUTH_SECRET}}"
+          NEXTAUTH_URL="${{secrets.NEXTAUTH_URL}}"
           EOL
 
       - name: Build Docker image

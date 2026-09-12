@@ -45,6 +45,7 @@ export interface TypeDelivery {
 
 export interface Product {
   id: string
+  idProduct: string
   code: string
   sku: string
   codeBar: string
@@ -54,17 +55,15 @@ export interface Product {
   price: number
   idCategory: string
   idBrand?: string
-  idMeasurement?: string
+  idMeasure?: string
   image: string
   isNew?: boolean
-  discount: number
   stock: number
-  oldPrice?: number
   idTypeProduct?: string
   typeProduct?: TypeProduct
   brand?: Brand
   category?: Category
-  measurement?: Measurement
+  measure?: Measure
   images?: ProductImage[],
   details?: ProductDetail[],
   colors?: Attribute[],
@@ -72,14 +71,14 @@ export interface Product {
   flavors?: Attribute[],
 }
 
-export interface Measurement {
+export interface Measure {
   id: string
   name: string
 }
 
 export interface Category {
   id: string
-  name: string
+  name?: string
   description?: string
   image?: string
 }
@@ -133,7 +132,8 @@ export interface CompanyBanner {
 }
 
 export interface Branch {
-  id: string
+  id: number
+  idBranch: string
   name: string
   address: string
   email: string
@@ -148,7 +148,7 @@ export interface Branch {
 export interface Tax {
   idTax?: string,
   name: string,
-  percentage: number,
+  rate: number,
   prefered: boolean,
 }
 
@@ -176,12 +176,12 @@ export interface Whatsapp {
 }
 
 export type FilterOptions = {
-  categories: Category[]
-  priceRange: [number, number]
-  brands: Brand[]
-  colors: Attribute[],
-  sizes: Attribute[],
-  flavors: Attribute[],
+  categories?: Category[]
+  priceRange?: [number, number]
+  brands?: Brand[]
+  colors?: Attribute[],
+  sizes?: Attribute[],
+  flavors?: Attribute[],
 }
 
 export type Consult = {
@@ -204,15 +204,15 @@ export interface Wishlist extends Product {
 }
 
 export interface Person {
-  idPerson: string
+  idPerson?: string
   idTypeDocument?: string
   document: string
   information: string
-  cellular: string
-  phone: string
-  email: string
+  phonerNumber: string
+  mobileNumber: string
+  email?: string
   clave?: string
-  address: string
+  address?: string
 
   typePerson?: TypePerson
   typeDocument?: TypeDocument
@@ -223,13 +223,37 @@ export interface Receipt {
   name: string;
   series: string;
   number: number;
-  code: string;
+  code?: string;
+}
+
+export interface Agency {
+  idAgency: number
+  name: string
+  description: string
+  status: boolean
+}
+
+export interface OrderShipping {
+  id: number
+  idOrderShipping: string
+  idOrder: string
+  address: string
+  reference: string
+  idBranch: string
+  date: string
+  time: string
+  idAgency: string
+  destination: string
+  receiver: string
+  
+  agency?: Agency
+  branch?: Branch
 }
 
 export interface OrderDetail {
   id: number
   product: Product
-  measurement: Measurement
+  measure: Measure
   category: Category
   price: number
   quantity: number
@@ -237,23 +261,37 @@ export interface OrderDetail {
   tax: Tax
 }
 
+export interface typeOrder {
+  id?: number
+  idTypeOrder?: string
+  name: string
+  description?: string
+  staus?: boolean
+}
+
 export interface Order {
   id?: number
   idOrder?: string
+  typeOrder?: typeOrder
   receipt?: Receipt
   person: Person
   date: string
   time: string
   series: string
   numbering: string
-  status: "pending" | "preparing" | "ready" | "delivered" | "cancelled"
+  status: number
   observations: string
   notes: string
-  instructions: string
-  idTypeDelivery: string
-  typeDelivery: TypeDelivery
-  scheduledDate: string
-  scheduledTime: string
   currency: Currency
-  orderDetails: OrderDetail[]
+  branch?: Branch
+  orderShipping?: OrderShipping
+  orderDetails: OrderDetail[],
+  total: number
 }
+
+export type ApiResult<T> = {
+  success: boolean;
+  status: number;
+  data?: T;
+  message?: string;
+};

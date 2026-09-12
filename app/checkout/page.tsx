@@ -1,29 +1,52 @@
-import { getBranches, getCompanyInfo, getListTypeDocument, getTaxes } from "@/lib/api";
+// pages/checkout.tsx
+
+import { getBranches } from "@/lib/api";
 import CheckoutComponent from "@/components/Checkout";
-import { Suspense } from "react";
-import Welcome from "@/components/Welcome";
+import { notFound, redirect } from "next/navigation";
+import { getCurrentSession } from "@/lib/auth";
+import { fetchAgencies, fetchPaymentReceipts, fetchTaxes } from "@/data/data-rest";
 
 export default async function CheckoutPage() {
-    const company = await getCompanyInfo();
-    const branches = await getBranches();
-    const taxes = await getTaxes();
-    const listTypeDocument = await getListTypeDocument();
+    const person = await getCurrentSession();
+
+    if (person === null) {
+        return redirect("/register");
+    }
+
+    const [taxes, branches, agencies] = await Promise.all([
+        fetchTaxes(),
+        getBranches(),
+        fetchAgencies(),
+    ]);
+
+    if (!taxes || taxes.length === 0) {
+        throw new Error("No se pudo obtener los impuestos");
+    }
+
+    if (!branches || branches.length === 0) {
+        throw new Error("No se pudo obtener las sucursales");
+    }
+
+    if (!agencies.success) {
+        throw new Error("No se pudo obtener las agencias");
+    }
 
     const branch = branches.find((branch) => branch.primary === true)!;
-    const tax = taxes.find((tax) => tax.prefered === true)!;
 
-    const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
+    const receipts = await fetchPaymentReceipts(branch.idBranch);
+
+    if (!receipts || receipts.length === 0) {
+        throw new Error("No se pudo obtener los comprobantes");
+    }
 
     return (
-        <Suspense fallback={<Welcome company={company} branch={branch} />}>
-            <CheckoutComponent
-                listTypeDocument={listTypeDocument}
-                company={company}
-                branch={branch}
-                branches={branches}
-                tax={tax}
-                authEnabled={authEnabled}
-            />
-        </Suspense>
+        <CheckoutComponent
+            taxes={taxes}
+            branch={branch}
+            branches={branches}
+            receipts={receipts}
+            person={person}
+            agencies={agencies.data!}
+        />
     );
 }

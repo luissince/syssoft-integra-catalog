@@ -13,6 +13,17 @@ const config: Config = {
 	],
 	theme: {
 		extend: {
+			fontFamily: {
+				sans: [
+					"var(--font-primary)"
+				],
+				title: [
+					"var(--font-title)"
+				],
+				code: [
+					"var(--font-code)"
+				],
+			},
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',

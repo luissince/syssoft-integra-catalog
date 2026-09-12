@@ -1,8 +1,8 @@
+// pages/product/[id].tsx
+
 import { notFound } from "next/navigation";
-import { getBranches, getCompanyInfo, getProductById, getProductsRelated } from "@/lib/api";
+import { getBranches, getProductById, getProductsRelated, getWhatsappInfo } from "@/lib/api";
 import ProductComponent from "@/components/Product";
-import { Suspense } from "react";
-import Welcome from "@/components/Welcome";
 
 interface ProductDetalleProps {
   params: Promise<{ id: string }>;
@@ -14,23 +14,27 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
 
   // Si no existe el id, mostrar 404
   if (!id) {
-    notFound();
+    return notFound();
   }
 
   // Cargar datos en paralelo para mejor performance
-  const [company, branches, product] = await Promise.all([
-    getCompanyInfo(),
+  const [
+    branches,
+    whatsapp,
+    product
+  ] = await Promise.all([
     getBranches(),
+    getWhatsappInfo(),
     getProductById(id)
   ]);
 
   // Si no existe el producto, mostrar 404
   if (!product) {
-    notFound();
+    return notFound();
   }
 
   // Cargar productos relacionados después de confirmar que el producto existe
-  const relatedProducts = await getProductsRelated(product.id, product.idCategory);
+  const relatedProducts = await getProductsRelated(id, product.idCategory);
 
   const branch = branches.find((branch) => branch.primary === true)!;
 
@@ -38,14 +42,12 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
-    <Suspense fallback={<Welcome company={company} branch={branch} />}>
-      <ProductComponent
-        company={company}
-        branch={branch}
-        product={product}
-        relatedProducts={relatedProducts}
-        authEnabled={authEnabled}
-      />
-    </Suspense>
+    <ProductComponent
+      branch={branch}
+      whatsapp={whatsapp}
+      product={product}
+      relatedProducts={relatedProducts}
+      authEnabled={authEnabled}
+    />
   );
 }

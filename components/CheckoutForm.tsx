@@ -1,7 +1,9 @@
+// components/CheckoutForm.tsx
+
 import React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,105 +15,135 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import type { PaymentMethod } from "@/types";
-import { Branch, Cart, Currency, Tax, TypeDocument } from "@/types/api-type";
+import { Agency, Branch, PaymentReceipt, Person, Tax } from "@/types/api-type";
 import {
   TYPE_DELIVERY,
 } from "@/constants/type-delivery";
 import {
   currentDate,
   formatCurrency,
-  isValidEmail,
-  keyNumberInteger,
-  keyNumberPhone,
   timeSlots,
 } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 import Image from "next/image";
-import { getPaymentReceipts } from "@/lib/api";
 import { useAlert } from "@/hooks/use-alert";
-import { useAuth } from "@/context/AuthContext";
-import { Eye, EyeOff } from "lucide-react";
 import { FormOrder } from "@/types/form";
+import { useCart } from "@/context/CartContext";
+import { useCurrency } from "@/context/CurrencyContext";
+import { Lock } from "lucide-react";
 
 interface CheckoutFormProps {
-  listTypeDocument: TypeDocument[];
+  taxes: Tax[];
+  branch: Branch;
   branches: Branch[];
-  tax: Tax;
-  currency: Currency;
-  cart: Cart[];
-  paymentMethods: PaymentMethod[];
+  receipts: PaymentReceipt[];
+  person: Person;
+  agencies: Agency[];
   onSubmitOrder: (orderData: FormOrder) => void;
-  onBack: () => void;
+}
+
+interface FormDataProps {
+  idTypeDelivery: string;
+
+  idBranch: string;
+
+  orderShipping: {
+    // DELIVERY
+    address: string | null;
+    reference: string | null;
+
+    // RECOJO_LOCAL
+    idBranch: string | null;
+
+    // PROGRAMADO
+    scheduledDate: string | null;
+    scheduledTime: string | null;
+
+    // ENVIO AGENCIA
+    idAgency: string | null;
+    destination: string | null;
+    receiverName: string | null;
+  };
+
+  // Método de pago
+  paymentMethod: string;
+  cardNumber: string;
+  cardExpiry: string;
+  cardCVV: string;
+  cardHolderName: string;
+
+  // Campos para Transferencia Bancaria
+  bankReceipt: File | null;
+
+  // Campos para Billetera Digital (Yape/Plin)
+  walletType: string; // "yape" o "plin"
+  walletReceipt: File | null;
+
+  // Otros
+  orderNotes: string;
 }
 
 export function CheckoutForm({
-  listTypeDocument,
+  taxes,
+  branch,
   branches,
-  tax,
-  currency,
-  cart,
-  paymentMethods,
+  receipts,
+  person,
+  agencies,
   onSubmitOrder,
-  onBack,
 }: CheckoutFormProps) {
-  const isMobile = useIsMobile();
+  const { cart } = useCart();
+  const { currency } = useCurrency();
   const alert = useAlert();
-  const { user } = useAuth();
 
-  const [formData, setFormData] = useState<{
-    idTypeDelivery: string;
-    idTypeDocument: string;
-    document: string;
-    name: string;
-    phone: string;
-    whatsapp: string;
-    scheduledDate: string;
-    scheduledTime: string;
-    address: string;
-    reference: string;
-    email: string;
-    password: string;
-    validationPassword: string;
-    idBranch: string;
-    paymentMethodReference: string;
-    orderNotes: string;
-    instructions: string;
-  }>({
-    idTypeDelivery: TYPE_DELIVERY.DELIVERY_NOW.id,
-    idTypeDocument: "",
-    document: user?.document || "",
-    name: user?.information || "",
-    phone: user?.cellular || "",
-    whatsapp: user?.phone || "",
-    scheduledDate: currentDate(),
-    scheduledTime: "",
-    address: user?.address || "",
-    reference: "",
-    email: user?.email || "",
-    password: "",
-    validationPassword: "",
-    idBranch: "",
-    paymentMethodReference: "",
+  const [formData, setFormData] = useState<FormDataProps>({
+    idTypeDelivery: TYPE_DELIVERY.HOME_DELIVERY.id,
+
+    // Recojo en local
+    idBranch: branch.idBranch,
+
+    orderShipping: {
+      // Envío a domicilio
+      address: null,
+      reference: null,
+
+      // Recojo en local
+      idBranch: null,
+
+      // Entrega programada
+      scheduledDate: null,
+      scheduledTime: null,
+
+      // Envío por agencia
+      idAgency: null,
+      destination: null,
+      receiverName: null,
+    },
+
+    // Método de pago
+    paymentMethod: "",
+    cardNumber: "",
+    cardExpiry: "",
+    cardCVV: "",
+    cardHolderName: "",
+
+    // Campos para Transferencia Bancaria
+    bankReceipt: null,
+
+    // Campos para Billetera Digital (Yape/Plin)
+    walletType: "",
+    walletReceipt: null,
+
+    // Otros
     orderNotes: "",
-    instructions: "",
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showValidationPassword, setShowValidationPassword] = useState(false);
-
-  const refTypeDocument = React.useRef<HTMLButtonElement>(null);
-  const refDocument = React.useRef<HTMLInputElement>(null);
-  const refName = React.useRef<HTMLInputElement>(null);
-  const refPhone = React.useRef<HTMLInputElement>(null);
-  const refEmail = React.useRef<HTMLInputElement>(null);
-  const refPassword = React.useRef<HTMLInputElement>(null);
-  const refValidationPassword = React.useRef<HTMLInputElement>(null);
-  const refWhastapp = React.useRef<HTMLInputElement>(null);
   const refAddress = React.useRef<HTMLInputElement>(null);
   const refBranch = React.useRef<HTMLButtonElement>(null);
   const refScheduledDate = React.useRef<HTMLInputElement>(null);
   const refScheduledTime = React.useRef<HTMLButtonElement>(null);
+  const refAgency = React.useRef<HTMLButtonElement>(null);
+  const refDestination = React.useRef<HTMLInputElement>(null);
+  const refReceiverName = React.useRef<HTMLInputElement>(null);
 
   const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -119,22 +151,10 @@ export function CheckoutForm({
   );
 
   useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      document: user?.document || "",
-      name: user?.information || "",
-      phone: user?.cellular || "",
-      whatsapp: user?.phone || "",
-      address: user?.address || "",
-      email: user?.email || "",
-    }));
-  }, [user]);
-
-  useEffect(() => {
     if (branches.length === 1) {
       setFormData((prev) => ({
         ...prev,
-        idBranch: branches[0].id,
+        idBranch: branches[0].idBranch,
       }));
     }
   }, [branches]);
@@ -142,771 +162,257 @@ export function CheckoutForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const paymentReceipts = await getPaymentReceipts(formData.idBranch);
-
-    const paymentReceipt = paymentReceipts.find(
-      (paymentReceipt) => paymentReceipt.prefered === true
-    );
+    const paymentReceipt = receipts.find((paymentReceipt) => paymentReceipt.prefered === true);
 
     if (!paymentReceipt) {
-      alert.warning(
-        {
-          message:
-            "No se encontró un comprobante preferido para la sucursal seleccionada.",
-        },
-        () => {}
-      );
-      return;
-    }
-
-    if (
-      Object.values(TYPE_DELIVERY).find((t) => t.id === formData.idTypeDelivery)
-        ?.isScheduled &&
-      formData.scheduledDate === ""
-    ) {
-      alert.warning(
-        {
-          message: "Por favor, introduce la fecha de programación.",
-        },
-        () => {
-          refScheduledDate.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (
-      Object.values(TYPE_DELIVERY).find((t) => t.id === formData.idTypeDelivery)
-        ?.isScheduled &&
-      formData.scheduledTime === ""
-    ) {
-      alert.warning(
-        {
-          message: "Por favor, introduce la hora de programación.",
-        },
-        () => {
-          refScheduledTime.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.idTypeDocument === "") {
-      alert.warning(
-        {
-          message: "Por favor, selecciona el tipo de documento.",
-        },
-        () => {
-          refTypeDocument.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.document === "") {
-      alert.warning(
-        {
-          message: "Por favor, introduce el número de documento.",
-        },
-        () => {
-          refDocument.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.name === "") {
-      alert.warning(
-        {
-          message: "Por favor, introduce el nombre.",
-        },
-        () => {
-          refName.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.phone === "") {
-      alert.warning(
-        {
-          message: "Por favor, introduce el número de teléfono.",
-        },
-        () => {
-          refPhone.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.whatsapp === "") {
-      alert.warning(
-        {
-          message: "Por favor, introduce el número de WhatsApp.",
-        },
-        () => {
-          refWhastapp.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (!isValidEmail(formData.email)) {
-      alert.warning(
-        {
-          message: "Por favor, introduce el correo electrónico.",
-        },
-        () => {
-          refEmail.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.password === "") {
-      alert.warning(
-        {
-          message: "Por favor, introduce la contraseña.",
-        },
-        () => {
-          refPassword.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.password !== formData.validationPassword) {
-      alert.warning(
-        {
-          message: "Las contraseñas no coinciden.",
-        },
-        () => {
-          refPassword.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (
-      (formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
-        formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_SCHEDULED.id) &&
-      formData.address === ""
-    ) {
-      alert.warning(
-        {
-          message: "Por favor, introduce la dirección.",
-        },
-        () => {
-          refAddress.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (formData.idBranch === "") {
-      alert.warning(
-        {
-          message: "Por favor, selecciona una sucursal.",
-        },
-        () => {
-          refBranch.current?.focus();
-        }
-      );
-      return;
-    }
-
-    if (currency === null) {
       alert.warning({
-        message: "No se puedo obtener información de la moneda seleccionada.",
+        message:
+          "No se encontró un comprobante preferido para la sucursal, comunique con el administrador.",
       });
       return;
     }
 
-    const orderData: FormOrder = {
-      cliente: {
-        idTipoDocumento: formData.idTypeDocument,
-        documento: formData.document,
-        informacion: formData.name,
-        telefono: formData.phone,
-        celular: formData.whatsapp,
-        email: formData.email,
-        clave: formData.password,
-        direccion: formData.address,
-      },
+    // Envío a domicilio
+    if (TYPE_DELIVERY.HOME_DELIVERY.id === formData.idTypeDelivery && !formData.orderShipping.address) {
+      alert.warning({
+        message: "Por favor, introduce la dirección de entrega.",
+      }, () => {
+        refAddress.current?.focus();
+      });
+      return;
+    }
 
-      idComprobante: paymentReceipt.idPaymentReceipt,
-      idMoneda: currency?.idCurrency!,
+    // Recojo en local
+    if (TYPE_DELIVERY.STORE_PICKUP.id === formData.idTypeDelivery && !formData.orderShipping.idBranch) {
+      alert.warning({
+        message: "Por favor, selecciona el local de recojo.",
+      }, () => {
+        refBranch.current?.focus();
+      });
+      return;
+    }
+
+    // Entrega programada
+    if (TYPE_DELIVERY.SCHEDULED_DELIVERY.id === formData.idTypeDelivery && !formData.orderShipping.scheduledDate) {
+      alert.warning({
+        message: "Por favor, introduce la fecha de programación.",
+      }, () => {
+        refScheduledDate.current?.focus();
+      });
+      return;
+    }
+
+    if (TYPE_DELIVERY.SCHEDULED_DELIVERY.id === formData.idTypeDelivery && !formData.orderShipping.scheduledTime) {
+      alert.warning({
+        message: "Por favor, introduce la hora de programación.",
+      }, () => {
+        refScheduledTime.current?.focus();
+      });
+      return;
+    }
+
+    if (TYPE_DELIVERY.SCHEDULED_DELIVERY.id === formData.idTypeDelivery && !formData.orderShipping.address) {
+      alert.warning({
+        message: "Por favor, introduce la dirección de entrega.",
+      }, () => {
+        refAddress.current?.focus();
+      });
+      return;
+    }
+
+    // Envío por agencia
+    if (TYPE_DELIVERY.SHIPPING_AGENCY.id === formData.idTypeDelivery && !formData.orderShipping.idAgency) {
+      alert.warning({
+        message: "Por favor, introduce el nombre de la agencia.",
+      }, () => {
+        refAgency.current?.focus();
+      });
+      return;
+    }
+
+    if (TYPE_DELIVERY.SHIPPING_AGENCY.id === formData.idTypeDelivery && !formData.orderShipping.destination) {
+      alert.warning({
+        message: "Por favor, introduce el destino.",
+      }, () => {
+        refDestination.current?.focus();
+      });
+      return;
+    }
+
+    if (TYPE_DELIVERY.SHIPPING_AGENCY.id === formData.idTypeDelivery && !formData.orderShipping.receiverName) {
+      alert.warning({
+        message: "Por favor, introduce el nombre del receptor.",
+      }, () => {
+        refReceiverName.current?.focus();
+      });
+      return;
+    }
+
+    const idImpuesto = taxes.find(tax => tax.prefered === true)?.idTax!;
+
+    if (!idImpuesto) {
+      alert.warning({
+        message: "No se encontró un impuesto preferido, comunique con el administrador.",
+      });
+      return;
+    }
+
+    const accept = await alert.question({
+      title: "Aceptar pago",
+      message: "¿Está seguro de que desea de confirmar el pedido?",
+    });
+
+    if (!accept) {
+      return;
+    }
+
+    const orderData: FormOrder = {
+      idTipoPedido: formData.idTypeDelivery,
+      pedidoEnvio: {
+        direccion: formData.orderShipping.address,
+        referencia: formData.orderShipping.reference,
+        idSucursal: formData.orderShipping.idBranch,
+        fechaPedido: formData.orderShipping.scheduledDate,
+        horaPedido: formData.orderShipping.scheduledTime,
+        idAgencia: formData.orderShipping.idAgency,
+        destino: formData.orderShipping.destination,
+        receptor: formData.orderShipping.receiverName,
+      },
       idSucursal: formData.idBranch,
       idUsuario: "US0001",
+      idMoneda: currency.idCurrency!,
+      idComprobante: paymentReceipt.idPaymentReceipt,
+      idCliente: person.idPerson!,
       nota: formData.orderNotes,
-      observacion: "",
-      instruccion: formData.instructions,
-
-      idTipoEntrega: formData.idTypeDelivery,
-      idTipoPedido: Object.values(TYPE_DELIVERY).find(
-        (t) => t.id === formData.idTypeDelivery
-      )?.isScheduled
-        ? "TP0002"
-        : "TP0001",
-      fechaPedido: formData.scheduledDate,
-      horaPedido: formData.scheduledTime,
-
-      entrega:
-        formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
-        formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_SCHEDULED.id
-          ? {
-              email: formData.email,
-              telefono: formData.phone,
-              celular: formData.whatsapp,
-              direccion: formData.address,
-              referencia: formData.reference,
-            }
-          : null,
-
       detalles: cart.map((item) => ({
-        cantidad: item.quantity,
-        codigo: item.code,
-        id: item.id,
-        idImpuesto: tax.idTax!,
-        idMedida: item.measurement?.id!,
-        idProducto: item.id,
-        imagen: item.image,
-        nombre: item.name,
-        nombreImpuesto: "",
-        nombreMedida: "",
-        porcentajeImpuesto: 0,
+        idProducto: item.idProduct,
+        idMedida: item.measure?.id!,
         precio: item.price,
+        cantidad: item.quantity,
+        idImpuesto: idImpuesto,
       })),
-    };
+    }
 
     onSubmitOrder(orderData);
   };
 
-  // const isFormValid =
-  //   formData.document &&
-  //   formData.name &&
-  //   formData.phone &&
-  //   formData.whatsapp &&
-  //   (formData.deliveryType === TYPE_DELIVERY.DELIVERY.id ? formData.address && formData.deliveryZone : true) &&
-  //   formData.paymentMethod &&
-  //   (formData.orderType === "now" || (formData.scheduledDate && formData.scheduledTime))
-
   return (
-    <div className="grid lg:grid-cols-2 gap-8">
+    <form onSubmit={handleSubmit} className="grid lg:grid-cols-2 gap-8 py-6">
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground font-display text-xl">
+          <CardTitle className="text-foreground text-xl">
             Información de Entrega
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-6">
             {/* Cómo quieres recibir tu pedido */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">
+              <h3 className="font-semibold text-foreground">
                 ¿Cómo quieres recibir tu pedido?
               </h3>
 
-              <RadioGroup
-                value={formData.idTypeDelivery}
-                onValueChange={(value) => {
-                  setFormData({ ...formData, idTypeDelivery: value });
-                }}
-                className="space-y-3"
-              >
-                {/* Entrega Inmediata */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-muted-foreground">
-                    Entrega Inmediata
-                  </h4>
+              <TypeDeliverComponent
+                formData={formData}
+                setFormData={setFormData}
+              />
 
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem
-                      value={TYPE_DELIVERY.DELIVERY_NOW.id}
-                      id="delivery-now"
-                    />
-                    <Label
-                      htmlFor="delivery-now"
-                      className="text-foreground flex items-center cursor-pointer"
-                    >
-                      {TYPE_DELIVERY.DELIVERY_NOW.icon}
-                      <div>
-                        <span className="font-medium">
-                          {TYPE_DELIVERY.DELIVERY_NOW.name}
-                        </span>
-                        <span className="block text-sm text-muted-foreground">
-                          {TYPE_DELIVERY.DELIVERY_NOW.description}
-                        </span>
-                      </div>
-                    </Label>
-                  </div>
+              {
+                formData.idTypeDelivery === TYPE_DELIVERY.HOME_DELIVERY.id && (
+                  <TypeDeliveryDomicilioComponent
+                    refAddress={refAddress}
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
 
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem
-                      value={TYPE_DELIVERY.PICKUP_NOW.id}
-                      id="pickup-now"
-                    />
-                    <Label
-                      htmlFor="pickup-now"
-                      className="text-foreground flex items-center cursor-pointer"
-                    >
-                      {TYPE_DELIVERY.PICKUP_NOW.icon}
-                      <div>
-                        <span className="font-medium">
-                          {TYPE_DELIVERY.PICKUP_NOW.name}
-                        </span>
-                        <span className="block text-sm text-muted-foreground">
-                          {TYPE_DELIVERY.PICKUP_NOW.description}
-                        </span>
-                      </div>
-                    </Label>
-                  </div>
-                </div>
+                )
+              }
 
-                {/* Entrega Programada */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-muted-foreground">
-                    Entrega Programada
-                  </h4>
+              {
+                formData.idTypeDelivery === TYPE_DELIVERY.STORE_PICKUP.id && (
+                  <TypeDeliveryRecojoLocalComponent
+                    refBranch={refBranch}
+                    branches={branches}
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
 
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem
-                      value={TYPE_DELIVERY.DELIVERY_SCHEDULED.id}
-                      id="delivery-scheduled"
-                    />
-                    <Label
-                      htmlFor="delivery-scheduled"
-                      className="text-foreground flex items-center cursor-pointer"
-                    >
-                      {TYPE_DELIVERY.DELIVERY_SCHEDULED.icon}
-                      <div>
-                        <span className="font-medium">
-                          {TYPE_DELIVERY.DELIVERY_SCHEDULED.name}
-                        </span>
-                        <span className="block text-sm text-muted-foreground">
-                          {TYPE_DELIVERY.DELIVERY_SCHEDULED.description}
-                        </span>
-                      </div>
-                    </Label>
-                  </div>
+                )
+              }
 
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem
-                      value={TYPE_DELIVERY.PICKUP_SCHEDULED.id}
-                      id="pickup-scheduled"
-                    />
-                    <Label
-                      htmlFor="pickup-scheduled"
-                      className="text-foreground flex items-center cursor-pointer"
-                    >
-                      {TYPE_DELIVERY.PICKUP_SCHEDULED.icon}
-                      <div>
-                        <span className="font-medium">
-                          {TYPE_DELIVERY.PICKUP_SCHEDULED.name}
-                        </span>
-                        <span className="block text-sm text-muted-foreground">
-                          {TYPE_DELIVERY.PICKUP_SCHEDULED.description}
-                        </span>
-                      </div>
-                    </Label>
-                  </div>
-                </div>
-              </RadioGroup>
+              {
+                formData.idTypeDelivery === TYPE_DELIVERY.SCHEDULED_DELIVERY.id && (
+                  <TypeDeliveryProgramadoComponent
+                    refScheduledDate={refScheduledDate}
+                    refScheduledTime={refScheduledTime}
+                    refAddress={refAddress}
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
+                )
+              }
 
-              {/* Campos de fecha y hora para pedidos programados */}
-              {Object.values(TYPE_DELIVERY).find(
-                (t) => t.id === formData.idTypeDelivery
-              )?.isScheduled && (
-                <div className="bg-muted/50 p-4 rounded-lg border border-border/50 ml-6">
-                  <h5 className="font-medium text-foreground mb-3">
-                    Programar para:
-                  </h5>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label
-                        htmlFor="scheduledDate"
-                        className="text-foreground font-medium text-sm"
-                      >
-                        Fecha *
-                      </Label>
-                      <Input
-                        id="scheduledDate"
-                        ref={refScheduledDate}
-                        type="date"
-                        value={formData.scheduledDate}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            scheduledDate: e.target.value,
-                          })
-                        }
-                        className="bg-background border-border text-foreground mt-2"
-                        min={new Date().toISOString().split("T")[0]}
-                      />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="scheduledTime"
-                        className="text-foreground font-medium text-sm"
-                      >
-                        Hora *
-                      </Label>
-                      <Select
-                        value={formData.scheduledTime}
-                        onValueChange={(value) =>
-                          setFormData({ ...formData, scheduledTime: value })
-                        }
-                      >
-                        <SelectTrigger
-                          ref={refScheduledTime}
-                          className="bg-background border-border text-foreground mt-2"
-                        >
-                          <SelectValue placeholder="Seleccionar hora" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-card border-border max-h-48">
-                          {timeSlots().map((time) => (
-                            <SelectItem
-                              key={time}
-                              value={time}
-                              className="text-foreground"
-                            >
-                              {time}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {
+                formData.idTypeDelivery === TYPE_DELIVERY.SHIPPING_AGENCY.id && (
+                  <TypeDeliveryEnvioAgenciaComponent
+                    refAgency={refAgency}
+                    refDestination={refDestination}
+                    refReceiverName={refReceiverName}
+                    agencies={agencies}
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
+
+                )
+              }
             </div>
 
-            {/* Información del cliente */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">
-                Datos del Cliente
-              </h3>
-
-              <div className="space-y-4">
-                <Label className="text-foreground font-medium">
-                  Tipo de Documento *
-                </Label>
-                <Select
-                  value={formData.idTypeDocument}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, idTypeDocument: value })
-                  }
-                >
-                  <SelectTrigger
-                    ref={refTypeDocument}
-                    className="bg-muted border-border text-foreground mt-2"
-                  >
-                    <SelectValue placeholder="Selecciona el tipo de documento" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    {listTypeDocument.map((typeDoc) => (
-                      <SelectItem
-                        key={typeDoc.id}
-                        value={typeDoc.id}
-                        className="text-foreground"
-                      >
-                        {typeDoc.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="name" className="text-foreground font-medium">
-                  N° de Documento *
-                </Label>
-                <Input
-                  id="document"
-                  ref={refDocument}
-                  type={isMobile ? "tel" : "text"}
-                  value={formData.document}
-                  onChange={(e) =>
-                    setFormData({ ...formData, document: e.target.value })
-                  }
-                  onKeyDown={!isMobile ? keyNumberInteger : undefined}
-                  className="bg-muted border-border text-foreground mt-2"
-                />
-              </div>
-              <div>
-                <Label htmlFor="name" className="text-foreground font-medium">
-                  Nombre completo *
-                </Label>
-                <Input
-                  id="name"
-                  ref={refName}
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="bg-muted border-border text-foreground mt-2"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label
-                    htmlFor="phone"
-                    className="text-foreground font-medium"
-                  >
-                    Número de celular *
-                  </Label>
-                  <Input
-                    id="phone"
-                    ref={refPhone}
-                    type={isMobile ? "tel" : "text"}
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    onKeyDown={!isMobile ? keyNumberPhone : undefined}
-                    className="bg-muted border-border text-foreground mt-2"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="whatsapp"
-                    className="text-foreground font-medium"
-                  >
-                    WhatsApp *
-                  </Label>
-                  <Input
-                    id="whatsapp"
-                    ref={refWhastapp}
-                    type={isMobile ? "tel" : "text"}
-                    value={formData.whatsapp}
-                    onChange={(e) =>
-                      setFormData({ ...formData, whatsapp: e.target.value })
-                    }
-                    onKeyDown={!isMobile ? keyNumberPhone : undefined}
-                    className="bg-muted border-border text-foreground mt-2"
-                    placeholder="Ej: +51999888777"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="email" className="text-foreground font-medium">
-                  Correo Electrónico *
-                </Label>
-                <Input
-                  id="email"
-                  ref={refEmail}
-                  type={isMobile ? "email" : "text"}
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="bg-muted border-border text-foreground mt-2"
-                />
-              </div>
-
-              <div>
-                <Label
-                  htmlFor="password"
-                  className="text-foreground font-medium"
-                >
-                  Contraseña de la cuenta *
-                </Label>
-                <div className="relative mt-2">
-                  <Input
-                    id="password"
-                    ref={refPassword}
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className="bg-muted border-border text-foreground pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center pr-3"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <Label
-                  htmlFor="validationPassword"
-                  className="text-foreground font-medium"
-                >
-                  Validar contraseña *
-                </Label>
-                <div className="relative mt-2">
-                  <Input
-                    id="validationPassword"
-                    ref={refValidationPassword}
-                    type={showValidationPassword ? "text" : "password"}
-                    value={formData.validationPassword}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        validationPassword: e.target.value,
-                      })
-                    }
-                    className="bg-muted border-border text-foreground pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center pr-3"
-                    onClick={() =>
-                      setShowValidationPassword(!showValidationPassword)
-                    }
-                  >
-                    {showValidationPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Dirección de entrega */}
-            {(formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
-              formData.idTypeDelivery ===
-                TYPE_DELIVERY.DELIVERY_SCHEDULED.id) && (
-              <div className="space-y-4">
-                <h3 className="font-semibold text-foreground font-display">
-                  Dirección de Entrega
-                </h3>
-                <div>
-                  <Label
-                    htmlFor="address"
-                    className="text-foreground font-medium"
-                  >
-                    Dirección *
-                  </Label>
-                  <Input
-                    id="address"
-                    ref={refAddress}
-                    value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
-                    className="bg-muted border-border text-foreground mt-2"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="reference"
-                    className="text-foreground font-medium"
-                  >
-                    Referencia
-                  </Label>
-                  <Input
-                    id="reference"
-                    value={formData.reference}
-                    onChange={(e) =>
-                      setFormData({ ...formData, reference: e.target.value })
-                    }
-                    className="bg-muted border-border text-foreground mt-2"
-                    placeholder="Ej: Casa azul, portón negro"
-                  />
-                </div>
-                {/* <div>
-                  <Label className="text-foreground font-medium">Sucursal *</Label>
-                  <Select
-                    value={formData.idBranch}
-                    onValueChange={(value) => setFormData({ ...formData, idBranch: value })}
-                  >
-                    <SelectTrigger className="bg-muted border-border text-foreground mt-2">
-                      <SelectValue placeholder="Selecciona tu sucursal" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">                    
-                      {deliveryZones.map((zone) => (
-                        <SelectItem key={zone.id} value={zone.id} className="text-foreground">
-                          {zone.name} - {formatCurrency(zone.price, currency!.code)} ({zone.time})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div> */}
-              </div>
-            )}
-
-            {/* {
-              formData.idTypeDelivery === TYPE_DELIVERY.RECOJO_LOCAL.id && ( */}
-            <div>
-              <Label className="text-foreground font-medium">Sucursal *</Label>
-              <Select
-                value={formData.idBranch}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, idBranch: value })
-                }
-              >
-                <SelectTrigger
-                  ref={refBranch}
-                  className="bg-muted border-border text-foreground mt-2"
-                >
-                  <SelectValue placeholder="Selecciona tu sucursal" />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border">
-                  {branches.map((branch) => (
-                    <SelectItem
-                      key={branch.id}
-                      value={branch.id}
-                      className="text-foreground"
-                    >
-                      {branch.name}
-                    </SelectItem>
-                  ))}
-                  {/* {deliveryZones.map((zone) => (
-                        <SelectItem key={zone.id} value={zone.id} className="text-foreground">
-                          {zone.name} -  {formatCurrency(zone.price, currency!.code)} ({zone.time})
-                        </SelectItem>
-                        
-                      ))} */}
-                </SelectContent>
-              </Select>
-            </div>
-            {/* )
-            } */}
-
-            {/* Descuento */}
-            {/* <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">Descuento</h3>
-              <div>
-                <Label htmlFor="discount" className="text-foreground font-medium">
-                  Porcentaje de Descuento
-                </Label>
-                <Input
-                  id="discount"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.discount}
-                  onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-                  className="bg-muted border-border text-foreground mt-2"
-                  placeholder="Ej: 10"
-                />
-              </div>
-            </div> */}
-
-            {/* Método de pago */}
+            {/* Metodo de pago */}
             {/* <div className="space-y-4">
               <h3 className="font-semibold text-foreground font-display">Método de Pago</h3>
-              <p className="text-sm text-muted-foreground">
-                Los pagos son referenciales. Aún no se aceptan pagos en línea. Al momento de recoger su pedido, se le proporcionará toda la información necesaria para realizar el pago.
-              </p>
               <RadioGroup
-                value={formData.paymentMethodReference}
-                onValueChange={(value) => setFormData({ ...formData, paymentMethodReference: value })}
+                value={formData.paymentMethod}
+                onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}
                 className="space-y-3"
               >
-                {paymentMethods
+                {[
+                  {
+                    id: "cash",
+                    name: "Efectivo",
+                    icon: "💵",
+                    color: "bg-green-100 text-green-800",
+                    borderColor: "border-green-200",
+                    hoverColor: "hover:bg-green-200",
+                    available: true,
+                  },
+                  {
+                    "id": "card",
+                    "name": "Tarjeta",
+                    "icon": "💳",
+                    color: "bg-blue-100 text-blue-800",
+                    borderColor: "border-blue-200",
+                    hoverColor: "hover:bg-blue-200",
+                    "available": true
+                  },
+                  {
+                    id: "bank_transfer",
+                    name: "Transferencia Bancaria",
+                    icon: "🏦",
+                    color: "bg-blue-100 text-blue-800",
+                    borderColor: "border-blue-200",
+                    hoverColor: "hover:bg-blue-200",
+                    available: true,
+                  },
+                  {
+                    id: "digital_wallet",
+                    name: "Billetera Digital",
+                    icon: "📱",
+                    color: "bg-purple-100 text-purple-800",
+                    borderColor: "border-purple-200",
+                    hoverColor: "hover:bg-purple-200",
+                    available: true,
+                  },
+                ]
                   .filter((method) => method.available)
                   .map((method) => (
                     <div key={method.id} className="flex items-center space-x-3">
@@ -918,13 +424,28 @@ export function CheckoutForm({
                     </div>
                   ))}
               </RadioGroup>
+
+              {formData.paymentMethod === "card" && (
+                <CardPaymentComponent formData={formData} setFormData={setFormData} />
+              )}
+
+              {formData.paymentMethod === "bank_transfer" && (
+                <BankTransferComponent formData={formData} setFormData={setFormData} />
+              )}
+
+              {formData.paymentMethod === "digital_wallet" && (
+                <DigitalWalletComponent formData={formData} setFormData={setFormData} />
+              )}
+
+              {formData.paymentMethod === "cash" && <CashPaymentComponent />}
             </div> */}
 
             {/* Notas del pedido */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground font-display">
+              <h3 className="font-semibold text-foreground">
                 Información Adicional
               </h3>
+
               <div>
                 <Label
                   htmlFor="orderNotes"
@@ -943,53 +464,28 @@ export function CheckoutForm({
                   rows={3}
                 />
               </div>
-              <div>
-                <Label
-                  htmlFor="instructions"
-                  className="text-foreground font-medium"
-                >
-                  Instrucciones de entrega
-                </Label>
-                <Textarea
-                  id="instructions"
-                  value={formData.instructions}
-                  onChange={(e) =>
-                    setFormData({ ...formData, instructions: e.target.value })
-                  }
-                  className="bg-muted border-border text-foreground placeholder:text-muted-foreground mt-2"
-                  placeholder="Instrucciones especiales para la entrega..."
-                  rows={3}
-                />
-              </div>
             </div>
-
-            <div className="flex gap-4 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onBack}
-                className="flex-1 bg-transparent"
-              >
-                Volver
-              </Button>
-              <Button
-                type="submit"
-                // disabled={!isFormValid}
-                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                Confirmar Pedido
-              </Button>
-            </div>
-          </form>
+          </div>
         </CardContent>
+        <CardFooter>
+          <Button
+            type="submit"
+            // disabled={!isFormValid}
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            Confirmar Pedido
+          </Button>
+        </CardFooter>
       </Card>
+
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground font-display text-xl">
+          <CardTitle className="text-foreground text-xl">
             Resumen del Pedido
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Detakke del pedido */}
           <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-2">
             {cart.map((item) => (
               <div
@@ -1007,7 +503,7 @@ export function CheckoutForm({
                   <div>
                     <p className="text-foreground font-medium">{item.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      Cantidad: {item.quantity}
+                      {item.quantity} x {formatCurrency(item.price, currency!.code)}
                     </p>
                     {item.notes && (
                       <p className="text-xs text-primary mt-1">
@@ -1016,91 +512,648 @@ export function CheckoutForm({
                     )}
                   </div>
                 </div>
-                <span className="text-primary font-bold font-display">
+                <span className="text-primary font-bold">
                   {formatCurrency(item.price * item.quantity, currency!.code)}
                 </span>
               </div>
             ))}
           </div>
+
           <div className="space-y-3 pt-4 border-t border-border">
             <div className="flex justify-between text-foreground">
               <span>Subtotal:</span>
               <span>{formatCurrency(subtotal, currency!.code)}</span>
             </div>
-            {/* {discountPercentage > 0 && (
-              <div className="flex justify-between text-foreground">
-                <span>Descuento ({discountPercentage}%):</span>
-                <span>-{formatCurrency((subtotal * discountPercentage / 100), currency!.code)}</span>
-              </div>
-            )} */}
-            {/* <div className="flex justify-between text-foreground">
-              <span>Subtotal con descuento:</span>
-              <span>{formatCurrency(discountedSubtotal, currency!.code)}</span>
-            </div> */}
-            {/* {formData.deliveryType === TYPE_DELIVERY.DELIVERY.id && (
-              <div className="flex justify-between text-foreground">
-                <span>Delivery:</span>
-                <span>{formatCurrency(deliveryFee, currency!.code)}</span>
-              </div>
-            )} */}
-            {/* <div className="flex justify-between text-xl font-bold text-primary pt-3 border-t border-border font-display">
-              <span>Total:</span>
-              <span>{formatCurrency(total, currency!.code)}</span>
-            </div> */}
           </div>
+
           {/* Información de entrega */}
           <div className="space-y-3 pt-4 border-t border-border">
             <div className="bg-muted/50 p-4 rounded-lg border border-border/50">
-              <div className="flex items-center mb-2">
+              <div className="flex flex-col items-center mb-2">
                 {
                   Object.values(TYPE_DELIVERY).find(
                     (t) => t.id === formData.idTypeDelivery
                   )?.icon
                 }
-                <span className="font-medium text-foreground">
+                <p className="font-medium text-foreground">
                   {
                     Object.values(TYPE_DELIVERY).find(
                       (t) => t.id === formData.idTypeDelivery
                     )?.name
                   }
-                </span>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {Object.values(TYPE_DELIVERY).find(
+                    (t) => t.id === formData.idTypeDelivery
+                  )?.description}
+                </p>
               </div>
-
-              {Object.values(TYPE_DELIVERY).find(
-                (t) => t.id === formData.idTypeDelivery
-              )?.isScheduled ? (
-                <p className="text-foreground text-sm">
-                  <strong>Programado para:</strong>{" "}
-                  <span className="text-primary">
-                    {new Date(formData.scheduledDate).toLocaleDateString()} a
-                    las {formData.scheduledTime}
-                  </span>
-                </p>
-              ) : (
-                <p className="text-foreground text-sm">
-                  <strong>Tiempo estimado:</strong>{" "}
-                  <span className="text-primary">
-                    {
-                      Object.values(TYPE_DELIVERY).find(
-                        (t) => t.id === formData.idTypeDelivery
-                      )?.description
-                    }
-                  </span>
-                </p>
-              )}
-
-              {(formData.idTypeDelivery === TYPE_DELIVERY.DELIVERY_NOW.id ||
-                formData.idTypeDelivery ===
-                  TYPE_DELIVERY.DELIVERY_SCHEDULED.id) && (
-                <p className="text-foreground text-sm mt-1">
-                  <strong>Dirección:</strong>{" "}
-                  <span className="text-primary">{formData.address}</span>
-                </p>
-              )}
             </div>
           </div>
         </CardContent>
       </Card>
+    </form>
+  );
+}
+
+const TypeDeliverComponent = ({
+  formData,
+  setFormData
+}: {
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  return (
+    <RadioGroup
+      value={formData.idTypeDelivery}
+      onValueChange={(value) =>
+        setFormData({
+          ...formData,
+          idTypeDelivery: value
+        })
+      }
+      className="space-y-3"
+    >
+      {
+        Object.values(TYPE_DELIVERY).map((delivery) => (
+          <div
+            key={delivery.id}
+            className="flex items-center space-x-3"
+          >
+            <RadioGroupItem
+              value={delivery.id}
+              id={delivery.id}
+            />
+            <Label
+              htmlFor={delivery.id}
+              className="text-foreground flex items-center cursor-pointer"
+            >
+              {delivery.icon}
+              <div>
+                <span className="font-medium">
+                  {delivery.name}
+                </span>
+
+                <span className="block text-sm text-muted-foreground">
+                  {delivery.description}
+                </span>
+              </div>
+            </Label>
+          </div>
+        ))
+      }
+    </RadioGroup>
+  );
+}
+
+const TypeDeliveryDomicilioComponent = ({
+  refAddress,
+  formData,
+  setFormData
+}: {
+  refAddress: React.RefObject<HTMLInputElement | null>;
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  return (
+    <div className="space-y-4">
+      <h3 className="font-semibold">
+        Dirección de entrega
+      </h3>
+
+      <div>
+        <Label>
+          Dirección <span className="text-red-500 text-base">*</span>
+        </Label>
+
+        <Input
+          ref={refAddress}
+          placeholder="Dirección de entrega"
+          value={formData.orderShipping.address ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                address: e.target.value
+              }
+            })
+          }
+          className="bg-muted border-border text-foreground mt-2"
+        />
+      </div>
+
+      <div>
+        <Label>
+          Referencia
+        </Label>
+        <Input
+          placeholder="Ej: Casa azul, portón negro"
+          value={formData.orderShipping.reference ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                reference: e.target.value
+              }
+            })
+          }
+          className="bg-muted border-border text-foreground mt-2"
+        />
+      </div>
     </div>
   );
 }
+
+const TypeDeliveryRecojoLocalComponent = ({
+  refBranch,
+  branches,
+  formData,
+  setFormData
+}: {
+  refBranch: React.RefObject<HTMLButtonElement | null>;
+  branches: Branch[];
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  return (
+    <div className="space-y-4">
+      <h3 className="font-semibold">
+        Datos de recojo
+      </h3>
+      <div>
+        <Label>
+          Local <span className="text-red-500 text-base">*</span>
+        </Label>
+
+        <Select
+          value={formData.orderShipping.idBranch ?? ""}
+          onValueChange={(value) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                idBranch: value
+              }
+            })
+          }
+        >
+          <SelectTrigger
+            ref={refBranch}
+            className="bg-muted border-border text-foreground mt-2">
+            <SelectValue
+              placeholder="Seleccione local"
+            />
+          </SelectTrigger>
+
+          <SelectContent>
+            {
+              branches.map(branch => (
+                <SelectItem
+                  key={branch.idBranch}
+                  value={branch.idBranch}
+                >
+                  {branch.name}
+                </SelectItem>
+              ))
+            }
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
+const TypeDeliveryProgramadoComponent = ({
+  refScheduledDate,
+  refScheduledTime,
+  refAddress,
+  formData,
+  setFormData
+}: {
+  refScheduledDate: React.RefObject<HTMLInputElement | null>;
+  refScheduledTime: React.RefObject<HTMLButtonElement | null>;
+  refAddress: React.RefObject<HTMLInputElement | null>;
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  return (
+    <div className="space-y-4">
+
+      <h3 className="font-semibold text-foreground">
+        Programar entrega
+      </h3>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label
+            htmlFor="scheduledDate"
+            className="text-foreground font-medium"
+          >
+            Fecha <span className="text-red-500 text-base">*</span>
+          </Label>
+
+          <Input
+            id="scheduledDate"
+            ref={refScheduledDate}
+            type="date"
+            value={formData.orderShipping.scheduledDate ?? ""}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                orderShipping: {
+                  ...formData.orderShipping,
+                  scheduledDate: e.target.value
+                }
+              })
+            }
+            min={new Date().toISOString().split("T")[0]}
+            className="bg-muted border-border text-foreground mt-2"
+          />
+        </div>
+
+        <div>
+          <Label
+            htmlFor="scheduledTime"
+            className="text-foreground font-medium"
+          >
+            Hora <span className="text-red-500 text-base">*</span>
+          </Label>
+
+          <Select
+            value={formData.orderShipping.scheduledTime ?? ""}
+            onValueChange={(value) =>
+              setFormData({
+                ...formData,
+                orderShipping: {
+                  ...formData.orderShipping,
+                  scheduledTime: value
+                }
+              })
+            }
+          >
+            <SelectTrigger
+              ref={refScheduledTime}
+              className="bg-muted border-border text-foreground mt-2"
+            >
+              <SelectValue placeholder="Seleccionar hora" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {
+                timeSlots().map(time => (
+
+                  <SelectItem
+                    key={time}
+                    value={time}
+                  >
+                    {time}
+                  </SelectItem>
+
+                ))
+              }
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div>
+        <Label>
+          Dirección <span className="text-red-500 text-base">*</span>
+        </Label>
+
+        <Input
+          ref={refAddress}
+          value={formData.orderShipping.address ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                address: e.target.value
+              }
+            })
+          }
+          className="bg-muted border-border text-foreground mt-2"
+          placeholder="Dirección de entrega"
+        />
+      </div>
+
+      <div>
+        <Label>
+          Referencia
+        </Label>
+
+        <Input
+          value={formData.orderShipping.reference ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                reference: e.target.value
+              }
+            })
+          }
+          className="bg-muted border-border text-foreground mt-2"
+          placeholder="Ej: Casa azul, portón negro"
+        />
+      </div>
+    </div>
+  );
+}
+
+const TypeDeliveryEnvioAgenciaComponent = ({
+  refAgency,
+  refDestination,
+  refReceiverName,
+  agencies,
+  formData,
+  setFormData
+}: {
+  refAgency: React.RefObject<HTMLButtonElement | null>;
+  refDestination: React.RefObject<HTMLInputElement | null>;
+  refReceiverName: React.RefObject<HTMLInputElement | null>;
+  agencies: Agency[];
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  return (
+    <div className="space-y-4">
+      <h3 className="font-semibold text-foreground">
+        Datos de envío por agencia
+      </h3>
+
+      <div>
+        <Label>
+          Agencia <span className="text-red-500 text-base">*</span>
+        </Label>
+
+        <Select
+          value={formData.orderShipping.idAgency ?? ""}
+          onValueChange={(value) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                idAgency: value
+              }
+            })
+          }
+        >
+          <SelectTrigger
+            ref={refAgency}
+            className="bg-muted border-border text-foreground mt-2">
+            <SelectValue
+              placeholder="Seleccione agencia"
+            />
+          </SelectTrigger>
+
+          <SelectContent>
+            {
+              agencies.map(agency => (
+                <SelectItem
+                  key={agency.idAgency}
+                  value={agency.idAgency.toString()}
+                >
+                  {agency.name}
+                </SelectItem>
+              ))
+            }
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label>
+          Destino <span className="text-red-500 text-base">*</span>
+        </Label>
+        <Input
+          ref={refDestination}
+          value={formData.orderShipping.destination ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                destination: e.target.value
+              }
+            })
+          }
+          placeholder="Ciudad / provincia"
+          className="bg-muted border-border text-foreground mt-2"
+        />
+      </div>
+
+      <div>
+        <Label>
+          Persona que recibe <span className="text-red-500 text-base">*</span>
+        </Label>
+
+        <Input
+          ref={refReceiverName}
+          placeholder="Persona que recoge"
+          value={formData.orderShipping.receiverName ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              orderShipping: {
+                ...formData.orderShipping,
+                receiverName: e.target.value
+              }
+            })
+          }
+          className="bg-muted border-border text-foreground mt-2"
+        />
+      </div>
+    </div>
+  );
+}
+
+const CardPaymentComponent = ({
+  formData,
+  setFormData,
+}: {
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  return (
+    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border/50">
+      <h4 className="font-semibold text-foreground">Datos de la Tarjeta</h4>
+
+      <div>
+        <Label htmlFor="cardNumber" className="text-foreground font-medium">
+          Número de Tarjeta
+        </Label>
+        <Input
+          id="cardNumber"
+          value={formData.cardNumber}
+          onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+          placeholder="1234 5678 9012 3456"
+          className="bg-muted border-border text-foreground mt-2"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="cardExpiry" className="text-foreground font-medium">
+            Fecha de Expiración
+          </Label>
+          <Input
+            id="cardExpiry"
+            value={formData.cardExpiry}
+            onChange={(e) => setFormData({ ...formData, cardExpiry: e.target.value })}
+            placeholder="MM/AA"
+            className="bg-muted border-border text-foreground mt-2"
+          />
+        </div>
+        <div>
+          <Label htmlFor="cardCVV" className="text-foreground font-medium">
+            CVV
+          </Label>
+          <Input
+            id="cardCVV"
+            value={formData.cardCVV}
+            onChange={(e) => setFormData({ ...formData, cardCVV: e.target.value })}
+            placeholder="123"
+            className="bg-muted border-border text-foreground mt-2"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="cardHolderName" className="text-foreground font-medium">
+          Nombre del Titular
+        </Label>
+        <Input
+          id="cardHolderName"
+          value={formData.cardHolderName}
+          onChange={(e) => setFormData({ ...formData, cardHolderName: e.target.value })}
+          placeholder="Nombre completo"
+          className="bg-muted border-border text-foreground mt-2"
+        />
+      </div>
+
+      <div className="flex items-center text-muted-foreground">
+        <Lock className="w-4 h-4 mr-2" />
+        <span className=" text-sm">
+          Tus datos de pago están seguros y encriptados
+        </span>
+      </div>
+    </div>
+  );
+};
+
+const DigitalWalletComponent = ({
+  formData,
+  setFormData,
+}: {
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, walletReceipt: e.target.files![0] });
+    }
+  };
+
+  return (
+    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border/50">
+      <h4 className="font-semibold text-foreground">Billetera Digital</h4>
+      <p className="text-sm text-muted-foreground">
+        Escanea nuestro código QR con tu aplicación de pago y sube una captura de pantalla del pago realizado.
+      </p>
+
+      <div className="flex flex-col items-center justify-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        <div className="w-32 h-32 bg-yellow-100 rounded-lg flex flex-col items-center justify-center">
+          <span className="text-2xl">📱</span>
+          <p className="text-sm font-medium">Código QR</p>
+          <p className="text-xs text-muted-foreground">Escanea para pagar</p>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          También puedes usar el usuario <strong>@masaymiga</strong> en tu aplicación.
+        </p>
+      </div>
+
+      <div>
+        <Label htmlFor="walletReceipt" className="text-foreground font-medium">
+          Sube la captura del pago
+        </Label>
+        <p className="text-xs text-muted-foreground">
+          (PNG, JPG - máx. 5MB)
+        </p>
+        <Input
+          id="walletReceipt"
+          type="file"
+          accept=".png,.jpg,.jpeg"
+          onChange={handleFileChange}
+          className="bg-muted border-border text-foreground mt-2"
+        />
+      </div>
+    </div>
+  );
+};
+
+const CashPaymentComponent = () => {
+  return (
+    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border/50">
+      <h4 className="font-semibold text-foreground">Pago en Efectivo</h4>
+      <p className="text-popover-foreground">
+        Pagarás en efectivo al recibir tu pedido.
+      </p>
+      <p className="text-muted-foreground text-sm">
+        Por favor, ten el importe exacto si es posible.
+      </p>
+    </div>
+  );
+};
+
+const BankTransferComponent = ({
+  formData,
+  setFormData,
+}: {
+  formData: FormDataProps;
+  setFormData: (value: FormDataProps) => void;
+}) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, bankReceipt: e.target.files![0] });
+    }
+  };
+
+  return (
+    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border/50">
+      <h4 className="font-semibold text-foreground">Transferencia Bancaria</h4>
+      <p className="text-sm text-muted-foreground">
+        Realiza una transferencia a nuestra cuenta bancaria y sube el comprobante.
+      </p>
+
+      <div className="space-y-3">
+        <div className="bg-background p-3 rounded-lg border border-border/50">
+          <p className="font-medium text-foreground">Datos Bancarios</p>
+          <p className="text-sm text-muted-foreground">Banco: Banco Nacional</p>
+          <p className="text-sm text-muted-foreground">Titular: Masa & Miga S.L.</p>
+          <p className="text-sm text-muted-foreground">IBAN: ES12 3456 7890 1234 5678 9012</p>
+          <p className="text-sm text-muted-foreground">Concepto: Tu nombre + Fecha</p>
+        </div>
+
+        <div>
+          <Label htmlFor="bankReceipt" className="text-foreground font-medium">
+            Sube el comprobante de transferencia
+          </Label>
+          <p className="text-xs text-muted-foreground">
+            (PNG, JPG, PDF - máx. 5MB)
+          </p>
+          <Input
+            id="bankReceipt"
+            type="file"
+            accept=".png,.jpg,.jpeg,.pdf"
+            onChange={handleFileChange}
+            className="bg-muted border-border text-foreground mt-2"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};

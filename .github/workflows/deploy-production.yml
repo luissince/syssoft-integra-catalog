@@ -1,9 +1,11 @@
 name: Docker Image CI - SysSoftIntegra Catalog Production
 
+
 on:
-  push:
-    branches: 
-      - "master"
+  workflow_dispatch:
+  # push:
+  #   branches: 
+  #     - "master"
 
 jobs:
   build-and-push:
@@ -33,6 +35,8 @@ jobs:
           NEXT_PUBLIC_APP_BACK_END="${{secrets.NEXT_PUBLIC_APP_BACK_END}}"
           AUTH_ENABLED="${{secrets.AUTH_ENABLED}}"
           NEXT_PUBLIC_ENV="${{secrets.NEXT_PUBLIC_ENV}}"
+          NEXTAUTH_SECRET="${{secrets.NEXTAUTH_SECRET}}"
+          NEXTAUTH_URL="${{secrets.NEXTAUTH_URL}}"
           EOL
 
       - name: Build Docker image
@@ -120,7 +124,7 @@ jobs:
 
       - name: Delete old images from ECR
         run: |
-          REPO="syssoftintegra/catalog-development"
+          REPO="syssoftintegra/catalog-production"
           ENV="${{ matrix.environment }}"
           TAG="${ENV}-latest"
 

@@ -1,5 +1,5 @@
 # 1 - Etapa de construcción
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Crear directorio para la aplicación
 WORKDIR /app
@@ -13,29 +13,39 @@ RUN npm ci
 # Copiar archivos
 COPY . .
 
+# ============================================
+# Información de versión
+# ============================================
+
+ARG NEXT_PUBLIC_APP_VERSION
+ARG NEXT_PUBLIC_APP_COMMIT
+
+ENV NEXT_PUBLIC_APP_VERSION=$NEXT_PUBLIC_APP_VERSION
+ENV NEXT_PUBLIC_APP_COMMIT=$NEXT_PUBLIC_APP_COMMIT
+
 # Compilar
 RUN npm run build
 
 # 2 - Etapa de producción
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 
 # Crear directorio para la aplicación
 WORKDIR /app
 
-# Pone la aplicación en modo producción
-ENV NODE_ENV production
+ENV NODE_ENV=production
+ENV PORT=3000
 
 # Copiar solo los archivos necesarios
-COPY --from=builder /app/next.config.mjs ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/next.config.mjs ./
+COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+
+# Ejecutar como usuario sin privilegios
+USER node
 
 # Expose el puerto 3000
 EXPOSE 3000
-
-# Inicia en el puerto 3000
-ENV PORT 3000
 
 # Ejecuta la aplicación
 CMD ["node", "server.js"]
