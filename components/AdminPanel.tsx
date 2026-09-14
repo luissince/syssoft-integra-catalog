@@ -13,7 +13,7 @@ import { Clock, Package, Check, User, EyeOff, Eye, IdCard } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn, formatCurrency, formatDecimal, formatNumberWithZeros, formatTime, keyNumberInteger, keyNumberPhone } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Company, Order, Person, TypeDocument } from "@/types/api-type";
+import { Order, Person, TypeDocument } from "@/types/api-type";
 import Welcome from "./Welcome";
 import { getCustomerById, updateCustomer } from "@/lib/api";
 import { FormCustomer } from "@/types/form";
@@ -529,13 +529,12 @@ export function AdminPanel({
 }
 
 interface AdminComponentProps {
-  company: Company;
   listTypeDocument: TypeDocument[];
   initialOrders: { orders: Order[], count: number };
   person: Person;
 }
 
-export default function AdminComponent({ company, listTypeDocument, initialOrders, person }: AdminComponentProps) {
+export default function AdminComponent({ listTypeDocument, initialOrders, person }: AdminComponentProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true);
 

@@ -1,51 +1,127 @@
-// components/Checkout.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckoutForm } from "@/components/CheckoutForm";
-import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+
+import { CheckoutForm } from "@/components/CheckoutForm";
 import { OrderCompletion } from "@/components/OrderCompletion";
-import { Agency, Branch, Order, PaymentReceipt, Person, Tax } from "@/types/api-type";
+
+import { useCart } from "@/context/CartContext";
+import { useBranch } from "@/context/BranchContext";
+
+import {
+    Agency,
+    Order,
+    PaymentReceipt,
+    Person,
+    Tax,
+} from "@/types/api-type";
+
 import { FormOrder } from "@/types/form";
+
 import { useAlert } from "@/hooks/use-alert";
+
 import { PageBreadcrumb } from "./PageBreadcrumb";
 import Container from "./Container";
-import { fetchCreateOrder, fetchGetOrder } from "@/data/data-rest";
 import Welcome from "./Welcome";
+
+import {
+    fetchCreateOrder,
+    fetchGetOrder,
+    fetchPaymentReceipts,
+} from "@/data/data-rest";
 
 interface CheckoutProps {
     taxes: Tax[];
-    branch: Branch;
-    branches: Branch[];
-    receipts: PaymentReceipt[];
-    person: Person
-    agencies: Agency[]
+    person: Person;
+    agencies: Agency[];
 }
 
-export default function CheckoutComponent({ taxes, branch, branches, receipts, person, agencies }: CheckoutProps) {
-    const router = useRouter()
-    const [completedOrder, setCompletedOrder] = useState<Order>();
-    const [loading, setLoading] = useState(true);
-    const [redirecting, setRedirecting] = useState(false);
+export default function CheckoutComponent({
+    taxes,
+    person,
+    agencies,
+}: CheckoutProps) {
 
-    const { cart, clearCart } = useCart();
+    const router = useRouter();
     const alert = useAlert();
 
-    useEffect(() => {
-        if (completedOrder) return;
+    const { cart, clearCart } = useCart();
+    const { branch } = useBranch();
 
+    const [receipts, setReceipts] = useState<PaymentReceipt[]>([]);
+    const [loadingReceipts, setLoadingReceipts] = useState(true);
+    const [redirecting, setRedirecting] = useState(false);
+    const [completedOrder, setCompletedOrder] = useState<Order>();
+
+    /*
+     * 1. Primero verificamos el carrito.
+     */
+    useEffect(() => {
+
+        if (completedOrder) {
+            return;
+        }
 
         if (cart.length === 0) {
             setRedirecting(true);
             router.replace("/");
+        }
+
+    }, [cart.length, completedOrder, router]);
+
+
+    /*
+     * 2. Si tenemos una sucursal válida,
+     *    cargamos sus comprobantes.
+     */
+    useEffect(() => {
+
+        if (cart.length === 0) {
             return;
         }
 
-        setLoading(false);
-    }, [cart.length, completedOrder, router]);
+        let cancelled = false;
+
+        const loadReceipts = async () => {
+
+            setLoadingReceipts(true);
+
+            const result = await fetchPaymentReceipts(
+                branch.idBranch
+            );
+
+            if (cancelled) {
+                return;
+            }
+
+            if (!result.success) {
+
+                alert.error({
+                    message: result.message,
+                });
+
+                setLoadingReceipts(false);
+
+                return;
+            }
+
+            setReceipts(result.data ?? []);
+
+            setLoadingReceipts(false);
+        };
+
+        loadReceipts();
+
+        return () => {
+            cancelled = true;
+        };
+
+    }, [branch.idBranch, cart.length]);
+
 
     const handleSubmitOrder = async (formOrder: FormOrder) => {
+
         alert.loading({
             message: "Procesando pedido...",
         });
@@ -53,65 +129,90 @@ export default function CheckoutComponent({ taxes, branch, branches, receipts, p
         const createOrderResult = await fetchCreateOrder(formOrder);
 
         if (!createOrderResult.success) {
+
             alert.error({
                 message: createOrderResult.message,
             });
+
             return;
         }
 
-        const orderResult = await fetchGetOrder(createOrderResult.data?.idPedido!);
+        const orderResult = await fetchGetOrder(
+            createOrderResult.data?.idPedido!
+        );
 
         if (!orderResult.success) {
+
             alert.error({
                 message: orderResult.message,
             });
+
             return;
         }
 
         alert.close(() => {
+
             setCompletedOrder(orderResult.data);
+
             clearCart();
+
         });
     };
 
-    // Mientras valida carrito o está redireccionando
-    if (loading || redirecting) {
+
+    /*
+     * Mientras se valida el carrito
+     * o se cargan los comprobantes.
+     */
+    if (redirecting || loadingReceipts) {
         return <Welcome />;
     }
 
-    // Pedido completado
+
+    /*
+     * Pedido completado.
+     */
     if (completedOrder) {
+
         return (
             <Container>
+
                 <OrderCompletion
                     order={completedOrder}
                     onBackToMenu={() => router.push("/")}
                 />
+
             </Container>
         );
     }
 
-    // Checkout normal
+
+    /*
+     * Checkout normal.
+     */
     return (
         <Container>
-            {/* Breadcrumb */}
+
             <PageBreadcrumb
                 items={[
-                    { label: "Inicio", href: "/" },
-                    { label: "Checkout" },
+                    {
+                        label: "Inicio",
+                        href: "/",
+                    },
+                    {
+                        label: "Checkout",
+                    },
                 ]}
             />
 
-            {/* Body */}
             <CheckoutForm
                 taxes={taxes}
-                branch={branch}
-                branches={branches}
                 receipts={receipts}
                 person={person}
                 agencies={agencies}
                 onSubmitOrder={handleSubmitOrder}
             />
+
         </Container>
     );
 }

@@ -8,24 +8,27 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { LogOut, Phone, Settings, MenuIcon, User, UserPlus } from "lucide-react";
 import { LoginCard } from "./LoginCard";
 import { useContact } from "@/lib/contact";
-import { Branch, Company, Person } from "@/types/api-type";
+import { Person } from "@/types/api-type";
 import Image from "next/image";
 import Container from "./Container";
 import { fetchLogoutCustomer } from "@/data/data-rest";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { notifyAuthChange } from "@/lib/utils";
+import { useCompany } from "@/context/CompanyContext";
+import { useBranch } from "@/context/BranchContext";
 
 interface NavProps {
-    company: Company;
-    branch: Branch;
     person: Person | null;
 }
 
-export default function Nav({ company, branch, person }: NavProps) {
+export default function Nav({ person }: NavProps) {
     const router = useRouter();
+    const { company } = useCompany();
+    const { branch } = useBranch();
+
     const { handleCall } = useContact();
     const [loginOpen, setLoginOpen] = useState(false);
     const { theme, setTheme } = useTheme();

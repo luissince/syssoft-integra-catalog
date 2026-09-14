@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 import { useCart } from "@/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import { Branch, Product, Whatsapp } from "@/types/api-type"
+import { Product, Whatsapp } from "@/types/api-type"
 import { cn, formatCurrency } from "@/lib/utils"
 import { MenuCard } from "./MenuCard"
 import { Label } from "./ui/label"
@@ -45,8 +45,6 @@ interface ProductImage {
 }
 
 interface PropsProductComponent {
-  branch: Branch
-  whatsapp: Whatsapp
   product: Product
   relatedProducts: Product[]
   authEnabled: boolean

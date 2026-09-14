@@ -30,11 +30,10 @@ import { FormOrder } from "@/types/form";
 import { useCart } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { Lock } from "lucide-react";
+import { useBranch } from "@/context/BranchContext";
 
 interface CheckoutFormProps {
   taxes: Tax[];
-  branch: Branch;
-  branches: Branch[];
   receipts: PaymentReceipt[];
   person: Person;
   agencies: Agency[];
@@ -84,14 +83,13 @@ interface FormDataProps {
 
 export function CheckoutForm({
   taxes,
-  branch,
-  branches,
   receipts,
   person,
   agencies,
   onSubmitOrder,
 }: CheckoutFormProps) {
   const { cart } = useCart();
+  const { branch, branches } = useBranch();
   const { currency } = useCurrency();
   const alert = useAlert();
 
