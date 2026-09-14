@@ -1,7 +1,7 @@
 // components/ProductSection.tsx
 "use client";
 
-import { Search, X } from "lucide-react";
+import { RefreshCcw, Search, X } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 
 import {
@@ -48,6 +48,8 @@ interface Props {
     changeItemsPerPage: (value: number) => void;
 
     loadMoreItems: () => void;
+
+    reloadProducts: () => Promise<void>;
 }
 
 export default function ProductSection({
@@ -69,6 +71,8 @@ export default function ProductSection({
     changeItemsPerPage,
 
     loadMoreItems,
+
+    reloadProducts
 }: Props) {
 
     return (
@@ -159,6 +163,10 @@ export default function ProductSection({
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
+
+                                <Button variant="outline" onClick={reloadProducts} className="flex items-center">
+                                    <RefreshCcw className="h-4 w-4" />
+                                </Button>
                             </div>
                         </div>
 

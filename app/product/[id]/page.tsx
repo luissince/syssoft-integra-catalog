@@ -1,8 +1,8 @@
 // pages/product/[id].tsx
 
 import { notFound } from "next/navigation";
-import { getBranches, getProductById, getProductsRelated, getWhatsappInfo } from "@/lib/api";
 import ProductComponent from "@/components/Product";
+import { fetchProductById, fetchProductsRelated } from "@/data/data-rest";
 
 interface ProductDetalleProps {
   params: Promise<{ id: string }>;
@@ -17,36 +17,24 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
     return notFound();
   }
 
-  // Cargar datos en paralelo para mejor performance
-  const [
-    branches,
-    whatsapp,
-    product
-  ] = await Promise.all([
-    getBranches(),
-    getWhatsappInfo(),
-    getProductById(id)
-  ]);
+  // Cargar producto
+  const product = await fetchProductById(id);
 
   // Si no existe el producto, mostrar 404
-  if (!product) {
+  if (!product.success || !product.data) {
     return notFound();
   }
 
   // Cargar productos relacionados después de confirmar que el producto existe
-  const relatedProducts = await getProductsRelated(id, product.idCategory);
-
-  const branch = branches.find((branch) => branch.primary === true)!;
+  const relatedProducts = await fetchProductsRelated(id, product.data.idCategory);
 
   // Procesar variable de entorno en el servidor
   const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
 
   return (
     <ProductComponent
-      branch={branch}
-      whatsapp={whatsapp}
-      product={product}
-      relatedProducts={relatedProducts}
+      product={product.data}
+      relatedProducts={relatedProducts.success ? relatedProducts.data! : []}
       authEnabled={authEnabled}
     />
   );

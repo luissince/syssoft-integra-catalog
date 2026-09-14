@@ -1,22 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import {
     Category,
-    Company,
     CompanyBanner,
-    Product
+    Product,
 } from "@/types/api-type";
 
 import HeroBanner from "./HeroBanner";
 import ProductSection from "./ProductSection";
-
 import { fetchProducts } from "@/data/data-rest";
 import { SkeletonProducts } from "./ui/skeleton";
 
 interface HomeComponentProps {
-    company: Company;
     categories: Category[];
     banners: CompanyBanner[];
     initialProducts: {
@@ -27,25 +24,36 @@ interface HomeComponentProps {
 }
 
 export default function HomeComponent({
-    company,
     categories,
     banners,
     initialProducts,
-    authEnabled = false
+    authEnabled = false,
 }: HomeComponentProps) {
+
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
     const [loading, setLoading] = useState(false);
 
     const [selectedCategory, setSelectedCategory] = useState("");
+
     const [searchQuery, setSearchQuery] = useState("");
 
     const [products, setProducts] = useState(initialProducts.data);
-    const [totalProducts, setTotalProducts] = useState(initialProducts.count);
+
+    const [totalProducts, setTotalProducts] = useState(
+        initialProducts.count
+    );
 
     const [itemsPerPage, setItemsPerPage] = useState(6);
-    const [offset, setOffset] = useState(initialProducts.data.length);
 
-    // Banner
+    const [offset, setOffset] = useState(
+        initialProducts.data.length
+    );
+
+    // --------------------------------------------------
+    // BANNER
+    // --------------------------------------------------
+
     useEffect(() => {
 
         if (banners.length <= 1) {
@@ -53,9 +61,11 @@ export default function HomeComponent({
         }
 
         const interval = setInterval(() => {
-            setCurrentBannerIndex((prev) =>
-                (prev + 1) % banners.length
+
+            setCurrentBannerIndex(
+                (prev) => (prev + 1) % banners.length
             );
+
         }, 5000);
 
         return () => clearInterval(interval);
@@ -63,11 +73,80 @@ export default function HomeComponent({
     }, [banners.length]);
 
 
-    // Buscar / filtrar productos
-    useEffect(() => {
+    // --------------------------------------------------
+    // FILTRAR PRODUCTOS
+    // --------------------------------------------------
 
-        // No hacemos nada al montar.
-        // Los productos ya vienen desde Server Component.
+    const filterProducts = useCallback(
+        async (
+            reset = true,
+            pageSize = itemsPerPage
+        ) => {
+
+            try {
+
+                setLoading(true);
+
+                const result = await fetchProducts({
+                    search: searchQuery,
+
+                    filters: {
+                        categories: selectedCategory
+                            ? [
+                                  {
+                                      id: selectedCategory,
+                                  },
+                              ]
+                            : [],
+                    },
+
+                    currentPage: reset ? 0 : offset,
+
+                    totalPage: pageSize,
+                });
+
+                if (reset) {
+
+                    setProducts(result.data);
+
+                    setOffset(result.data.length);
+
+                } else {
+
+                    setProducts((prev) => [
+                        ...prev,
+                        ...result.data,
+                    ]);
+
+                    setOffset(
+                        (prev) =>
+                            prev + result.data.length
+                    );
+                }
+
+                setTotalProducts(result.count);
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        },
+        [
+            searchQuery,
+            selectedCategory,
+            itemsPerPage,
+            offset,
+        ]
+    );
+
+
+    // --------------------------------------------------
+    // BUSCAR / FILTRAR
+    // --------------------------------------------------
+
+    useEffect(() => {
 
         if (
             searchQuery === "" &&
@@ -77,58 +156,86 @@ export default function HomeComponent({
         }
 
         const timer = setTimeout(() => {
+
             filterProducts(true);
+
         }, 500);
 
         return () => clearTimeout(timer);
 
-    }, [searchQuery, selectedCategory]);
+    }, [
+        searchQuery,
+        selectedCategory,
+        filterProducts,
+    ]);
 
 
-    const filterProducts = async (
-        reset = true,
-        pageSize = itemsPerPage
+    // --------------------------------------------------
+    // CAMBIAR CANTIDAD
+    // --------------------------------------------------
+
+    const changeItemsPerPage = (
+        value: number
     ) => {
+
+        setItemsPerPage(value);
+
+        setOffset(0);
+
+        filterProducts(true, value);
+    };
+
+
+    // --------------------------------------------------
+    // LIMPIAR BUSQUEDA
+    // --------------------------------------------------
+
+    const clearSearch = () => {
+
+        setSearchQuery("");
+
+    };
+
+
+    // --------------------------------------------------
+    // CARGAR MÁS
+    // --------------------------------------------------
+
+    const loadMoreItems = () => {
+
+        filterProducts(false);
+
+    };
+
+
+    // --------------------------------------------------
+    // RECARGAR TODO
+    // --------------------------------------------------
+
+    const reloadProducts = async () => {
+
+        setSearchQuery("");
+        setSelectedCategory("");
+        setOffset(0);
 
         try {
 
             setLoading(true);
 
             const result = await fetchProducts({
-                search: searchQuery,
-
+                search: "",
                 filters: {
-                    categories: [
-                        {
-                            id: selectedCategory
-                        }
-                    ]
+                    categories: [],
                 },
-
-                currentPage: reset ? 0 : offset,
-
-                totalPage: pageSize,
+                currentPage: 0,
+                totalPage: itemsPerPage,
             });
 
-            if (reset) {
-
-                setProducts(result.data);
-
-                setOffset(result.data.length);
-
-            } else {
-
-                setProducts((prev) => [
-                    ...prev,
-                    ...result.data
-                ]);
-
-                setOffset((prev) =>
-                    prev + result.data.length
-                );
-            }
+            setProducts(result.data);
 
             setTotalProducts(result.count);
+
+            setOffset(result.data.length);
 
         } finally {
 
@@ -138,60 +245,71 @@ export default function HomeComponent({
     };
 
 
-    const changeItemsPerPage = (value: number) => {
-
-        setItemsPerPage(value);
-        setOffset(0);
-
-        // Pasamos "value" directamente porque
-        // setItemsPerPage todavía no actualizó el state.
-        filterProducts(true, value);
-    };
-
-
-    const clearSearch = () => {
-        setSearchQuery("");
-    };
-
-
-    const loadMoreItems = () => {
-        filterProducts(false);
-    };
-
-
     return (
         <>
             <HeroBanner
-                company={company}
                 banners={banners}
-                setCurrentBannerIndex={setCurrentBannerIndex}
-                currentBannerIndex={currentBannerIndex}
+                setCurrentBannerIndex={
+                    setCurrentBannerIndex
+                }
+                currentBannerIndex={
+                    currentBannerIndex
+                }
             />
 
-            {loading ? (
-                <SkeletonProducts />
-            ) : (
+            <div className="relative">
+
                 <ProductSection
                     categories={categories}
-                    selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
+
+                    selectedCategory={
+                        selectedCategory
+                    }
+
+                    setSelectedCategory={
+                        setSelectedCategory
+                    }
 
                     products={products}
 
                     searchQuery={searchQuery}
 
                     itemsPerPage={itemsPerPage}
+
                     totalProducts={totalProducts}
 
                     authEnabled={authEnabled}
 
-                    setSearchQuery={setSearchQuery}
+                    setSearchQuery={
+                        setSearchQuery
+                    }
+
                     clearSearch={clearSearch}
 
-                    changeItemsPerPage={changeItemsPerPage}
-                    loadMoreItems={loadMoreItems}
+                    changeItemsPerPage={
+                        changeItemsPerPage
+                    }
+
+                    loadMoreItems={
+                        loadMoreItems
+                    }
+
+                    reloadProducts={
+                        reloadProducts
+                    }
                 />
-            )}
+
+                {loading && (
+                    <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[1px]">
+                        <div className="sticky top-20 flex justify-center pt-10">
+                            <div className="rounded-md bg-white px-4 py-2 shadow">
+                                Cargando productos...
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+            </div>
         </>
     );
 }

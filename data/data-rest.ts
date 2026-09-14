@@ -1,6 +1,5 @@
 // data-rest.ts
 
-import { TYPE_PRODUCT_LIST } from "@/constants/type-product";
 import { apiFetch, apiRequestFetch } from "@/lib/utils";
 import { Agency, ApiResult } from "@/types/api-type";
 import {
@@ -31,12 +30,11 @@ export const fetchGetToken = async (Cookie: string): Promise<ApiResult<{ accessT
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-       "Cookie": Cookie,
+      "Cookie": Cookie,
     },
     cache: "no-store",
   });
 }
-
 
 // Función para obtener todo los productos por filtro
 export const fetchProducts = async ({
@@ -51,8 +49,6 @@ export const fetchProducts = async ({
   filters?: FilterOptions | null,
 }):
   Promise<{ data: Product[], count: number }> => {
-
-
   // Obtener los datos de la respuesta
   return await apiFetch<{
     data: Product[],
@@ -73,123 +69,26 @@ export const fetchProducts = async ({
 }
 
 // Función para obtener en detalle de un producto
-export const fetchProductById = async (id: string): Promise<Product> => {
+export const fetchProductById = async (id: string): Promise<ApiResult<Product>> => {
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${domainBase}/api/producto/filter/web/${id}`, {
+  return await apiRequestFetch<Product>(`${domainBase}/api/producto/filter/web/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
     next: { revalidate: 0 }
   });
-
-  let images = [];
-
-  if (data.imagen) {
-    images.push({
-      id: "principal-1",
-      name: data.nombre,
-      url: data.imagen,
-      width: 600,
-      height: 400
-    })
-  }
-
-  if (data.imagenes.lenght !== 0) {
-    data.imagenes.forEach((image: any) => {
-      images.push({
-        id: image.idImagen,
-        name: image.nombre,
-        url: image.url,
-        width: image.ancho,
-        height: image.alto
-      })
-    })
-  }
-
-  if (!data.imagen && (!data.imagenes || data.imagenes.length === 0)) {
-    images.push({
-      id: "1",
-      name: "Default",
-      url: "/placeholder.svg",
-      width: 600,
-      height: 400
-    })
-  }
-
-  return {
-    id: data.id,
-    idProduct: data.idProducto,
-    code: data.codigo,
-    sku: data.sku,
-    codeBar: data.codigoBarras,
-    name: data.nombre,
-    description: data.descripcionCorta,
-    descriptionLong: data.descripcionLarga,
-    price: data.precio,
-    idCategory: data.idCategoria,
-    idBrand: data.idMarca,
-    image: data.imagen,
-    isNew: true,
-    stock: data.cantidad,
-    typeProduct: TYPE_PRODUCT_LIST.find(type => type.id === data.idTipoProducto),
-    category: { id: data.categoria.idCategoria, name: data.categoria.nombre },
-    brand: { id: data.marca.idMarca, name: data.marca.nombre },
-    measure: { id: data.medida.idMedida, name: data.medida.nombre },
-    details: data.detalles.map((item: { id: string, nombre: string, valor: string }) => ({ id: item.id, name: item.nombre, value: item.valor })),
-    images: images,
-    colors: data.colores.map((item: { id: string, idAtributo: string, nombre: string, hexadecimal: string }) => ({ id: item.idAtributo, name: item.nombre, hexadecimal: item.hexadecimal })),
-    sizes: data.tallas.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
-    flavors: data.sabores.map((item: { id: string, idAtributo: string, nombre: string, valor: string }) => ({ id: item.idAtributo, name: item.nombre, value: item.valor })),
-  } as Product;
 }
 
 // Función para obtener los productos relacionados
-export const fetchProductsRelated = async (idProduct: string, idCategory: string): Promise<Product[]> => {
+export const fetchProductsRelated = async (idProduct: string, idCategory: string): Promise<ApiResult<Product[]>> => {
   // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${domainBase}/api/producto/filter/web/related/${idProduct}/${idCategory}`, {
+  return await apiRequestFetch<Product[]>(`${domainBase}/api/producto/filter/web/related/${idProduct}/${idCategory}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
     next: { revalidate: 0 }
-  });
-
-  return data.map((item: {
-    id: number
-    idProducto: string,
-    nombre: string,
-    codigo: string,
-    sku: string,
-    codigoBarras: string,
-    idTipoProducto: string,
-    descripcionCorta: string,
-    descripcionLarga: string,
-    precio: number,
-    imagen: string,
-    cantidad: number,
-    servicio: number,
-
-    idCategoria: string,
-    categoriaNombre: string,
-
-    idMarca: string,
-    marcaNombre: string,
-
-    idMedida: string,
-    nombreMedida: string,
-  }) => {
-    return {
-      id: item.id.toString(),
-      idProduct: item.idProducto,
-      code: item.codigo,
-      name: item.nombre,
-      description: item.descripcionCorta,
-      descriptionLong: item.descripcionLarga,
-      price: item.precio,
-      idCategory: item.idCategoria,
-      idBrand: item.idMarca,
-      image: item.imagen,
-      isNew: true,
-      stock: item.cantidad,
-      isService: item.servicio === 1 ? true : false,
-      category: { id: item.idCategoria, name: item.categoriaNombre },
-      brand: { id: item.idMarca, name: item.marcaNombre },
-      measure: { id: item.idMedida, name: item.nombreMedida },
-      typeProduct: TYPE_PRODUCT_LIST.find(type => type.id === item.idTipoProducto),
-    } as unknown as Product
   });
 }
 
@@ -219,8 +118,6 @@ export const fetchCategories = async (): Promise<Category[]> => {
 
 // Función para obtener la información de la empresa
 export const fetchCompanyInfo = async (): Promise<Company> => {
-
-
   // Obtener los datos de la respuesta
   const data = await apiFetch<any>(`${domainBase}/api/empresa/web/info`, {
     next: { revalidate: 0 }
@@ -411,27 +308,15 @@ export const fetchCurrencyInfo = async (): Promise<Currency> => {
 }
 
 // Función para obtener la información del comprobante o documento
-export const fetchPaymentReceipts = async (idBranch: string): Promise<PaymentReceipt[]> => {
+export const fetchPaymentReceipts = async (idBranch: string): Promise<ApiResult<PaymentReceipt[]>> => {
   // Obtener los datos de la respuesta
-  const data = await apiFetch<[]>(`${domainBase}/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
+  return await apiRequestFetch<PaymentReceipt[]>(`${domainBase}/api/comprobante/combo?tipo=TC0010&idSucursal=${idBranch}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
     next: { revalidate: 0 }
   });
-
-  const paymentReceipts: PaymentReceipt[] = data.map((document: {
-    idComprobante: string,
-    nombre: string,
-    serie: string,
-    preferida: number
-  }) => {
-    return {
-      idPaymentReceipt: document.idComprobante,
-      name: document.nombre,
-      series: document.serie,
-      prefered: document.preferida === 1 ? true : false,
-    }
-  });
-
-  return paymentReceipts;
 }
 
 // Función para registrar el pedido
