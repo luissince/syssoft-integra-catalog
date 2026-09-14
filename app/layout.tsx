@@ -19,6 +19,8 @@ import Footer from "@/components/Footer"
 import { WhatsAppProvider } from "@/context/WhatsAppContext";
 import AuthSyncProvider from "@/components/AuthSyncProvider";
 import CartButton from "@/components/CartButton";
+import { CompanyProvider } from "@/context/CompanyContext";
+import { BranchProvider } from "@/context/BranchContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -107,6 +109,10 @@ export default async function RootLayout({
 
   const branch = branches.find((branch) => branch.primary === true)!;
 
+  if (!branch) {
+    throw new Error("Primary branch not found");
+  }
+
   return (
     <html lang="es" className={`
     ${inter.variable}
@@ -117,34 +123,31 @@ export default async function RootLayout({
         <AuthSyncProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
             <AuthProvider>
-              <CurrencyProvider initialCurrency={currency}>
-                <WhatsAppProvider initialWhatsapp={whatsapp}>
-                  <CartProvider>
-                    <WishlistProvider>
-                      <div className="min-h-screen bg-background">
-                        <Nav
-                          company={company}
-                          branch={branch}
-                          person={person}
-                        />
+              <CompanyProvider initialCompany={company}>
+                <BranchProvider initialBranches={branches}>
+                  <CurrencyProvider initialCurrency={currency}>
+                    <WhatsAppProvider initialWhatsapp={whatsapp}>
+                      <CartProvider>
+                        <WishlistProvider>
+                          <div className="min-h-screen bg-background">
+                            <Nav
+                              person={person}
+                            />
 
-                        {children}
+                            {children}
 
-                        <Footer
-                          company={company}
-                          branch={branch}
-                        />
-                      </div>
-                      <Toaster />
-                      <CartButton />
-                      <WhatsAppButton
-                        company={company}
-                      />
-                      <ContactButton />
-                    </WishlistProvider>
-                  </CartProvider>
-                </WhatsAppProvider>
-              </CurrencyProvider>
+                            <Footer />
+                          </div>
+                          <Toaster />
+                          <CartButton />
+                          <WhatsAppButton />
+                          <ContactButton />
+                        </WishlistProvider>
+                      </CartProvider>
+                    </WhatsAppProvider>
+                  </CurrencyProvider>
+                </BranchProvider>
+              </CompanyProvider>
             </AuthProvider>
           </ThemeProvider>
         </AuthSyncProvider>

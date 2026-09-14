@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCompany } from "@/context/CompanyContext";
 import { cn } from "@/lib/utils";
 
 interface Banner {
@@ -8,13 +8,7 @@ interface Banner {
     url: string;
 }
 
-interface Company {
-    name: string;
-    information: string;
-}
-
 interface Props {
-    company: Company;
     banners: Banner[];
     setCurrentBannerIndex: (index: number) => void;
     currentBannerIndex: number;
@@ -22,12 +16,13 @@ interface Props {
 }
 
 export default function HeroBanner({
-    company,
     banners,
     setCurrentBannerIndex,
     currentBannerIndex,
     className,
 }: Props) {
+
+    const { company } = useCompany();
 
     return (
         <section className={cn(

@@ -8,11 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Branch, Consult } from "@/types/api-type"
+import { Consult } from "@/types/api-type"
 import { createConsult } from "@/lib/api"
 import { PageBreadcrumb } from "./PageBreadcrumb"
 import Container from "./Container"
 import { toast } from "@/hooks/use-toast"
+import { useBranch } from "@/context/BranchContext"
 
 type FormValues = {
   name: string
@@ -20,10 +21,6 @@ type FormValues = {
   subject: string
   phone: string
   message: string
-}
-
-interface Props {
-  branches: Branch[]
 }
 
 const consultDefault: Consult = {
@@ -35,10 +32,12 @@ const consultDefault: Consult = {
   status: 1,
 }
 
-export default function ContactComponent({ branches }: Props) {
+export default function ContactComponent() {
   const router = useRouter()
+  const { branch, branches } = useBranch()
+  
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedBranch, setSelectedBranch] = useState(branches[0].idBranch)
+  const [selectedBranch, setSelectedBranch] = useState(branch.idBranch)
 
   const {
     register,
@@ -187,7 +186,7 @@ export default function ContactComponent({ branches }: Props) {
 
         <div>
           <h2 className="text-xl font-semibold mb-6">Nuestras Sucursales</h2>
-          <Tabs defaultValue={branches[0].idBranch} value={selectedBranch} onValueChange={setSelectedBranch} className="mb-6">
+          <Tabs defaultValue={branch.idBranch} value={selectedBranch} onValueChange={setSelectedBranch} className="mb-6">
             <TabsList className="flex justify-start flex-grow w-full">
               {branches.map((branch) => (
                 <TabsTrigger key={branch.idBranch} value={branch.idBranch}>

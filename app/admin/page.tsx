@@ -3,7 +3,6 @@
 import AdminComponent from "@/components/AdminPanel";
 import { fetchAllOrder } from "@/data/data-rest";
 import {
-    getCompanyInfo,
     getListTypeDocument
 } from "@/lib/api";
 import { getCurrentSession } from "@/lib/auth";
@@ -17,11 +16,9 @@ export default async function Component() {
     }
 
     const [
-        company,
         listTypeDocument,
         orders
     ] = await Promise.all([
-        getCompanyInfo(),
         getListTypeDocument(),
         fetchAllOrder({
             opcion: 3,
@@ -36,7 +33,6 @@ export default async function Component() {
 
     return (
         <AdminComponent
-            company={company}
             listTypeDocument={listTypeDocument}
             initialOrders={orders.data!}
             person={person}

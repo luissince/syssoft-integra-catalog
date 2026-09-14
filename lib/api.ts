@@ -27,26 +27,6 @@ import {
 } from "@/types/api-type";
 import { FormCustomer } from "@/types/form";
 
-// Obtener en detalle de un producto
-export async function getProductById(code: string): Promise<Product | null> {
-    try {
-        const data = await fetchProductById(code);
-        return data;
-    } catch (error) {
-        return null;
-    }
-}
-
-// Obtener los productos relacionados
-export async function getProductsRelated(idProduct: string, idCategory: string): Promise<Product[]> {
-    try {
-        const data = await fetchProductsRelated(idProduct, idCategory);
-        return data;
-    } catch (error) {
-        return [];
-    }
-}
-
 // Obtener las categorías
 export async function getCategories(): Promise<Category[]> {
     try {

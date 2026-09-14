@@ -5,18 +5,17 @@ import { Button } from "./ui/button";
 import { Clock, MapPin, Phone, MessageCircle } from "lucide-react";
 import { useContact } from "@/lib/contact";
 import { useRouter } from "next/navigation";
-import { Branch, Company, Whatsapp } from "@/types/api-type";
 import Container from "./Container";
 import { useWhatsApp } from "@/context/WhatsAppContext";
 import { APP_COMMIT, APP_VERSION } from "@/lib/version";
+import { useCompany } from "@/context/CompanyContext";
+import { useBranch } from "@/context/BranchContext";
 
-interface FooterProps {
-  company: Company;
-  branch: Branch;
-}
-
-export default function Footer({ company, branch }: FooterProps) {
+export default function Footer() {
   const router = useRouter();
+  const { company } = useCompany();
+  const { branch } = useBranch();
+
   const { handleCall, handleWhatsapp, getDefaultMessage, isMobile } = useContact();
   const { whatsapp } = useWhatsApp();
 
