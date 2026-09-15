@@ -209,7 +209,7 @@ export default function ProductSection({
                             </div>
                         )}
 
-                        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 pb-8">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
                             {products.map((item) => (
                                 <MenuCard
                                     key={item.idProduct}

@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 import {
     Category,
     CompanyBanner,
-    Product,
+    Product
 } from "@/types/api-type";
 
 import HeroBanner from "./HeroBanner";
 import ProductSection from "./ProductSection";
+
 import { fetchProducts } from "@/data/data-rest";
 import { SkeletonProducts } from "./ui/skeleton";
 
@@ -27,33 +28,23 @@ export default function HomeComponent({
     categories,
     banners,
     initialProducts,
-    authEnabled = false,
+    authEnabled = false
 }: HomeComponentProps) {
-
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-
     const [loading, setLoading] = useState(false);
 
+    const [restart, setRestart] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("");
-
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
     const [products, setProducts] = useState(initialProducts.data);
-
-    const [totalProducts, setTotalProducts] = useState(
-        initialProducts.count
-    );
+    const [totalProducts, setTotalProducts] = useState(initialProducts.count);
 
     const [itemsPerPage, setItemsPerPage] = useState(6);
+    const [offset, setOffset] = useState(initialProducts.data.length);
 
-    const [offset, setOffset] = useState(
-        initialProducts.data.length
-    );
-
-    // --------------------------------------------------
-    // BANNER
-    // --------------------------------------------------
-
+    // Banner
     useEffect(() => {
 
         if (banners.length <= 1) {
@@ -61,11 +52,9 @@ export default function HomeComponent({
         }
 
         const interval = setInterval(() => {
-
-            setCurrentBannerIndex(
-                (prev) => (prev + 1) % banners.length
+            setCurrentBannerIndex((prev) =>
+                (prev + 1) % banners.length
             );
-
         }, 5000);
 
         return () => clearInterval(interval);
@@ -73,243 +62,158 @@ export default function HomeComponent({
     }, [banners.length]);
 
 
-    // --------------------------------------------------
-    // FILTRAR PRODUCTOS
-    // --------------------------------------------------
-
-    const filterProducts = useCallback(
-        async (
-            reset = true,
-            pageSize = itemsPerPage
-        ) => {
-
-            try {
-
-                setLoading(true);
-
-                const result = await fetchProducts({
-                    search: searchQuery,
-
-                    filters: {
-                        categories: selectedCategory
-                            ? [
-                                  {
-                                      id: selectedCategory,
-                                  },
-                              ]
-                            : [],
-                    },
-
-                    currentPage: reset ? 0 : offset,
-
-                    totalPage: pageSize,
-                });
-
-                if (reset) {
-
-                    setProducts(result.data);
-
-                    setOffset(result.data.length);
-
-                } else {
-
-                    setProducts((prev) => [
-                        ...prev,
-                        ...result.data,
-                    ]);
-
-                    setOffset(
-                        (prev) =>
-                            prev + result.data.length
-                    );
-                }
-
-                setTotalProducts(result.count);
-
-            } finally {
-
-                setLoading(false);
-
-            }
-
-        },
-        [
-            searchQuery,
-            selectedCategory,
-            itemsPerPage,
-            offset,
-        ]
-    );
-
-
-    // --------------------------------------------------
-    // BUSCAR / FILTRAR
-    // --------------------------------------------------
-
+    // Buscar / filtrar productos
     useEffect(() => {
-
-        if (
-            searchQuery === "" &&
-            selectedCategory === ""
-        ) {
-            return;
-        }
-
         const timer = setTimeout(() => {
-
-            filterProducts(true);
-
+            setDebouncedSearchQuery(searchQuery);
         }, 500);
 
         return () => clearTimeout(timer);
+    }, [searchQuery]);
 
-    }, [
-        searchQuery,
-        selectedCategory,
-        filterProducts,
-    ]);
+    useEffect(() => {
+        if (debouncedSearchQuery === "" && selectedCategory === "") {
+            return;
+        }
 
+        filterProducts(true);
+    }, [debouncedSearchQuery, selectedCategory]);
 
-    // --------------------------------------------------
-    // CAMBIAR CANTIDAD
-    // --------------------------------------------------
+    useEffect(() => {
+        if (restart) {
+            filterProducts(true);
+            setRestart(false);
+        }
+    }, [restart]);
 
-    const changeItemsPerPage = (
-        value: number
+    useEffect(() => {
+        if (loading) {
+            return;
+        }
+
+        filterProducts(true);
+    }, [itemsPerPage]);
+
+    const filterProducts = async (
+        reset = true,
+        pageSize = itemsPerPage
     ) => {
+        if (loading) {
+            return;
+        }
 
-        setItemsPerPage(value);
+        try {
+            setLoading(true);
 
-        setOffset(0);
+            const result = await fetchProducts({
+                search: debouncedSearchQuery,
+                filters: {
+                    categories: selectedCategory
+                        ? [
+                            {
+                                id: selectedCategory
+                            }
+                        ]
+                        : []
+                },
+                currentPage: reset ? 0 : offset,
+                totalPage: pageSize,
+            });
 
-        filterProducts(true, value);
+            if (reset) {
+                setProducts(result.data);
+                setOffset(result.data.length);
+            } else {
+                setProducts(prev => [
+                    ...prev,
+                    ...result.data
+                ]);
+
+                setOffset(prev =>
+                    prev + result.data.length
+                );
+            }
+
+            setTotalProducts(result.count);
+        } finally {
+            setLoading(false);
+        }
     };
 
-
-    // --------------------------------------------------
-    // LIMPIAR BUSQUEDA
-    // --------------------------------------------------
+    const changeItemsPerPage = (value: number) => {
+        if (loading) {
+            return;
+        }
+        setItemsPerPage(value);
+        setOffset(0);
+    };
 
     const clearSearch = () => {
-
+        if (loading) {
+            return;
+        }
         setSearchQuery("");
-
     };
-
-
-    // --------------------------------------------------
-    // CARGAR MÁS
-    // --------------------------------------------------
 
     const loadMoreItems = () => {
-
+        if (loading) {
+            return;
+        }
         filterProducts(false);
-
     };
-
 
     // --------------------------------------------------
     // RECARGAR TODO
     // --------------------------------------------------
-
     const reloadProducts = async () => {
-
+        if (loading) {
+            return;
+        }
         setSearchQuery("");
         setSelectedCategory("");
+        setProducts([]);
         setOffset(0);
+        setRestart(true);
 
-        try {
-
-            setLoading(true);
-
-            const result = await fetchProducts({
-                search: "",
-                filters: {
-                    categories: [],
-                },
-                currentPage: 0,
-                totalPage: itemsPerPage,
-            });
-
-            setProducts(result.data);
-
-            setTotalProducts(result.count);
-
-            setOffset(result.data.length);
-
-        } finally {
-
-            setLoading(false);
-
-        }
     };
-
 
     return (
         <>
             <HeroBanner
                 banners={banners}
-                setCurrentBannerIndex={
-                    setCurrentBannerIndex
-                }
-                currentBannerIndex={
-                    currentBannerIndex
-                }
+                setCurrentBannerIndex={setCurrentBannerIndex}
+                currentBannerIndex={currentBannerIndex}
             />
 
-            <div className="relative">
+            {
+                loading && <SkeletonProducts />
+            }
 
-                <ProductSection
-                    categories={categories}
+            {
+                !loading && (
+                    <ProductSection
+                        categories={categories}
+                        selectedCategory={selectedCategory}
+                        setSelectedCategory={setSelectedCategory}
 
-                    selectedCategory={
-                        selectedCategory
-                    }
+                        products={products}
 
-                    setSelectedCategory={
-                        setSelectedCategory
-                    }
+                        searchQuery={searchQuery}
 
-                    products={products}
+                        itemsPerPage={itemsPerPage}
+                        totalProducts={totalProducts}
 
-                    searchQuery={searchQuery}
+                        authEnabled={authEnabled}
 
-                    itemsPerPage={itemsPerPage}
+                        setSearchQuery={setSearchQuery}
+                        clearSearch={clearSearch}
 
-                    totalProducts={totalProducts}
-
-                    authEnabled={authEnabled}
-
-                    setSearchQuery={
-                        setSearchQuery
-                    }
-
-                    clearSearch={clearSearch}
-
-                    changeItemsPerPage={
-                        changeItemsPerPage
-                    }
-
-                    loadMoreItems={
-                        loadMoreItems
-                    }
-
-                    reloadProducts={
-                        reloadProducts
-                    }
-                />
-
-                {loading && (
-                    <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[1px]">
-                        <div className="sticky top-20 flex justify-center pt-10">
-                            <div className="rounded-md bg-white px-4 py-2 shadow">
-                                Cargando productos...
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-            </div>
+                        changeItemsPerPage={changeItemsPerPage}
+                        loadMoreItems={loadMoreItems}
+                        reloadProducts={reloadProducts}
+                    />
+                )
+            }
         </>
     );
 }
