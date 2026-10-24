@@ -28,14 +28,10 @@ export default async function ProductDetalle({ params }: ProductDetalleProps) {
   // Cargar productos relacionados después de confirmar que el producto existe
   const relatedProducts = await fetchProductsRelated(id, product.data.idCategory);
 
-  // Procesar variable de entorno en el servidor
-  const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
-
   return (
     <ProductComponent
       product={product.data}
       relatedProducts={relatedProducts.success ? relatedProducts.data! : []}
-      authEnabled={authEnabled}
     />
   );
 }

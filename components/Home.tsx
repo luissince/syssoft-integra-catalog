@@ -21,14 +21,12 @@ interface HomeComponentProps {
         data: Product[];
         count: number;
     };
-    authEnabled?: boolean;
 }
 
 export default function HomeComponent({
     categories,
     banners,
-    initialProducts,
-    authEnabled = false
+    initialProducts
 }: HomeComponentProps) {
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -202,8 +200,6 @@ export default function HomeComponent({
 
                         itemsPerPage={itemsPerPage}
                         totalProducts={totalProducts}
-
-                        authEnabled={authEnabled}
 
                         setSearchQuery={setSearchQuery}
                         clearSearch={clearSearch}

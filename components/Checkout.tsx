@@ -76,7 +76,6 @@ export default function CheckoutComponent({
      *    cargamos sus comprobantes.
      */
     useEffect(() => {
-
         if (cart.length === 0) {
             return;
         }
@@ -84,9 +83,7 @@ export default function CheckoutComponent({
         let cancelled = false;
 
         const loadReceipts = async () => {
-
             setLoadingReceipts(true);
-
             const result = await fetchPaymentReceipts(
                 branch.idBranch
             );
@@ -96,18 +93,14 @@ export default function CheckoutComponent({
             }
 
             if (!result.success) {
-
                 alert.error({
                     message: result.message,
                 });
-
                 setLoadingReceipts(false);
-
                 return;
             }
 
             setReceipts(result.data ?? []);
-
             setLoadingReceipts(false);
         };
 
@@ -119,9 +112,7 @@ export default function CheckoutComponent({
 
     }, [branch.idBranch, cart.length]);
 
-
     const handleSubmitOrder = async (formOrder: FormOrder) => {
-
         alert.loading({
             message: "Procesando pedido...",
         });
@@ -129,11 +120,9 @@ export default function CheckoutComponent({
         const createOrderResult = await fetchCreateOrder(formOrder);
 
         if (!createOrderResult.success) {
-
             alert.error({
                 message: createOrderResult.message,
             });
-
             return;
         }
 
@@ -142,20 +131,15 @@ export default function CheckoutComponent({
         );
 
         if (!orderResult.success) {
-
             alert.error({
                 message: orderResult.message,
             });
-
             return;
         }
 
         alert.close(() => {
-
             setCompletedOrder(orderResult.data);
-
             clearCart();
-
         });
     };
 

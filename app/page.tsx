@@ -21,14 +21,11 @@ export default async function Home() {
     }),
   ]);
 
-  const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
-
   return (
     <HomeComponent
       banners={banners}
       categories={categories}
       initialProducts={products}
-      authEnabled={authEnabled}
     />
   );
 }

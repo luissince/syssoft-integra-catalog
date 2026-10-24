@@ -21,6 +21,8 @@ import AuthSyncProvider from "@/components/AuthSyncProvider";
 import CartButton from "@/components/CartButton";
 import { CompanyProvider } from "@/context/CompanyContext";
 import { BranchProvider } from "@/context/BranchContext";
+import { LocationProvider } from "@/context/LocationContext";
+import Menu from "@/components/Menu";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -129,19 +131,22 @@ export default async function RootLayout({
                     <WhatsAppProvider initialWhatsapp={whatsapp}>
                       <CartProvider>
                         <WishlistProvider>
-                          <div className="min-h-screen bg-background">
-                            <Nav
-                              person={person}
-                            />
+                          <LocationProvider>
+                            <div className="min-h-screen bg-background">
+                              <Nav
+                                person={person}
+                              />
 
-                            {children}
+                              {children}
 
-                            <Footer />
-                          </div>
-                          <Toaster />
-                          <CartButton />
-                          <WhatsAppButton />
-                          <ContactButton />
+                              <Footer />
+                              <Menu />
+                            </div>
+                            <Toaster />
+                            {/* <CartButton /> */}
+                            <WhatsAppButton />
+                            <ContactButton />
+                          </LocationProvider>
                         </WishlistProvider>
                       </CartProvider>
                     </WhatsAppProvider>

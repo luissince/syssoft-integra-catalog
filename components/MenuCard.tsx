@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Plus, Minus } from "lucide-react"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { Currency, Product } from "@/types/api-type"
+import { Product } from "@/types/api-type"
 import { TYPE_PRODUCT } from "@/constants/type-product"
 import { formatCurrency } from "@/lib/utils"
 import { useCurrency } from "@/context/CurrencyContext"
@@ -20,10 +20,9 @@ import { useCart } from "@/context/CartContext"
 
 interface MenuCardProps {
   item: Product;
-  authEnabled: boolean;
 }
 
-export function MenuCard({ item, authEnabled }: MenuCardProps) {
+export function MenuCard({ item }: MenuCardProps) {
 
   const router = useRouter()
   const { addToCart } = useCart();
@@ -103,98 +102,92 @@ export function MenuCard({ item, authEnabled }: MenuCardProps) {
               </Badge>
             )}
 
-            {
-              !authEnabled && (
-                <div className="text-muted-foreground font-bold text-right">
-                  {formatCurrency(item.price, currency.code)}
-                  {item.measure?.name && <small className="text-xs"> x {item.measure.name}</small>}
-                </div>
-              )
-            }
+            <div className="text-muted-foreground font-bold text-right">
+              {formatCurrency(item.price, currency.code)}
+              {item.measure?.name && <small className="text-xs"> x {item.measure.name}</small>}
+            </div>
           </div>
 
           {/* Precio y botón (altura fija) */}
-          {authEnabled && (
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2 mt-auto">
-              <div className="text-muted-foreground font-bold text-base">
-                {formatCurrency(item.price, currency.code)}
-                {item.measure?.name && <small className="text-xs"> x {item.measure.name}</small>}
-              </div>
-              <div className="w-full lg:w-auto flex lg:justify-end" onClick={(e) => e.stopPropagation()}>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      size="sm"
-                      className="w-full lg:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4"
-                    >
-                      Agregar
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-card text-card-foreground border-border max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl">{item.name}</DialogTitle>
-                      <DialogDescription>
-                        {item.description}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-6">
-                      {
-                        TYPE_PRODUCT.PRODUCT.id === item.typeProduct?.id && (
-                          <div>
-                            <Label className="text-foreground font-medium">Cantidad</Label>
-                            <div className="flex items-center space-x-3 mt-3">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                className="h-10 w-10 p-0"
-                              >
-                                <Minus className="w-4 h-4" />
-                              </Button>
-                              <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setQuantity(quantity + 1)}
-                                className="h-10 w-10 p-0"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        )
-                      }
-
-                      <div>
-                        <Label htmlFor="notes" className="text-foreground font-medium">
-                          Notas especiales (opcional)
-                        </Label>
-                        <Textarea
-                          id="notes"
-                          placeholder="Ej: Sin cebolla, término medio, etc."
-                          value={notes}
-                          onChange={(e) => setNotes(e.target.value)}
-                          className="mt-3 bg-muted border-border text-foreground placeholder:text-muted-foreground"
-                          rows={3}
-                        />
-                      </div>
-                      <div className="flex justify-between items-center pt-4 border-t border-border">
-                        <span className="text-xl font-bold text-foreground">
-                          Total: <span className="text-primary">{formatCurrency(item.price * quantity, currency.code)}</span>
-                        </span>
-                        <Button
-                          onClick={handleAddToCart}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"
-                        >
-                          Agregar al carrito
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2 mt-auto">
+            <div className="text-muted-foreground font-bold text-base">
+              {formatCurrency(item.price, currency.code)}
+              {item.measure?.name && <small className="text-xs"> x {item.measure.name}</small>}
             </div>
-          )}
+            <div className="w-full lg:w-auto flex lg:justify-end" onClick={(e) => e.stopPropagation()}>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="w-full lg:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-card text-card-foreground border-border max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl">{item.name}</DialogTitle>
+                    <DialogDescription>
+                      {item.description}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-6">
+                    {
+                      TYPE_PRODUCT.PRODUCT.id === item.typeProduct?.id && (
+                        <div>
+                          <Label className="text-foreground font-medium">Cantidad</Label>
+                          <div className="flex items-center space-x-3 mt-3">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                              className="h-10 w-10 p-0"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </Button>
+                            <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setQuantity(quantity + 1)}
+                              className="h-10 w-10 p-0"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    <div>
+                      <Label htmlFor="notes" className="text-foreground font-medium">
+                        Notas especiales (opcional)
+                      </Label>
+                      <Textarea
+                        id="notes"
+                        placeholder="Ej: Sin cebolla, término medio, etc."
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="mt-3 bg-muted border-border text-foreground placeholder:text-muted-foreground"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center pt-4 border-t border-border">
+                      <span className="text-xl font-bold text-foreground">
+                        Total: <span className="text-primary">{formatCurrency(item.price * quantity, currency.code)}</span>
+                      </span>
+                      <Button
+                        onClick={handleAddToCart}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"
+                      >
+                        Agregar al carrito
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

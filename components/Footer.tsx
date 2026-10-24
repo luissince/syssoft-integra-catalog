@@ -59,7 +59,7 @@ export default function Footer() {
           {/* Restaurant Info */}
           <div className="col-span-1 md:col-span-6">
             <div className="mb-4">
-              <span className="text-xl lg:text-2xl font-bold text-foreground">{company.name}</span>
+              <span className="text-lg lg:text-xl font-bold text-foreground">{company.name}</span>
             </div>
             <p className="text-sm lg:text-base text-muted-foreground mb-2 leading-relaxed">
               {company.information}
