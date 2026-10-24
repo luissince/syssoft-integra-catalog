@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { LogOut, Phone, Settings, MenuIcon, User, UserPlus } from "lucide-react";
+import { LogOut, Phone, Settings, MenuIcon, User, UserPlus, ShoppingBag } from "lucide-react";
 import { LoginCard } from "./LoginCard";
 import { useContact } from "@/lib/contact";
 import { Person } from "@/types/api-type";
@@ -16,9 +16,10 @@ import { useState } from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { notifyAuthChange } from "@/lib/utils";
+import { cn, notifyAuthChange } from "@/lib/utils";
 import { useCompany } from "@/context/CompanyContext";
 import { useBranch } from "@/context/BranchContext";
+import { useCart } from "@/context/CartContext";
 
 interface NavProps {
     person: Person | null;
@@ -28,6 +29,7 @@ export default function Nav({ person }: NavProps) {
     const router = useRouter();
     const { company } = useCompany();
     const { branch } = useBranch();
+    const { cart } = useCart();
 
     const { handleCall } = useContact();
     const [loginOpen, setLoginOpen] = useState(false);
@@ -57,10 +59,10 @@ export default function Nav({ person }: NavProps) {
     };
 
     return (
-        <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
+        <header className="bg-card border-b border-border sticky top-0 z-20 shadow-sm">
             <Container>
                 <div className="flex items-center justify-between">
-                    <div className="flex h-16 w-28 items-center lg:h-20 lg:w-36">
+                    <div className="flex items-start justify-center flex-col h-16 w-28 lg:h-20 lg:w-36">
                         <Image
                             src={company.logo || "/placeholder.svg"}
                             alt={company.name}
@@ -82,6 +84,36 @@ export default function Nav({ person }: NavProps) {
                         </Button>
 
                         <ThemeToggle />
+
+                        <Button
+                            variant="outline"
+                            className="flex items-center relative"
+                            onClick={() => router.push("/cart")}
+                        >
+                            <ShoppingBag className="w-4 h-4" />
+
+                            {cart.length > 0 && (
+                                <span
+                                    className={cn(
+                                        "absolute",
+                                        "-top-1",
+                                        "-right-1",
+                                        "min-w-5",
+                                        "h-5",
+                                        "px-1",
+                                        "rounded-full",
+                                        "bg-primary",
+                                        "text-primary-foreground",
+                                        "text-xs",
+                                        "font-bold",
+                                        "flex",
+                                        "items-center",
+                                        "justify-center",
+                                    )}>
+                                    {cart.length}
+                                </span>
+                            )}
+                        </Button>
 
                         {
                             person ? (
@@ -110,7 +142,6 @@ export default function Nav({ person }: NavProps) {
                             )
                         }
                     </div>
-
 
                     {/* Tablet/Mobile */}
                     <div className="lg:hidden">

@@ -18,10 +18,10 @@ import Container from "@/components/Container";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 
 interface PaymentMethodsPageProps {
-    authEnabled: boolean;
+
 }
 
-export default function PaymentMethodsPage({ authEnabled }: PaymentMethodsPageProps) {
+export default function PaymentMethodsPage({ }: PaymentMethodsPageProps) {
     const router = useRouter();
     const [copiedText, setCopiedText] = useState<string | null>(null);
 

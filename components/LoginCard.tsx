@@ -203,7 +203,6 @@ export function LoginCard({
             </Label>
 
             <div className="relative">
-
               <Input
                 id="password"
                 ref={refPassword}
@@ -236,7 +235,6 @@ export function LoginCard({
                 type="button"
                 onClick={handleRegister}
                 variant="outline"
-                className="text-xs"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
                 Crear Cuenta

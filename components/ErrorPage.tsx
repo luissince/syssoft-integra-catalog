@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, ArrowLeft, RefreshCw } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -52,16 +52,13 @@ export default function ErrorPage({
     )}>
 
       <div className="text-center space-y-8 p-8 max-w-md">
-
         <div className="w-24 h-24 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">
           <span className="text-6xl animate-bounce">
             {icon}
           </span>
         </div>
 
-
         <div className="space-y-4">
-
           <h1 className="text-6xl font-bold text-red-500">
             {code}
           </h1>
@@ -73,41 +70,25 @@ export default function ErrorPage({
           <p className="text-muted-foreground text-lg">
             {message} {dots}
           </p>
-
         </div>
 
-
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-
           <Button
-            
+            onClick={() => window.location.href = "/"}
           >
-            <Home className="w-4 h-4 mr-2"/>
+            <Home className="w-4 h-4 mr-2" />
             Inicio
           </Button>
-
-
-          <Button
-            variant="outline"
-            
-          >
-            <ArrowLeft className="w-4 h-4 mr-2"/>
-            Regresar
-          </Button>
-
 
           <Button
             variant="ghost"
             onClick={() => window.location.reload()}
           >
-            <RefreshCw className="w-4 h-4 mr-2"/>
+            <RefreshCw className="w-4 h-4 mr-2" />
             Recargar
           </Button>
-
         </div>
-
       </div>
-
     </div>
   );
 }

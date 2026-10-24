@@ -12,7 +12,7 @@ import Container from "./Container";
 import { PageBreadcrumb } from "./PageBreadcrumb";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { keyNumberPhone } from "@/lib/utils";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, House } from "lucide-react";
 import { fetchRegisterConsumer } from "@/data/data-rest";
 import { FormCustomer } from "@/types/form";
 import { useRouter } from "next/navigation";
@@ -117,7 +117,7 @@ export default function RegisterComponent({ listTypeDocument }: RegisterCardProp
       alertKit.warning({
         title: "Cliente",
         message: message,
-      },()=>{
+      }, () => {
         setLoading(false);
       });
       return;
@@ -141,6 +141,22 @@ export default function RegisterComponent({ listTypeDocument }: RegisterCardProp
           { label: "Registro" },
         ]}
       />
+
+      {/* Encabezado */}
+      <div className="mb-6 flex items-center gap-3 py-6">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <House className="h-5 w-5" />
+        </div>
+
+        <div>
+          <h1 className="text-xl font-bold text-foreground md:text-2xl">
+            Registro
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Crea tu cuenta para poder comenzar a usar el Catalogo
+          </p>
+        </div>
+      </div>
 
       {/* Body */}
       <div className="w-full flex items-center justify-center py-2 lg:py-4">

@@ -47,7 +47,6 @@ interface ProductImage {
 interface PropsProductComponent {
   product: Product
   relatedProducts: Product[]
-  authEnabled: boolean
 }
 
 interface PropsProductImageGallery {
@@ -293,7 +292,7 @@ function ProductImageGallery({
   )
 }
 
-export default function ProductComponent({ product, relatedProducts, authEnabled }: PropsProductComponent) {
+export default function ProductComponent({ product, relatedProducts }: PropsProductComponent) {
   const params = useParams()
   const router = useRouter()
 
@@ -484,43 +483,39 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
           <div className="space-y-6 pt-2">
             {/* Cantidad */}
             <div className="flex flex-col gap-3">
-              {
-                authEnabled && (
-                  <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
-                    <p className="font-medium text-sm lg:text-base">Cantidad:</p>
-                    <div className="flex items-center space-x-3">
-                      {
-                        product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+                <p className="font-medium text-sm lg:text-base">Cantidad:</p>
+                <div className="flex items-center space-x-3">
+                  {
+                    product.typeProduct?.id === TYPE_PRODUCT.SERVICE.id ? (
+                      <span className="w-12 text-center font-semibold text-sm lg:text-base">{quantity}</span>
+                    )
+                      : (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleQuantityChange(-1)}
+                            disabled={quantity <= 1 || isOutOfStock}
+                            className="h-10 w-10 p-0"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </Button>
                           <span className="w-12 text-center font-semibold text-sm lg:text-base">{quantity}</span>
-                        )
-                          : (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleQuantityChange(-1)}
-                                disabled={quantity <= 1 || isOutOfStock}
-                                className="h-10 w-10 p-0"
-                              >
-                                <Minus className="w-4 h-4" />
-                              </Button>
-                              <span className="w-12 text-center font-semibold text-sm lg:text-base">{quantity}</span>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                disabled={isOutOfStock}
-                                onClick={() => handleQuantityChange(1)}
-                                className="h-10 w-10 p-0"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </Button>
-                            </>
-                          )
-                      }
-                    </div>
-                  </div>
-                )
-              }
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={isOutOfStock}
+                            onClick={() => handleQuantityChange(1)}
+                            className="h-10 w-10 p-0"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )
+                  }
+                </div>
+              </div>
 
               {/* Notas especiales */}
               <div>
@@ -538,51 +533,49 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
               </div>
 
               {/* Botones de acción */}
-              {
-                authEnabled && (
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <Button
-                      className="w-full"
-                      disabled={isOutOfStock}
-                      onClick={handleAddToCart}
-                    >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Añadir al carrito
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      disabled={isOutOfStock}
-                      onClick={handleBuyNow}
-                    >
-                      Pedir ahora
-                    </Button>
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button
+                  className="w-full"
+                  disabled={isOutOfStock}
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Añadir al carrito
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isOutOfStock}
+                  onClick={handleBuyNow}
+                >
+                  Pedir ahora
+                </Button>
 
-                    <div className="flex gap-2 mt-2 sm:mt-0">
-                      <Button
-                        variant={isWishlisted ? "default" : "outline"}
-                        size="icon"
-                        className={`flex-shrink-0 ${isWishlisted ? "bg-red-500 hover:bg-red-600" : ""}`}
-                        onClick={handleWishlistToggle}
-                        aria-label={isWishlisted ? "Eliminar de favoritos" : "Añadir a favoritos"}
-                      >
-                        <Heart className={`h-5 w-5 ${isWishlisted ? "fill-white text-white" : ""}`} />
+                <div className="flex gap-2 mt-2 sm:mt-0">
+                  <Button
+                    variant={isWishlisted ? "default" : "outline"}
+                    size="icon"
+                    className={`flex-shrink-0 ${isWishlisted ? "bg-red-500 hover:bg-red-600" : ""}`}
+                    onClick={handleWishlistToggle}
+                    aria-label={isWishlisted ? "Eliminar de favoritos" : "Añadir a favoritos"}
+                  >
+                    <Heart className={`h-5 w-5 ${isWishlisted ? "fill-white text-white" : ""}`} />
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon" className="flex-shrink-0">
+                        <Share2 className="h-5 w-5" />
                       </Button>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="icon" className="flex-shrink-0">
-                            <Share2 className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleShare("clipboard")}>
-                            Copiar enlace
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleShare("whatsapp")}>
-                            Compartir en WhatsApp
-                          </DropdownMenuItem>
-                          {/* <DropdownMenuItem onClick={() => handleShare("facebook")}>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleShare("clipboard")}>
+                        Copiar enlace
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleShare("whatsapp")}>
+                        Compartir en WhatsApp
+                      </DropdownMenuItem>
+                      {/* <DropdownMenuItem onClick={() => handleShare("facebook")}>
                           Compartir en Facebook
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleShare("twitter")}>
@@ -591,12 +584,10 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
                         <DropdownMenuItem onClick={() => handleShare("email")}>
                           Compartir por email
                         </DropdownMenuItem> */}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                )
-              }
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
             </div>
 
             {/* Total */}
@@ -692,7 +683,6 @@ export default function ProductComponent({ product, relatedProducts, authEnabled
               <MenuCard
                 key={item.idProduct}
                 item={item}
-                authEnabled={authEnabled}
               />
             ))}
           </div>

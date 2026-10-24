@@ -1,6 +1,6 @@
 // components/CheckoutForm.tsx
 
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,8 +29,9 @@ import { useAlert } from "@/hooks/use-alert";
 import { FormOrder } from "@/types/form";
 import { useCart } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
-import { Lock } from "lucide-react";
+import { Asterisk, Loader2, LocateFixed, Lock } from "lucide-react";
 import { useBranch } from "@/context/BranchContext";
+import { useLocation } from "@/context/LocationContext";
 
 interface CheckoutFormProps {
   taxes: Tax[];
@@ -91,6 +92,8 @@ export function CheckoutForm({
   const { cart } = useCart();
   const { branch, branches } = useBranch();
   const { currency } = useCurrency();
+  const { userLocation, isLocating } = useLocation();
+
   const alert = useAlert();
 
   const [formData, setFormData] = useState<FormDataProps>({
@@ -143,10 +146,7 @@ export function CheckoutForm({
   const refDestination = React.useRef<HTMLInputElement>(null);
   const refReceiverName = React.useRef<HTMLInputElement>(null);
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
     if (branches.length === 1) {
@@ -156,6 +156,24 @@ export function CheckoutForm({
       }));
     }
   }, [branches]);
+
+  useEffect(() => {
+    const loadLocation = async () => {
+      const location = userLocation;
+      if (location) {
+        setFormData((prev) => ({
+          ...prev,
+          orderShipping: {
+            ...prev.orderShipping,
+            address: location.name,
+          },
+        }));
+      }
+    };
+    if (!isLocating) {
+      loadLocation();
+    }
+  }, [isLocating]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,7 +340,6 @@ export function CheckoutForm({
                     formData={formData}
                     setFormData={setFormData}
                   />
-
                 )
               }
 
@@ -334,7 +351,6 @@ export function CheckoutForm({
                     formData={formData}
                     setFormData={setFormData}
                   />
-
                 )
               }
 
@@ -360,7 +376,6 @@ export function CheckoutForm({
                     formData={formData}
                     setFormData={setFormData}
                   />
-
                 )
               }
             </div>
@@ -485,9 +500,9 @@ export function CheckoutForm({
         <CardContent className="space-y-4">
           {/* Detakke del pedido */}
           <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-2">
-            {cart.map((item) => (
+            {cart.map((item, index) => (
               <div
-                key={item.id}
+                key={index}
                 className="flex justify-between items-center py-3 border-b border-border"
               >
                 <div className="flex items-center space-x-3">
@@ -519,8 +534,8 @@ export function CheckoutForm({
 
           <div className="space-y-3 pt-4 border-t border-border">
             <div className="flex justify-between text-foreground">
-              <span>Subtotal:</span>
-              <span>{formatCurrency(subtotal, currency!.code)}</span>
+              <span>Total:</span>
+              <span>{formatCurrency(total, currency!.code)}</span>
             </div>
           </div>
 
@@ -607,12 +622,14 @@ const TypeDeliverComponent = ({
 const TypeDeliveryDomicilioComponent = ({
   refAddress,
   formData,
-  setFormData
+  setFormData,
 }: {
   refAddress: React.RefObject<HTMLInputElement | null>;
   formData: FormDataProps;
   setFormData: (value: FormDataProps) => void;
 }) => {
+  const { isLocating, requestUserLocation } = useLocation();
+
   return (
     <div className="space-y-4">
       <h3 className="font-semibold">
@@ -620,31 +637,52 @@ const TypeDeliveryDomicilioComponent = ({
       </h3>
 
       <div>
-        <Label>
-          Dirección <span className="text-red-500 text-base">*</span>
-        </Label>
+        <div className="flex items-center">
+          <Label>
+            Dirección
+          </Label>
 
-        <Input
-          ref={refAddress}
-          placeholder="Dirección de entrega"
-          value={formData.orderShipping.address ?? ""}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              orderShipping: {
-                ...formData.orderShipping,
-                address: e.target.value
-              }
-            })
-          }
-          className="bg-muted border-border text-foreground mt-2"
-        />
+          <Asterisk className="text-red-500 text-base w-4 h-4" />
+        </div>
+
+        <div className="relative">
+          <Input
+            ref={refAddress}
+            placeholder="Dirección de entrega"
+            value={formData.orderShipping.address ?? ""}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                orderShipping: {
+                  ...formData.orderShipping,
+                  address: e.target.value
+                }
+              })
+            }
+            className="bg-muted border-border text-foreground mt-2"
+          />
+
+          <Button
+            variant="ghost"
+            type="button"
+            className="absolute inset-y-0 right-0"
+            onClick={requestUserLocation}
+            disabled={isLocating}
+          >
+            {
+              isLocating
+                ? <Loader2 className="w-4 h-4 text-emerald-600 animate-spin shrink-0" />
+                : <LocateFixed className="w-4 h-4 text-muted-foreground" />
+            }
+          </Button>
+        </div>
       </div>
 
       <div>
         <Label>
           Referencia
         </Label>
+
         <Input
           placeholder="Ej: Casa azul, portón negro"
           value={formData.orderShipping.reference ?? ""}
@@ -681,9 +719,13 @@ const TypeDeliveryRecojoLocalComponent = ({
         Datos de recojo
       </h3>
       <div>
-        <Label>
-          Local <span className="text-red-500 text-base">*</span>
-        </Label>
+        <div className="flex items-center">
+          <Label>
+            Local
+          </Label>
+
+          <Asterisk className="text-red-500 text-base w-4 h-4" />
+        </div>
 
         <Select
           value={formData.orderShipping.idBranch ?? ""}
@@ -736,6 +778,8 @@ const TypeDeliveryProgramadoComponent = ({
   formData: FormDataProps;
   setFormData: (value: FormDataProps) => void;
 }) => {
+  const { isLocating, requestUserLocation } = useLocation();
+
   return (
     <div className="space-y-4">
 
@@ -745,12 +789,13 @@ const TypeDeliveryProgramadoComponent = ({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label
-            htmlFor="scheduledDate"
-            className="text-foreground font-medium"
-          >
-            Fecha <span className="text-red-500 text-base">*</span>
-          </Label>
+          <div className="flex items-center">
+            <Label htmlFor="scheduledDate">
+              Fecha
+            </Label>
+
+            <Asterisk className="text-red-500 text-base w-4 h-4" />
+          </div>
 
           <Input
             id="scheduledDate"
@@ -772,12 +817,13 @@ const TypeDeliveryProgramadoComponent = ({
         </div>
 
         <div>
-          <Label
-            htmlFor="scheduledTime"
-            className="text-foreground font-medium"
-          >
-            Hora <span className="text-red-500 text-base">*</span>
-          </Label>
+          <div className="flex items-center">
+            <Label htmlFor="scheduledTime">
+              Hora
+            </Label>
+
+            <Asterisk className="text-red-500 text-base w-4 h-4" />
+          </div>
 
           <Select
             value={formData.orderShipping.scheduledTime ?? ""}
@@ -817,25 +863,45 @@ const TypeDeliveryProgramadoComponent = ({
       </div>
 
       <div>
-        <Label>
-          Dirección <span className="text-red-500 text-base">*</span>
-        </Label>
+        <div className="flex items-center">
+          <Label>
+            Dirección
+          </Label>
 
-        <Input
-          ref={refAddress}
-          value={formData.orderShipping.address ?? ""}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              orderShipping: {
-                ...formData.orderShipping,
-                address: e.target.value
-              }
-            })
-          }
-          className="bg-muted border-border text-foreground mt-2"
-          placeholder="Dirección de entrega"
-        />
+          <Asterisk className="text-red-500 text-base w-4 h-4" />
+        </div>
+
+        <div className="relative">
+          <Input
+            ref={refAddress}
+            value={formData.orderShipping.address ?? ""}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                orderShipping: {
+                  ...formData.orderShipping,
+                  address: e.target.value
+                }
+              })
+            }
+            className="bg-muted border-border text-foreground mt-2"
+            placeholder="Dirección de entrega"
+          />
+
+          <Button
+            variant="ghost"
+            type="button"
+            className="absolute inset-y-0 right-0"
+            onClick={requestUserLocation}
+            disabled={isLocating}
+          >
+            {
+              isLocating
+                ? <Loader2 className="w-4 h-4 text-emerald-600 animate-spin shrink-0" />
+                : <LocateFixed className="w-4 h-4 text-muted-foreground" />
+            }
+          </Button>
+        </div>
       </div>
 
       <div>
@@ -884,9 +950,13 @@ const TypeDeliveryEnvioAgenciaComponent = ({
       </h3>
 
       <div>
-        <Label>
-          Agencia <span className="text-red-500 text-base">*</span>
-        </Label>
+        <div className="flex items-center">
+          <Label>
+            Agencia
+          </Label>
+
+          <Asterisk className="text-red-500 text-base w-4 h-4" />
+        </div>
 
         <Select
           value={formData.orderShipping.idAgency ?? ""}
@@ -924,9 +994,14 @@ const TypeDeliveryEnvioAgenciaComponent = ({
       </div>
 
       <div>
-        <Label>
-          Destino <span className="text-red-500 text-base">*</span>
-        </Label>
+        <div className="flex items-center">
+          <Label>
+            Destino
+          </Label>
+
+          <Asterisk className="text-red-500 text-base w-4 h-4" />
+        </div>
+
         <Input
           ref={refDestination}
           value={formData.orderShipping.destination ?? ""}
@@ -945,9 +1020,13 @@ const TypeDeliveryEnvioAgenciaComponent = ({
       </div>
 
       <div>
-        <Label>
-          Persona que recibe <span className="text-red-500 text-base">*</span>
-        </Label>
+        <div className="flex items-center">
+          <Label>
+            Persona que recibe
+          </Label>
+
+          <Asterisk className="text-red-500 text-base w-4 h-4" />
+        </div>
 
         <Input
           ref={refReceiverName}
