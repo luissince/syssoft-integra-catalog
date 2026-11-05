@@ -3,7 +3,6 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TypeDocument } from "@/types/api-type";
@@ -12,7 +11,13 @@ import Container from "./Container";
 import { PageBreadcrumb } from "./PageBreadcrumb";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { keyNumberPhone } from "@/lib/utils";
-import { Eye, EyeOff, House } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  House,
+  UserRound,
+  ShieldCheck,
+} from "lucide-react"
 import { fetchRegisterConsumer } from "@/data/data-rest";
 import { FormCustomer } from "@/types/form";
 import { useRouter } from "next/navigation";
@@ -131,10 +136,9 @@ export default function RegisterComponent({ listTypeDocument }: RegisterCardProp
     });
   };
 
+
   return (
     <Container>
-
-      {/* Breadcrumb */}
       <PageBreadcrumb
         items={[
           { label: "Inicio", href: "/" },
@@ -142,222 +146,226 @@ export default function RegisterComponent({ listTypeDocument }: RegisterCardProp
         ]}
       />
 
-      {/* Encabezado */}
-      <div className="mb-6 flex items-center gap-3 py-6">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <House className="h-5 w-5" />
-        </div>
+      <div className="mx-auto max-w-5xl py-8 md:py-12">
+        <div className="mx-auto mb-8 max-w-xl text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <House className="h-7 w-7" />
+          </div>
 
-        <div>
-          <h1 className="text-xl font-bold text-foreground md:text-2xl">
-            Registro
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+            Crear una cuenta
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Crea tu cuenta para poder comenzar a usar el Catalogo
+
+          <p className="mt-2 text-sm text-muted-foreground md:text-base">
+            Regístrate para comenzar a explorar nuestro catálogo.
           </p>
         </div>
-      </div>
 
-      {/* Body */}
-      <div className="w-full flex items-center justify-center py-2 lg:py-4">
-        <form className="space-y-4 w-full lg:w-2/4" onSubmit={handleRegister}>
-          {/* Document type */}
-          <div>
-            <Label className="text-foreground font-medium">
-              Tipo de Documento <span className="text-red-500 text-base">*</span>
-            </Label>
-            <Select
-              value={idTypeDocument}
-              onValueChange={(value) =>
-                setIdTypeDocument(value)
-              }
-            >
-              <SelectTrigger
-                ref={refTypeDocument}
-                className="bg-muted border-border text-foreground mt-2"
-              >
-                <SelectValue placeholder="Selecciona el tipo de documento" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                {listTypeDocument.map((typeDoc) => (
-                  <SelectItem
-                    key={typeDoc.id}
-                    value={typeDoc.id}
-                    className="text-foreground"
+        <form
+          onSubmit={handleRegister}
+          className="mx-auto max-w-3xl space-y-6"
+        >
+          {/* Datos personales */}
+          <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <UserRound className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="font-semibold">Datos personales</h2>
+                <p className="text-sm text-muted-foreground">
+                  Información para identificar tu cuenta.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Tipo de documento <span className="text-destructive">*</span></Label>
+                <Select
+                  value={idTypeDocument}
+                  onValueChange={setIdTypeDocument}
+                >
+                  <SelectTrigger
+                    ref={refTypeDocument}
                   >
-                    {typeDoc.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                    <SelectValue placeholder="Selecciona un documento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {listTypeDocument.map((typeDoc) => (
+                      <SelectItem key={typeDoc.id} value={typeDoc.id}>
+                        {typeDoc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          {/* Document */}
-          <div>
-            <Label className="text-foreground font-medium">N° de Documento({document.length ?? 0}) <span className="text-red-500 text-base">*</span></Label>
-            <Input
-              ref={refDocument}
-              type="text"
-              value={document}
-              onChange={(e) => setDocument(e.target.value)}
-              className="mt-1 bg-muted border-border text-foreground"
-              placeholder="0000000"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="document">
+                  Número de documento (<small className="">{document.length}</small>)  <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="document"
+                  ref={refDocument}
+                  value={document}
+                  onChange={(e) => setDocument(e.target.value)}
+                  placeholder="Ingresa tu documento"
+                />
+              </div>
 
-          {/* Name */}
-          <div>
-            <Label className="text-foreground font-medium">Nombre Completo <span className="text-red-500 text-base">*</span></Label>
-            <Input
-              ref={refName}
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 bg-muted border-border text-foreground"
-              placeholder="Juan Pérez"
-            />
-          </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="name">
+                  Nombre completo <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  ref={refName}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ej. Juan Pérez"
+                />
+              </div>
 
-          {/* Phone */}
-          <div>
-            <Label
-              htmlFor="phone"
-              className="text-foreground font-medium"
-            >
-              Número de celular({phone.length ?? 0}) <span className="text-red-500 text-base">*</span>
-            </Label>
-            <Input
-              id="phone"
-              ref={refPhone}
-              type={isMobile ? "tel" : "text"}
-              value={phone}
-              onChange={(e) =>
-                setPhone(e.target.value)
-              }
-              placeholder="987654321"
-              onKeyDown={!isMobile ? keyNumberPhone : undefined}
-              className="bg-muted border-border text-foreground mt-2"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">
+                  Teléfono <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="phone"
+                  ref={refPhone}
+                  type={isMobile ? "tel" : "text"}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  onKeyDown={!isMobile ? keyNumberPhone : undefined}
+                  placeholder="987654321"
+                />
+              </div>
 
-          {/* WhatsApp con selector de país */}
-          <CountryCodeSelector
-            value={whatsapp}
-            onChange={setWhatsapp}
-            placeholder="987654321"
-            className="mt-2"
-          />
-
-          {/* Email */}
-          <div>
-            <Label htmlFor="email" className="text-foreground font-medium">
-              Correo Electrónico <span className="text-red-500 text-base">*</span>
-            </Label>
-            <Input
-              id="email"
-              ref={refEmail}
-              type={isMobile ? "email" : "text"}
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
-              placeholder="tumail@gmail.com"
-              className="bg-muted border-border text-foreground mt-2"
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <Label
-              htmlFor="password"
-              className="text-foreground font-medium"
-            >
-              Contraseña de la cuenta({password.length}) <span className="text-red-500 text-base">*</span>
-            </Label>
-            <div className="relative mt-2">
-              <Input
-                id="password"
-                ref={refPassword}
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
-                placeholder="******"
-                className="bg-muted border-border text-foreground pr-10"
+              <CountryCodeSelector
+                value={whatsapp}
+                onChange={setWhatsapp}
+                placeholder="987654321"
+                className="w-full"
               />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <Eye className="h-4 w-4 text-muted-foreground" />
-                )}
-              </button>
+
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="address">Dirección</Label>
+                <Input
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Dirección de tu domicilio"
+                />
+              </div>
             </div>
-          </div>
+          </section>
 
-          {/* Validation password */}
-          <div>
-            <Label
-              htmlFor="validationPassword"
-              className="text-foreground font-medium"
-            >
-              Validar contraseña({validationPassword.length}) <span className="text-red-500 text-base">*</span>
-            </Label>
-            <div className="relative mt-2">
-              <Input
-                id="validationPassword"
-                ref={refValidationPassword}
-                type={showValidationPassword ? "text" : "password"}
-                value={validationPassword}
-                onChange={(e) =>
-                  setValidationPassword(e.target.value)
-                }
-                placeholder="******"
-                className="bg-muted border-border text-foreground pr-10"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                onClick={() =>
-                  setShowValidationPassword(!showValidationPassword)
-                }
-              >
-                {showValidationPassword ? (
-                  <EyeOff className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <Eye className="h-4 w-4 text-muted-foreground" />
-                )}
-              </button>
+          {/* Seguridad de la cuenta */}
+          <section className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="font-semibold">Seguridad de la cuenta</h2>
+                <p className="text-sm text-muted-foreground">
+                  Configura tus credenciales de acceso.
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Address */}
-          <div>
-            <Label className="text-foreground font-medium">Dirección</Label>
-            <Input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="mt-1 bg-muted border-border text-foreground"
-              placeholder="Ej: Av. 28 de mayo 123"
-            />
-          </div>
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Correo electrónico <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  ref={refEmail}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu@correo.com"
+                />
+              </div>
 
-          <DialogFooter>
+              <div className="space-y-2">
+                <Label htmlFor="password">
+                  Contraseña <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    ref={refPassword}
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Crea una contraseña"
+                  />
+                  <button
+                    type="button"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword
+                      ? <EyeOff className="h-4 w-4" />
+                      : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {password.length} caracteres
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="validationPassword">
+                  Confirmar contraseña <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="validationPassword"
+                    ref={refValidationPassword}
+                    type={showValidationPassword ? "text" : "password"}
+                    value={validationPassword}
+                    onChange={(e) => setValidationPassword(e.target.value)}
+                    placeholder="Repite tu contraseña"
+                  />
+                  <button
+                    type="button"
+                    aria-label={showValidationPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    onClick={() =>
+                      setShowValidationPassword(!showValidationPassword)
+                    }
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                  >
+                    {showValidationPassword
+                      ? <EyeOff className="h-4 w-4" />
+                      : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div className="space-y-3">
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              disabled={loading}
+              className="h-12 w-full text-base font-semibold shadow-sm"
             >
-              {loading ? "Registrando..." : "Crear Cuenta"}
+              {loading ? "Creando cuenta..." : "Crear mi cuenta"}
             </Button>
-          </DialogFooter>
+
+            <p className="text-center text-xs text-muted-foreground">
+              Al registrarte, tus datos serán utilizados para gestionar
+              tu cuenta conforme a la política de privacidad del sitio.
+            </p>
+          </div>
         </form>
       </div>
-    </Container>
-  );
+    </Container >
+  )
+
 }

@@ -2,26 +2,21 @@ import {
     fetchBranches, 
     fetchCategories, 
     fetchCompanyBanners, 
-    fetchCompanyInfo, 
     fetchCreateConsult, 
     fetchCurrencies,
     fetchCurrencyInfo, 
     fetchCustomerById, 
     fetchListTypeDocument, 
-    fetchProductById, 
-    fetchProductsRelated, 
     fetchUpdateCustomer, 
     fetchWhatsappInfo 
 } from "@/data/data-rest";
 import { 
     Branch, 
     Category, 
-    Company,
     CompanyBanner, 
     Consult, 
     Currency, 
     Person, 
-    Product, 
     TypeDocument,
     Whatsapp 
 } from "@/types/api-type";
@@ -34,36 +29,6 @@ export async function getCategories(): Promise<Category[]> {
         return data;
     } catch (error) {
         return [];
-    }
-}
-
-// Obtener la información de la empresa
-export async function getCompanyInfo(): Promise<Company> {
-    try {
-        const data = await fetchCompanyInfo();
-        return data;
-    } catch (error) {
-        console.log(error);
-        const company: Company = {
-            idCompany: "1",
-            aboutUs: "Descripción del negocio",
-            email: "ecommerse@gmail.com",
-            information: "Somos una empresa de comercio electrónico",
-            name: "Ecommerse",
-            website: "https://ecommerse.com",
-            youtubePage: "https://www.youtube.com/",
-            facebookPage: "https://www.facebook.com/",
-            twitterPage: "https://twitter.com/",
-            instagramPage: "https://www.instagram.com/",
-            tiktokPage: "https://www.tiktok.com/",
-            privacyPolicy: "Política de privacidad",
-            icon: "favicon.svg",
-            logo: "placeholder.svg",
-            cover: "placeholder.svg",
-            banner: "placeholder.svg",
-            termsAndConditions: "Términos y condiciones",
-        }
-        return company;
     }
 }
 

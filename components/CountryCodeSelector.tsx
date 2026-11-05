@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import React, { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 // Lista de países con sus códigos
 const countries = [
@@ -75,7 +76,10 @@ export default function CountryCodeSelector({
   };
 
   return (
-    <div>
+    <div className={cn(
+      "space-y-2",
+      className
+    )}>
       <Label
         htmlFor="whatsapp"
         className="text-foreground font-medium"
@@ -83,7 +87,6 @@ export default function CountryCodeSelector({
         WhatsApp({phoneNumber.length ?? 0}) <span className="text-red-500 text-base">*</span>
       </Label>
 
-      <div className={`space-y-2 ${className}`}>
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Selector de país */}
           <div className="w-full sm:w-1/3">
@@ -125,12 +128,12 @@ export default function CountryCodeSelector({
         </div>
 
         {/* Mostrar el número completo (opcional) */}
-        {value && (
+        {/* {value && (
           <p className="text-xs text-muted-foreground mt-1">
             Número completo: {value}
           </p>
-        )}
-      </div>
+        )} */}
+     
     </div>
   );
 }

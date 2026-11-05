@@ -104,22 +104,22 @@ export interface RangePrice {
 
 export interface Company {
   idCompany?: string,
-  aboutUs: string,
+  documentNumber: string,
+  businessName: string,
+  legalName: string,
   email: string,
-  information: string,
-  name: string,
   website: string,
   youtubePage: string,
   facebookPage: string,
   twitterPage: string,
   instagramPage: string,
   tiktokPage: string,
+  information: string,
+  aboutUs: string,
   privacyPolicy: string,
+  termsAndConditions: string,
   icon: string,
   logo: string,
-  cover: string,
-  banner: string,
-  termsAndConditions: string,
   banners?: CompanyBanner[],
 }
 
@@ -218,7 +218,7 @@ export interface Person {
   typeDocument?: TypeDocument
 }
 
-export interface Receipt { 
+export interface Receipt {
   idReceipt: string;
   name: string;
   series: string;
@@ -245,7 +245,7 @@ export interface OrderShipping {
   idAgency: string
   destination: string
   receiver: string
-  
+
   agency?: Agency
   branch?: Branch
 }

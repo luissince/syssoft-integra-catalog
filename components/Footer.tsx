@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from "./ui/button";
-import { Clock, MapPin, Phone, MessageCircle } from "lucide-react";
+import { Clock, MapPin, Phone, MessageCircle, Landmark, BookOpenCheck, CreditCard, Smartphone, Coins, Banknote } from "lucide-react";
 import { useContact } from "@/lib/contact";
 import { useRouter } from "next/navigation";
 import Container from "./Container";
@@ -16,54 +16,35 @@ export default function Footer() {
   const { company } = useCompany();
   const { branch } = useBranch();
 
-  const { handleCall, handleWhatsapp, getDefaultMessage, isMobile } = useContact();
+  const { handleCall, handleWhatsapp, getDefaultMessage } = useContact();
   const { whatsapp } = useWhatsApp();
 
   const handleCallClick = () => {
-    // handleCall(restaurantData.restaurant.phone);
     handleCall(branch.phone);
   };
 
   const handleWhatsAppClick = () => {
-    // const message = getDefaultMessage(restaurantData.restaurant.name);
-    const message = getDefaultMessage(company.name);
-    // handleWhatsapp(restaurantData.restaurant.whatsapp, message);
-    handleWhatsapp(whatsapp.number, message);
-  };
-
-  const handleMapClick = () => {
-    // const address = encodeURIComponent(restaurantData.restaurant.address);
-    const address = encodeURIComponent(branch.address);
-
-    if (isMobile) {
-      const mapsURL = `maps://?q=${address}`;
-      const googleMapsURL = `https://maps.google.com/maps?q=${address}`;
-      window.location.href = mapsURL;
-      setTimeout(() => {
-        window.open(googleMapsURL, '_blank');
-      }, 500);
-    } else {
-      const googleMapsURL = `https://maps.google.com/maps?q=${address}`;
-      window.open(googleMapsURL, '_blank');
-    }
+    handleWhatsapp(whatsapp.number, getDefaultMessage(company.businessName));
   };
 
   const handlePaymentMethodsClick = () => {
     router.push('/payment-methods');
   };
 
+  const handleComplaintsBookClick = () => {
+    router.push('/complaints-book');
+  };
+
   return (
     <footer className="bg-card border-t border-border mt-auto">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Restaurant Info */}
-          <div className="col-span-1 md:col-span-6">
+          <div className="col-span-1">
             <div className="mb-4">
-              <span className="text-lg lg:text-xl font-bold text-foreground">{company.name}</span>
+              <span className="text-lg lg:text-xl font-bold text-foreground">{company.businessName}</span>
             </div>
-            <p className="text-sm lg:text-base text-muted-foreground mb-2 leading-relaxed">
-              {company.information}
-            </p>
+            <p className="text-sm lg:text-base text-muted-foreground mb-2 leading-relaxed">{company.information}</p>
             {/* Botones de contacto principales */}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <Button
@@ -72,9 +53,7 @@ export default function Footer() {
               >
                 <Phone className="w-4 h-4" />
                 Llamar
-                <span className="text-xs opacity-80">
-                  {branch.phone}
-                </span>
+                <span className="text-xs opacity-80">{branch.phone}</span>
               </Button>
 
               <Button
@@ -84,103 +63,94 @@ export default function Footer() {
               >
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp
-                <span className="text-xs opacity-80">
-                  {/* {restaurantData.restaurant.whatsapp} */}
-                  {whatsapp.number}
-                </span>
+                <span className="text-xs opacity-80">{whatsapp.number}</span>
               </Button>
             </div>
           </div>
 
           {/* Contact Info */}
-          <div className="col-span-1 md:col-span-3">
+          <div className="col-span-1">
             <h3 className="font-semibold text-foreground mb-4">Contacto</h3>
             <div className="space-y-3 text-sm">
-              <button
-                onClick={handleMapClick}
+              <div
                 className="flex items-start space-x-2 text-left hover:text-primary transition-colors cursor-pointer group"
               >
                 <MapPin className="w-4 h-4 text-primary mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <span className="text-muted-foreground group-hover:text-primary">
-                  {/* {restaurantData.restaurant.address} */}
                   {branch.address}
                 </span>
-              </button>
+              </div>
 
               <div className="flex items-center space-x-2">
                 <Clock className="w-4 h-4 text-primary flex-shrink-0" />
                 <span className="text-muted-foreground">
-                  {/* {restaurantData.restaurant.hours} */}
                   {branch.schedule}
                 </span>
               </div>
 
-              <button
-                onClick={handleCallClick}
+              <div
                 className="flex items-center space-x-2 hover:text-primary transition-colors cursor-pointer group"
               >
                 <Phone className="w-4 h-4 text-primary flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <span className="text-muted-foreground group-hover:text-primary">
-                  {/* {restaurantData.restaurant.phone} */}
                   {branch.phone}
                 </span>
-              </button>
+              </div>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="col-span-1 md:col-span-3">
-            {/* <h3 className="font-semibold text-foreground mb-4">Menú</h3> */}
+          <div className="col-span-1">
             <h3 className="font-medium text-foreground mb-4">Aceptamos</h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <button
-                // onClick={() => handlePaymentMethod("TARJETA")}
-                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-3">
+              <div
+                className="flex items-center gap-3 py-2"
               >
-                💳 Tarjeta
-              </button>
+                <CreditCard className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-muted-foreground text-sm">Tarjeta</span>
+              </div>
 
-              <button
-                // onClick={() => handlePaymentMethod("BILLETERA")}
-                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+              <div
+                className="flex items-center gap-3 py-2"
               >
-                📱 Billetera digital
-              </button>
+                <Smartphone className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-muted-foreground text-sm">Billetera digital</span>
+              </div>
 
-              <button
-                // onClick={() => handlePaymentMethod("DEPOSITO")}
-                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+              <div
+                className="flex items-center gap-3 py-2"
               >
-                🏦 Depósito bancario
-              </button>
+                <Banknote className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-muted-foreground text-sm">Depósito bancario</span>
+              </div>
 
-              <button
-                // onClick={() => handlePaymentMethod("EFECTIVO")}
-                className="text-xs text-primary hover:text-primary/80 bg-muted/30 px-3 py-2 rounded transition-colors"
+              <div
+                className="flex items-center gap-3 py-2"
               >
-                💵 Efectivo
-              </button>
+                <Coins className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-muted-foreground text-sm">Efectivo</span>
+              </div>
             </div>
 
-            {/* Enlaces sociales adicionales */}
             <div className="mt-4 pt-4 border-t border-border">
-              <div className="flex flex-col gap-2">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
                 <Button
-                  onClick={handleWhatsAppClick}
-                  variant="ghost"
+                  onClick={handlePaymentMethodsClick}
                   size="sm"
-                  className="justify-start p-0 h-auto text-gray-400 hover:text-gray-600"
+                  variant="link"
+                  className="p-0 justify-start gap-3 text-gray-400 hover:text-gray-600"
                 >
-                  🏦 Numero de Cuentas
+                  <Landmark className="w-4 h-4" />
+                  <span>Métodos de Pago</span>
                 </Button>
                 <Button
-                  onClick={handleCallClick}
-                  variant="ghost"
+                  onClick={handleComplaintsBookClick}
                   size="sm"
-                  className="justify-start p-0 h-auto text-gray-400 hover:text-gray-600"
+                  variant="link"
+                  className="p-0 justify-start gap-3 text-gray-400 hover:text-gray-600"
                 >
-                  📚 Libro de Reclamaciones
+                  <BookOpenCheck className="w-4 h-4" />
+                  <span>Libro de Reclamaciones</span>
                 </Button>
                 {/* <Button
                   onClick={handlePaymentMethodsClick}
@@ -198,7 +168,7 @@ export default function Footer() {
         {/* Bottom Footer */}
         <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <div className="text-sm text-muted-foreground mb-4 md:mb-0">
-            © {new Date().getFullYear()} {company.name}. Todos los derechos reservados.
+            © {new Date().getFullYear()} {company.businessName}. Todos los derechos reservados.
           </div>
 
           <div className="flex items-center space-x-1">

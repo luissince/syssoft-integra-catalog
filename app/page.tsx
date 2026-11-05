@@ -17,7 +17,7 @@ export default async function Home() {
     getCompanyBanners(),
     fetchProducts({
       currentPage: 0,
-      totalPage: 6,
+      totalPage: 8,
     }),
   ]);
 

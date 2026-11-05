@@ -29,9 +29,6 @@ APP_BACK_END="http://localhost:5002"
 # NEXT_PUBLIC_APP_BACK_END="http://localhost:5002"
 NEXT_PUBLIC_APP_BACK_END="http://localhost:5002"
 
-# true active login, false desactive login
-AUTH_ENABLED=false
-
 # development or production
 NEXT_PUBLIC_ENV=development
 
@@ -46,7 +43,6 @@ NEXTAUTH_SECRET="secret"
 
 * `APP_BACK_END`: Base URL para peticiones **del servidor** (SSR/acciones).
 * `NEXT_PUBLIC_APP_BACK_END`: Base URL para peticiones **del cliente** (expuesta).
-* `AUTH_ENABLED`: Activan o desactivan autenticación (server/client).
 * `ENV` / `NEXT_PUBLIC_ENV`: Modo de ejecución/etiquetado del entorno.
 * `NEXTAUTH_URL` / `NEXTAUTH_SECRET`: Configuración de `next-auth`.
 
@@ -121,13 +117,6 @@ type FetchOptions = RequestInit & { auth?: boolean; };
 export async function apiFetch<T>(path: string, opts: FetchOptions = {}): Promise<T> {
   const url = `${API_BASE}${path}`;
   const headers = new Headers(opts.headers);
-
-  // Auth opcional
-  const AUTH_ENABLED = String(process.env.AUTH_ENABLED) === "true";
-  if (opts.auth && AUTH_ENABLED) {
-    // Ejemplo: token por cookie o header
-    // headers.set("Authorization", `Bearer ${token}`);
-  }
 
   const res = await fetch(url, {
     ...opts,
@@ -311,11 +300,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## 🔐 Autenticación (flag)
 
-* Con `AUTH_ENABLED=false`, el cliente **no** enviará tokens.
 * Si el backend exige auth:
 
-  1. Pon `AUTH_ENABLED=true` y agrega el header `Authorization` en `apiFetch`.
-  2. Maneja refresh/token storage (cookies HttpOnly recomendadas).
+  1. Maneja refresh/token storage (cookies HttpOnly recomendadas).
 
 ---
 

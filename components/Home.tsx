@@ -39,7 +39,7 @@ export default function HomeComponent({
     const [products, setProducts] = useState(initialProducts.data);
     const [totalProducts, setTotalProducts] = useState(initialProducts.count);
 
-    const [itemsPerPage, setItemsPerPage] = useState(6);
+    const [itemsPerPage, setItemsPerPage] = useState(8);
     const [offset, setOffset] = useState(initialProducts.data.length);
 
     // Banner

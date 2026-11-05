@@ -65,7 +65,7 @@ export default function Nav({ person }: NavProps) {
                     <div className="flex items-start justify-center flex-col h-16 w-28 lg:h-20 lg:w-36">
                         <Image
                             src={company.logo || "/placeholder.svg"}
-                            alt={company.name}
+                            alt={company.businessName}
                             width={112}
                             height={56}
                             className="max-h-full max-w-full object-contain cursor-pointer"
