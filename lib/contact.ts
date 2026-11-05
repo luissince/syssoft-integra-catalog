@@ -83,8 +83,8 @@ export const handleWhatsApp = (phone: string, message?: string): void => {
 /**
  * Genera mensaje predeterminado para WhatsApp
  */
-export const getDefaultWhatsAppMessage = (restaurantName: string): string => {
-  return `¡Hola! Me interesa conocer más sobre ${restaurantName}. ¿Podrían ayudarme con información sobre su menú y pedidos?`;
+export const getDefaultWhatsAppMessage = (companyName: string): string => {
+  return `¡Hola! Me interesa conocer más sobre ${companyName}. ¿Podrían ayudarme con información sobre su menú y pedidos?`;
 };
 
 /**

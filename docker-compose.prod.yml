@@ -1,7 +1,11 @@
+# docker-compose.prod.yml
 x-service-template: &catalog-service
   networks:
     - luis
   restart: always
+  mem_limit: 1g
+  cpus: 1.5
+  mem_reservation: 300m
 
 services:
   sysintegra-services:

@@ -1,29 +1,35 @@
-import { getBranches, getCompanyInfo, getListTypeDocument, getTaxes } from "@/lib/api";
+// pages/checkout.tsx
+
 import CheckoutComponent from "@/components/Checkout";
-import { Suspense } from "react";
-import Welcome from "@/components/Welcome";
+import { redirect } from "next/navigation";
+import { getCurrentSession } from "@/lib/auth";
+import { fetchAgencies, fetchTaxes } from "@/data/data-rest";
 
 export default async function CheckoutPage() {
-    const company = await getCompanyInfo();
-    const branches = await getBranches();
-    const taxes = await getTaxes();
-    const listTypeDocument = await getListTypeDocument();
+    const person = await getCurrentSession();
 
-    const branch = branches.find((branch) => branch.primary === true)!;
-    const tax = taxes.find((tax) => tax.prefered === true)!;
+    if (person === null) {
+        return redirect("/register");
+    }
 
-    const authEnabled = process.env.AUTH_ENABLED === "true" ? true : false;
+    const [taxes, agencies] = await Promise.all([
+        fetchTaxes(),
+        fetchAgencies(),
+    ]);
+
+    if (!taxes || taxes.length === 0) {
+        throw new Error("No se pudo obtener los impuestos");
+    }
+
+    if (!agencies.success) {
+        throw new Error("No se pudo obtener las agencias");
+    }
 
     return (
-        <Suspense fallback={<Welcome company={company} branch={branch} />}>
-            <CheckoutComponent
-                listTypeDocument={listTypeDocument}
-                company={company}
-                branch={branch}
-                branches={branches}
-                tax={tax}
-                authEnabled={authEnabled}
-            />
-        </Suspense>
+        <CheckoutComponent
+            taxes={taxes}
+            person={person}
+            agencies={agencies.data!}
+        />
     );
 }

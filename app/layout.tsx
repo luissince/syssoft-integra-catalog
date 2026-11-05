@@ -1,24 +1,34 @@
+// app/layout.tsx
+
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
-import { Inter, Playfair_Display } from "next/font/google"
-import "./globals.css"
+import { Inter, Playfair_Display, Roboto_Mono } from "next/font/google"
+import "../styles/globals.css";
+import { getCurrentSession } from "@/lib/auth";
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/context/AuthContext"
-import { getCompanyInfo, getCurrencyInfo, getWhatsappInfo } from "@/lib/api"
+import { getBranches, getCurrencyInfo, getWhatsappInfo } from "@/lib/api"
 import { WishlistProvider } from "@/context/WishlistContext"
 import { CurrencyProvider } from "@/context/CurrencyContext"
 import WhatsAppButton from "@/components/WhatsAppButton"
 import ContactButton from "@/components/ContactButton"
+import Nav from "@/components/Nav"
+import Footer from "@/components/Footer"
+import { WhatsAppProvider } from "@/context/WhatsAppContext";
+import AuthSyncProvider from "@/components/AuthSyncProvider";
+import { CompanyProvider } from "@/context/CompanyContext";
+import { BranchProvider } from "@/context/BranchContext";
+import { LocationProvider } from "@/context/LocationContext";
+import Menu from "@/components/Menu";
+import { fetchCompanyInfo } from "@/data/data-rest";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
-})
+});
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -26,18 +36,40 @@ const playfair = Playfair_Display({
   display: "swap",
 })
 
-export async function generateMetadata(): Promise<Metadata> {
-  const company = await getCompanyInfo();
+const mono = Roboto_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
-  return {
-    title: company.name,
-    description: company.aboutUs,
-    // keywords: restaurantData.restaurant.keywords,
-    generator: "https://www.syssoftintegra.com/",
-    icons: {
-      icon: company.icon,
-      apple: company.icon,
-    },
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const { success, data, message } = await fetchCompanyInfo();
+
+    if (!success || !data) {
+      throw new Error(message)
+    }
+
+
+    return {
+      title: data.legalName,
+      description: data.aboutUs,
+      // keywords: restaurantData.restaurant.keywords,
+      generator: "https://www.syssoftintegra.com/",
+      icons: {
+        icon: data.icon,
+        apple: data.icon,
+      }
+    };
+  } catch (error) {
+    console.error("Metadata error:", error);
+    return {
+      title: "Sistema",
+      description: "Tienda online",
+      generator: "https://www.syssoftintegra.com/",
+      icons: {
+        icon: "/favicon.ico"
+      }
+    };
   }
 }
 
@@ -52,37 +84,83 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const currency = await getCurrencyInfo();
-  const whatsapp = await getWhatsappInfo();
+  const [
+    company,
+    currency,
+    whatsapp,
+    branches,
+    person
+  ] = await Promise.all([
+    fetchCompanyInfo(),
+    getCurrencyInfo(),
+    getWhatsappInfo(),
+    getBranches(),
+    getCurrentSession(),
+  ]);
+
+  if (!company.success || !company.data) {
+    throw new Error("Company information not found");
+  }
+
+  if (!currency) {
+    throw new Error("Currency information not found");
+  }
+
+  if (!whatsapp) {
+    throw new Error("Whatsapp information not found");
+  }
+
+  if (!branches || branches.length === 0) {
+    throw new Error("Branches not found");
+  }
+
+  const branch = branches.find((branch) => branch.primary === true)!;
+
+  if (!branch) {
+    throw new Error("Primary branch not found");
+  }
 
   return (
-    <html lang="es" suppressHydrationWarning>
-      <head>
-        <style>{`
-          html {
-            font-family: ${GeistSans.style.fontFamily};
-            --font-sans: ${GeistSans.variable};
-            --font-mono: ${GeistMono.variable};
-            --font-inter: ${inter.style.fontFamily};
-            --font-playfair: ${playfair.style.fontFamily};
-          }
-        `}</style>
-      </head>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
-          <AuthProvider>
-            <CurrencyProvider initialCurrency={currency}>
-              <CartProvider>
-                <WishlistProvider>
-                  {children}
-                  <Toaster />
-                  <WhatsAppButton whatsapp={whatsapp} />
-                  <ContactButton />
-                </WishlistProvider>
-              </CartProvider>
-            </CurrencyProvider>
-          </AuthProvider>
-        </ThemeProvider>
+    <html lang="es" className={`
+    ${inter.variable}
+    ${playfair.variable}
+    ${mono.variable}
+  `} suppressHydrationWarning>
+      <body className={`${inter.className} antialiased`}>
+        <AuthSyncProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
+            <AuthProvider>
+              <CompanyProvider initialCompany={company.data}>
+                <BranchProvider initialBranches={branches}>
+                  <CurrencyProvider initialCurrency={currency}>
+                    <WhatsAppProvider initialWhatsapp={whatsapp}>
+                      <CartProvider>
+                        <WishlistProvider>
+                          <LocationProvider>
+                            <div className="min-h-screen bg-background">
+                              <Nav
+                                person={person}
+                              />
+
+                              {children}
+
+                              <Footer />
+                              <Menu />
+                            </div>
+                            <Toaster />
+                            {/* <CartButton /> */}
+                            <WhatsAppButton />
+                            <ContactButton />
+                          </LocationProvider>
+                        </WishlistProvider>
+                      </CartProvider>
+                    </WhatsAppProvider>
+                  </CurrencyProvider>
+                </BranchProvider>
+              </CompanyProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </AuthSyncProvider>
       </body>
     </html>
   )

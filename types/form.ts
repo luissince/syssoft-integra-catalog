@@ -1,66 +1,67 @@
 export interface FormOrderDetail {
+    id?: number | string,
+    idProducto: string,
     cantidad: number,
-    codigo: string,
-    id: number | string,
+    codigo?: string,
     idImpuesto: string,
     idMedida: string,
-    idProducto: string,
-    imagen: string,
-    nombre: string,
-    nombreImpuesto: string,
-    nombreMedida: string,
-    porcentajeImpuesto: number,
+    imagen?: string,
+    nombre?: string,
+    nombreImpuesto?: string,
+    nombreMedida?: string,
+    porcentajeImpuesto?: number,
     precio: number
 }
 
-export interface FormOrderDelivery {
-    email: string
-    telefono: string
-    celular: string
-    direccion: string
-    referencia: string
-}
-
-export interface FormOrderCustomer {
-    idTipoDocumento: string
-    documento: string
-    informacion: string
-    telefono: string
-    celular: string
-    email: string
-    clave: string
-    direccion: string
+export interface FormOrderShipping {
+    direccion: string | null
+    referencia: string | null
+    idSucursal: string | null
+    fechaPedido: string | null
+    horaPedido: string | null
+    idAgencia: string | null
+    destino: string | null
+    receptor: string | null
 }
 
 export interface FormOrder {
-    cliente: FormOrderCustomer
-
-    idComprobante: string
-    idMoneda: string
+    idTipoPedido: string
+    pedidoEnvio: FormOrderShipping
     idSucursal: string
     idUsuario: string
+    idMoneda: string
+    idComprobante: string
+    idCliente: string
     nota: string
-    observacion: string
-    instruccion: string
-
-    idTipoEntrega: string
-    idTipoPedido: string
-    fechaPedido: string
-    horaPedido: string
-
-    entrega: FormOrderDelivery | null
 
     detalles: FormOrderDetail[]
 }
 
 export interface FormCustomer {
-    idPersona: string,
+    idPersona?: string,
     idTipoDocumento: string,
     documento: string,
     informacion: string,
-    celular: string,
+    cliente?: boolean,
+    proveedor?: boolean,
+    conductor?: boolean,
+    licenciaConducir?: string,
     telefono: string,
-    email: string,
-    clave: string,
-    direccion: string,
+    celular: string,
+    email?: string,
+    clave?: string,
+    fechaNacimiento?: string,
+    genero?: string,
+    direccion?: string,
+    idUbigeo?: string,
+    estadoCivil?: string,
+    predeterminado?: boolean,
+    estado?: boolean,
+    observacion?: string,
+    idUsuario?: string,
+}
+
+export interface FormOrderResponse {
+    idPedido: string,
+    message: string
 }

@@ -23,19 +23,28 @@ Catálogo web construido con **Next.js 14 (App Router)** que consume la API del 
 Crea un archivo `.env.local` en la raíz:
 
 ```env
+# APP_BACK_END="http://localhost:5002"
 APP_BACK_END="http://localhost:5002"
+
+# NEXT_PUBLIC_APP_BACK_END="http://localhost:5002"
 NEXT_PUBLIC_APP_BACK_END="http://localhost:5002"
-AUTH_ENABLED=false
+
+# development or production
 NEXT_PUBLIC_ENV=development
-ENV=development
+
+# NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="http://localhost:3000"
+
+# NEXTAUTH_SECRET="secret"
+NEXTAUTH_SECRET="secret"
 ````
 
 **Qué hace cada una:**
 
 * `APP_BACK_END`: Base URL para peticiones **del servidor** (SSR/acciones).
 * `NEXT_PUBLIC_APP_BACK_END`: Base URL para peticiones **del cliente** (expuesta).
-* `AUTH_ENABLED`: Activan o desactivan autenticación (server/client).
 * `ENV` / `NEXT_PUBLIC_ENV`: Modo de ejecución/etiquetado del entorno.
+* `NEXTAUTH_URL` / `NEXTAUTH_SECRET`: Configuración de `next-auth`.
 
 > En producción usa HTTPS y dominio real en `*_APP_BACK_END`.
 
@@ -109,13 +118,6 @@ export async function apiFetch<T>(path: string, opts: FetchOptions = {}): Promis
   const url = `${API_BASE}${path}`;
   const headers = new Headers(opts.headers);
 
-  // Auth opcional
-  const AUTH_ENABLED = String(process.env.AUTH_ENABLED) === "true";
-  if (opts.auth && AUTH_ENABLED) {
-    // Ejemplo: token por cookie o header
-    // headers.set("Authorization", `Bearer ${token}`);
-  }
-
   const res = await fetch(url, {
     ...opts,
     headers,
@@ -163,7 +165,7 @@ import { Paginated, Product } from "@/lib/types";
 
 export const metadata = { title: "Productos | Catálogo" };
 
-async function getProducts(search: string, page: number, limit: number) {
+async function fetchProducts(search: string, page: number, limit: number) {
   const q = new URLSearchParams({ search, page: String(page), limit: String(limit) });
   return apiFetch<Paginated<Product>>(`/api/productos?${q.toString()}`);
 }
@@ -173,7 +175,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Rec
   const page = Number(searchParams.page ?? "1");
   const limit = Number(searchParams.limit ?? "12");
 
-  const { data, total } = await getProducts(search, page, limit);
+  const { data, total } = await fetchProducts(search, page, limit);
 
   return (
     <main className="mx-auto max-w-6xl p-4">
@@ -298,11 +300,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## 🔐 Autenticación (flag)
 
-* Con `AUTH_ENABLED=false`, el cliente **no** enviará tokens.
 * Si el backend exige auth:
 
-  1. Pon `AUTH_ENABLED=true` y agrega el header `Authorization` en `apiFetch`.
-  2. Maneja refresh/token storage (cookies HttpOnly recomendadas).
+  1. Maneja refresh/token storage (cookies HttpOnly recomendadas).
 
 ---
 

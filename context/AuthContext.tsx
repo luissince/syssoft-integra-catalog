@@ -1,15 +1,15 @@
 "use client";
 
-import { loginCustomer } from '@/lib/api';
+import { fetchRegisterConsumer } from '@/data/data-rest';
 import { Person } from '@/types/api-type';
+import { FormCustomer } from '@/types/form';
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
 interface AuthContextType {
   user: Person | null;
   isAuthenticated: boolean;
   authLoading: boolean;
-  login: (username: string, password: string) => Promise<Person | string>;
-  register: (person: Person) => boolean;
+  register: (person: FormCustomer) => Promise<boolean>;
   update: (person: Person) => void;
   logout: () => void;
 }
@@ -32,27 +32,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuthLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<Person | string> => {
-    const customer = await loginCustomer({ email, password });
-
-    if (typeof customer === "string") {
-      return customer;
-    }
-
-    localStorage.setItem("isAuthenticated", JSON.stringify(true));
-    localStorage.setItem("user", JSON.stringify(customer));
-
-    setIsAuthenticated(true);
-    setUser(customer);
-    return customer;
-  };
-
   const update = (person: Person) => {
     setUser(person);
     localStorage.setItem("user", JSON.stringify(person));
   };
 
-  const register = (person: Person) => {
+  const register =  async (body: FormCustomer) => {
+    const { success } = await fetchRegisterConsumer(body);
+
+    if (!success) {
+      return false;
+    }
 
     return true;
   };
@@ -65,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, authLoading, login, register, update, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, authLoading, register, update, logout }}>
       {children}
     </AuthContext.Provider>
   );
