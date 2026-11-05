@@ -49,6 +49,9 @@ export const fetchProducts = async ({
   filters?: FilterOptions | null,
 }):
   Promise<{ data: Product[], count: number }> => {
+
+  await sleep(5000); // Simular un retraso de 500 ms
+
   // Obtener los datos de la respuesta
   return await apiFetch<{
     data: Product[],

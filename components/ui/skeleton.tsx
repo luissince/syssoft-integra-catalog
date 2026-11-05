@@ -26,8 +26,8 @@ const SkeletonProducts = () => {
             </div>
 
             {/* Products */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 pb-8">
-              {Array.from({ length: 6 }).map((_, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, index) => (
                 <div
                   key={index}
                   className="rounded-lg border bg-card overflow-hidden"
@@ -52,52 +52,6 @@ const SkeletonProducts = () => {
 
             {/* Load more */}
             <div className="h-10 w-full bg-muted rounded-md mt-4" />
-          </div>
-
-          {/* Cart */}
-          <div className="w-full max-w-sm hidden lg:block">
-            <div className="rounded-lg border bg-card p-4 space-y-5">
-              {/* Cart header */}
-              <div className="flex items-center justify-between">
-                <div className="h-6 w-32 bg-muted rounded" />
-                <div className="h-6 w-8 bg-muted rounded-full" />
-              </div>
-
-              {/* Cart items */}
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="flex gap-3 border-b pb-4"
-                >
-                  <div className="w-16 h-16 bg-muted rounded-md shrink-0" />
-
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-3/4 bg-muted rounded" />
-                    <div className="h-3 w-1/2 bg-muted rounded" />
-
-                    <div className="flex justify-between items-center">
-                      <div className="h-4 w-16 bg-muted rounded" />
-                      <div className="h-8 w-20 bg-muted rounded-md" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Total */}
-              <div className="space-y-3 pt-2">
-                <div className="flex justify-between">
-                  <div className="h-4 w-20 bg-muted rounded" />
-                  <div className="h-4 w-20 bg-muted rounded" />
-                </div>
-
-                <div className="flex justify-between">
-                  <div className="h-6 w-24 bg-muted rounded" />
-                  <div className="h-6 w-24 bg-muted rounded" />
-                </div>
-
-                <div className="h-10 w-full bg-muted rounded-md" />
-              </div>
-            </div>
           </div>
         </div>
       </Container>
