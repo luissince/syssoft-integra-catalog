@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Mail, Phone, MapPin, Building2 } from "lucide-react"
+import { Mail, Phone, MapPin, Building2, MessageSquareMore } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -35,7 +35,7 @@ const consultDefault: Consult = {
 export default function ContactComponent() {
   const router = useRouter()
   const { branch, branches } = useBranch()
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState(branch.idBranch)
 
@@ -89,8 +89,16 @@ export default function ContactComponent() {
       />
 
       {/* Body */}
-      <div className="py-6">
-        <p className="text-muted-foreground text-center">
+      <div className="mx-auto mb-8 max-w-xl text-center mt-8 md:my-12">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <MessageSquareMore className="h-7 w-7" />
+        </div>
+
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+          Contacto
+        </h1>
+
+        <p className="mt-2 text-sm text-muted-foreground md:text-base">
           Estamos aquí para ayudarte con cualquier duda o problema que tengas
         </p>
       </div>

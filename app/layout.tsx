@@ -9,7 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/context/AuthContext"
-import { getBranches, getCompanyInfo, getCurrencyInfo, getWhatsappInfo } from "@/lib/api"
+import { getBranches, getCurrencyInfo, getWhatsappInfo } from "@/lib/api"
 import { WishlistProvider } from "@/context/WishlistContext"
 import { CurrencyProvider } from "@/context/CurrencyContext"
 import WhatsAppButton from "@/components/WhatsAppButton"
@@ -18,11 +18,11 @@ import Nav from "@/components/Nav"
 import Footer from "@/components/Footer"
 import { WhatsAppProvider } from "@/context/WhatsAppContext";
 import AuthSyncProvider from "@/components/AuthSyncProvider";
-import CartButton from "@/components/CartButton";
 import { CompanyProvider } from "@/context/CompanyContext";
 import { BranchProvider } from "@/context/BranchContext";
 import { LocationProvider } from "@/context/LocationContext";
 import Menu from "@/components/Menu";
+import { fetchCompanyInfo } from "@/data/data-rest";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,16 +43,21 @@ const mono = Roboto_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const company = await getCompanyInfo();
+    const { success, data, message } = await fetchCompanyInfo();
+
+    if (!success || !data) {
+      throw new Error(message)
+    }
+
 
     return {
-      title: company.name,
-      description: company.aboutUs,
+      title: data.legalName,
+      description: data.aboutUs,
       // keywords: restaurantData.restaurant.keywords,
       generator: "https://www.syssoftintegra.com/",
       icons: {
-        icon: company.icon,
-        apple: company.icon,
+        icon: data.icon,
+        apple: data.icon,
       }
     };
   } catch (error) {
@@ -86,14 +91,14 @@ export default async function RootLayout({
     branches,
     person
   ] = await Promise.all([
-    getCompanyInfo(),
+    fetchCompanyInfo(),
     getCurrencyInfo(),
     getWhatsappInfo(),
     getBranches(),
     getCurrentSession(),
   ]);
 
-  if (!company) {
+  if (!company.success || !company.data) {
     throw new Error("Company information not found");
   }
 
@@ -125,7 +130,7 @@ export default async function RootLayout({
         <AuthSyncProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
             <AuthProvider>
-              <CompanyProvider initialCompany={company}>
+              <CompanyProvider initialCompany={company.data}>
                 <BranchProvider initialBranches={branches}>
                   <CurrencyProvider initialCurrency={currency}>
                     <WhatsAppProvider initialWhatsapp={whatsapp}>

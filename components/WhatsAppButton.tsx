@@ -14,7 +14,7 @@ export default function WhatsAppButton() {
 
   const handleWhatsAppClick = () => {
     // const message = getDefaultMessage(restaurantData.restaurant.name);
-    const message = getDefaultMessage(company.name);
+    const message = getDefaultMessage(company.businessName);
     // handleWhatsapp(restaurantData.restaurant.whatsapp, message);
     handleWhatsapp(whatsapp.number, message);
   };

@@ -117,30 +117,10 @@ export const fetchCategories = async (): Promise<Category[]> => {
 };
 
 // Función para obtener la información de la empresa
-export const fetchCompanyInfo = async (): Promise<Company> => {
-  // Obtener los datos de la respuesta
-  const data = await apiFetch<any>(`${domainBase}/api/empresa/web/info`, {
+export const fetchCompanyInfo = async (): Promise<ApiResult<Company>> => {
+  return await apiRequestFetch<Company>(`${domainBase}/api/empresa/web/info`, {
     next: { revalidate: 0 }
   });
-
-  return {
-    aboutUs: data.acercaNosotros,
-    email: data.email,
-    information: data.informacion,
-    name: data.nombreEmpresa,
-    website: data.paginaWeb,
-    youtubePage: data.youTubePagina,
-    facebookPage: data.facebookPagina,
-    twitterPage: data.twitterPagina,
-    instagramPage: data.instagramPagina,
-    tiktokPage: data.tiktokPagina,
-    privacyPolicy: data.politicasPrivacidad,
-    icon: data.rutaIcon,
-    logo: data.rutaImage,
-    cover: data.rutaPortada,
-    banner: data.rutaBanner,
-    termsAndConditions: data.terminosCondiciones,
-  } as Company;
 }
 
 // Función para obtener los banners de la empresa
